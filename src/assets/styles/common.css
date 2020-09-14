@@ -1,0 +1,15 @@
+.menu{
+    display: inline-block;
+    padding:0 16px;
+    text-align: center;
+}
+
+.page {
+    height: 40px; 
+    line-height: 40px; 
+    text-align: right;
+    position: fixed;
+    bottom: 0;
+    right:0;
+    overflow: hidden;
+}
