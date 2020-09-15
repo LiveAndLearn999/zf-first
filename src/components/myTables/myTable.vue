@@ -5,6 +5,7 @@
  * @LastEditors: Please set LastEditors
  * @Description: the components of base-table
  * @FilePath: /shop/src/components/myTables/baseTable.vue
+ http://test-open-admin.ggjtaq.com/admin/index/admin.html
 -->
 <template>
       <div>
