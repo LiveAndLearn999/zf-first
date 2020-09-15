@@ -22,17 +22,29 @@ const Admin = () => import('../views/Admin.vue');
 const Echarts = () => import('../views/Admin/Echarts.vue');
 const Console = () => import('../views/Admin/Console.vue');
 const Shop = () => import('../views/Admin/Shop.vue');
+
+
 // 综合管理
 const Manage = () => import('../views/Amanage/Manage.vue');
 const Role   = () => import('../views/Amanage/Role.vue');
 const Work   = () => import('../views/Amanage/Work.vue');
 const Notice   = () => import('../views/Amanage/Notice.vue');
 const Order   = () => import('../views/Amanage/Order.vue');
+
+
 // 财务中心
 const Transaction   = () => import('../views/Bfinance/Transaction.vue');
 const Spaccount   = () => import('../views/Bfinance/Spaccount.vue');
 const Shoptran   = () => import('../views/Bfinance/Shoptran.vue');
 const Statistic   = () => import('../views/Bfinance/Statistic.vue');
+
+
+//车辆与设备
+const Vehequipment   = () => import('../views/Dvehicle/Vehequipment.vue');
+const Magequipment   = () => import('../views/Dvehicle/Magequipment.vue');
+const Simanage   = () => import('../views/Dvehicle/Simanage.vue');
+
+
 // 培训学习
 const Resource   = () => import('../views/Ctrain/Resource.vue');
 const Plain   = () => import('../views/Ctrain/Plain.vue');
@@ -228,6 +240,33 @@ const routes = [
                 }
             },
 
+            
+            {
+                path: 'vehicle_equipment/:menu_uuid',
+                component: Vehequipment,
+                meta: {
+                    rbac: 'logins',
+                    title: '车辆管理'
+                }
+            },
+            {
+                path: 'equipment_manage/:menu_uuid',
+                component: Magequipment,
+                meta: {
+                    rbac: 'logins',
+                    title: '设备管理'
+                }
+            },
+            {
+                path: 'sim_manage/:menu_uuid',
+                component: Simanage,
+                meta: {
+                    rbac: 'logins',
+                    title: 'Sim卡管理'
+                }
+            },
+
+
 
             {
                 path: 'customer/:menu_uuid',
@@ -400,4 +439,7 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
+
+// vehicle equipment
+//Vehequipment
 

@@ -1,12 +1,13 @@
 <!--
  * @Author: your name
- * @Date: 2020-09-10 17:38:37
- * @LastEditTime: 2020-09-15 10:15:19
+ * @Date: 2020-09-15 16:15:20
+ * @LastEditTime: 2020-09-15 17:12:37
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
- * @FilePath: /shop/src/views/Egoods/Goods.vue
+ * @FilePath: /shop/src/views/Dvehicle/Simanage.vue
 -->
 <template>
+    
     <div>
 
         <!-- 菜单 -->
@@ -37,18 +38,33 @@
                 </el-col>
             </el-row>
         </div>
-
+        
         <!-- <h6>{{cpname}}</h6> -->
-        <TableBase :loading="loading" :rows="rows" :columns="columns" @selRow="onSelectCurrRow"/>
+        <TableBase :loading="loading" :rows="rows" :columns="columns" @selRow="onSelectCurrRow" />
 
-        <!-- 添加 -->
+         <!-- 添加 -->
         <el-dialog  
             title="添加"
             :visible.sync="add_show"
             width="500px">
             <el-form :model="AddFormData" label-width="120px">
-                <el-form-item label="货物名称:" required>
-                    <el-input v-model="AddFormData.name" />
+                <el-form-item label="sim卡号:" required>
+                    <el-input v-model="AddFormData.sim" />
+                </el-form-item>
+                <el-form-item label="总流量:">
+                    <el-input v-model="AddFormData.netflow" />
+                </el-form-item>
+                <el-form-item label="采购额:">
+                    <el-input v-model="AddFormData.sim_purchase" />
+                </el-form-item>
+                <el-form-item label="采购时间:">
+                    <el-input v-model="AddFormData.sim_purchase_time" />
+                </el-form-item>
+                <el-form-item label="剩余流量:">
+                    <el-input v-model="AddFormData.able_flow" />
+                </el-form-item>
+                <el-form-item label="使用状态:">
+                    <el-input v-model="AddFormData.use_status" />
                 </el-form-item>
             </el-form>
 
@@ -58,15 +74,29 @@
             </span>
         </el-dialog>
 
-
         <!-- 编辑-->
         <el-dialog  
             title="编辑"
             :visible.sync="edit_show"
             width="500px">
             <el-form :model="EditFormData" label-width="120px">
-                <el-form-item label="货物名称:">
-                    <el-input v-model="EditFormData.name" />
+                <el-form-item label="sim卡号:" required>
+                    <el-input v-model="EditFormData.sim" />
+                </el-form-item>
+                <el-form-item label="总流量:">
+                    <el-input v-model="EditFormData.netflow" />
+                </el-form-item>
+                <el-form-item label="采购额:">
+                    <el-input v-model="EditFormData.sim_purchase" />
+                </el-form-item>
+                <el-form-item label="采购时间:">
+                    <el-input v-model="EditFormData.sim_purchase_time" />
+                </el-form-item>
+                <el-form-item label="剩余流量:">
+                    <el-input v-model="EditFormData.able_flow" />
+                </el-form-item>
+                <el-form-item label="使用状态:">
+                    <el-input v-model="EditFormData.use_status" />
                 </el-form-item>
             </el-form>
 
@@ -76,18 +106,14 @@
             </span>
         </el-dialog>
 
-         <!-- 详细 -->
+        <!-- 充值 -->
         <el-dialog  
-            title=""
-            :visible.sync="detail_show"
+            title="充值"
+            :visible.sync="charge_show"
             width="500px">
-            <el-form :model="DetailFormData" label-width="120px">
-                <el-form-item label="货物名称:">{{DetailFormData.name}}</el-form-item>
-                <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
-                <el-form-item label="修改时间:">{{DetailFormData.last_time}}</el-form-item>
-            </el-form>
+            <div style="width: 100%;height: 300px;background: lightgray"></div>
         </el-dialog>
-
+    
     </div>
 </template>
 <script>
@@ -95,13 +121,14 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-    import { EbGoodList, EbGoodAdd, EbGoodEdit, EbGoodDel, EbGoodDetail } from "@/api/request"
+    import { ShopSimList, ShopSimAdd, ShopSimEdit, ShopSimDel } from "@/api/request"
     import TableBase from "@/components/myTables/baseTable.vue"
 
-    if (!store.state.EbGoodData) {
-        Vue.set(store.state, 'EbGoodData', {
+    if (!store.state.SimanageData) {
+        Vue.set(store.state, 'SimanageData', {
             rows:[],
             total:0,
+            charge_show: false,
             loading:false,
             curr_row:null,
              // 添加
@@ -115,15 +142,25 @@
             //编辑
             edit_show:false,
             EditFormData:{},
+
+            SearchFormData:{
+                page_num:1,
+                page_len:10
+            },
             //表格数据
             rows: [],
             //表头设置
             columns: [
-                {prop: 'name', label: '货物名称'},
+                {prop: 'able_flow', label: '剩余流量'},
                 {prop: 'add_time', label: '添加时间'},
-                {prop: 'last_time', label: '修改时间'}
+                {prop: 'last_time', label: '结束时间'},
+                {prop: 'netflow', label: '总流量'},
+                {prop: 'sim', label: 'sim卡号'},
+                {prop: 'sim_purchase', label: '采购金额'},
+                {prop: 'use_status', label: '使用状态'},
+                {prop: 'netflow', label: '总流量'}
             ],
-            cpname: '货物管理--api 平台未找到相关接口',
+            cpname: 'Sim卡管理',
 
         });
     }
@@ -133,12 +170,15 @@
             TableBase
         },
         data() {
-            return store.state.EbGoodData;
+            return store.state.SimanageData
         },
         created() {
-                this.init()
+            this.init()
         },
         methods: {
+            change(e) {
+                this.$forceUpdate()
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
@@ -148,7 +188,7 @@
                 let pam = {
                     login_token:lime.cookie_get('login_token')
                 }
-                EbGoodList(pam, res => {
+                ShopSimList(pam, res => {
                     this.loading = false;
                     this.rows = res.data.rows;
                     this.total = res.data.total;
@@ -168,26 +208,30 @@
             },
             // 点击单选
             onSelectCurrRow(row) {
-                // console.log(111111)
-                // console.log(row)
                 this.curr_row = row;
-
             },
-            // 添加
+            //添加
             handleAdd() {
                 this.add_show = true
             },
             onAddSubmit() {
-                let pam = {
-                    login_token:lime.cookie_get('login_token'),
-                    name: this.AddFormData.name
-                }
-                EbGoodAdd(pam, res => {
+                this.AddFormData.login_token = lime.cookie_get('login_token')
+                let pam = this.AddFormData
+                ShopSimAdd(pam, res => {
                     this.init();
                     this.add_show = false;
                 }).catch(err => {
                     this.$message.error(err.msg);
                 })
+            },
+            handleEdit() {
+                if (util.empty(this.curr_row)) {
+                    this.$message.error('请选择一条数据');
+                    return false;
+                }
+                this.EditFormData.type_name = this.curr_row.type_name;
+                this.EditFormData.uuid = this.curr_row.uuid;
+                this.edit_show = true
             },
             //删除
             handleDel() {
@@ -200,7 +244,7 @@
                         login_token:lime.cookie_get('login_token'),
                         uuid: this.curr_row.uuid
                     }
-                    EbGoodDel(pam, res => {
+                    ShopSimDel(pam, res => {
                         this.init();
                         this.$message.success('操作成功');
                     }).catch(err => {
@@ -208,51 +252,24 @@
                     })
                 })
             },
-            // 编辑
-            handleEdit() {
-                if (util.empty(this.curr_row)) {
-                    this.$message.error('请选择一条数据');
-                    return false;
-                }
-                this.EditFormData.name = this.curr_row.name;
-                this.EditFormData.uuid = this.curr_row.uuid;
-                this.edit_show = true
-            },
+            //编辑
             onEditSubmit() {
-                let pam = {
-                   login_token: lime.cookie_get('login_token'),
-                   uuid: this.EditFormData.uuid,
-                   name: this.EditFormData.name
-               }
-                EbGoodEdit(pam, res => {
+                this.EditFormData.login_token = lime.cookie_get('login_token')
+                let pam = this.EditFormData
+                ShopSimEdit(pam, res => {
                    this.init();
                    this.edit_show = false;
                 }).catch(err => {
                     this.$message.error(err.msg);
                 })
             },
-            handleDetail() {
-                if (util.empty(this.curr_row)) {
-                    this.$message.error('请选择一条数据');
-                    return false;
-                }
-                let pam = {
-                    login_token: lime.cookie_get('login_token'),
-                    uuid: this.curr_row.uuid
-                }
-                EbGoodDetail(pam, res => {
-                    this.DetailFormData = res.data
-                    this.detail_show = true
-                }).catch(err => {
-                    this.$message.error(err.msg);
-                })
-                // this.detail_show = true
+            handleStreamRecharge() {
+                this.charge_show = true
             }
         }
         
     }
 </script>
-
 <style scoped>
-   @import '../../assets/styles/common.css'; 
+    @import '../../assets/styles/common.css'; 
 </style>

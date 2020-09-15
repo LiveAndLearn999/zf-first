@@ -1,14 +1,44 @@
 <!--
  * @Author: xk
  * @Date: 2020-09-14 09:26:53
- * @LastEditTime: 2020-09-15 09:55:12
+ * @LastEditTime: 2020-09-15 18:35:30
  * @LastEditors: Please set LastEditors
  * @Description: the components of base-table
  * @FilePath: /shop/src/components/myTables/baseTable.vue
 -->
 <template>
-    
-       <div style="border-top: solid 1px #f2f1f4;">
+      <div>
+
+           <!-- 菜单 -->
+        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+            <el-row>
+                <el-col :span="6">
+                    <div style="padding-left:16px;">
+                        <i class="el-icon-s-unfold"></i>
+                        <span style="padding-left:9px;">
+                            {{$store.state.AdminData.active_title}}
+                        </span>
+                    </div>
+                </el-col>
+
+                <el-col :span="18">
+                    <div style="text-align: right; ">
+                        <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
+                        <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
+
+                        <el-link
+                            class="menu" 
+                            @click="onSubMenu(item)"
+                            v-for="(item,index) in $store.state.AdminData.right_menus" 
+                            :key="index">
+                            {{item.name}}
+                        </el-link>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+
+        <div style="border-top: solid 1px #f2f1f4;">
             <el-table 
                 :data="rows"
                 :height="height - 60 - 46 - 48"
@@ -37,6 +67,9 @@
                 </el-pagination>
             </div>
         </div> 
+
+      </div>
+       
      
 </template>
 
@@ -53,8 +86,8 @@ export default {
     columns: {type: Array, default: () => []},
     onSortChange: {type: Function, default: () => () => {console.log(11111)}},
     // onSelectRow: {type: Function, default: () => () => {console.log(22222)}},
-    page_num: {type: Number, default: () => 1},
-    onPageChange: {type: Function, default: () => () => {console.log(33333)}},
+    // page_num: {type: Number, default: () => 1},
+    // onPageChange: {type: Function, default: () => () => {console.log(33333)}},
     total: {type: Number, default: () => 1},
     loading: {type: Boolean, default: () => false},
     // onSubMenu: {type: Function, default: () => () => {console.log(99999)}}
@@ -70,11 +103,20 @@ export default {
    },
    methods: {
        onSelectRow(row) {
-        //    console.log(2222)
-        //    console.log(row)
-        //    console.log(3333)
            this.$emit('selRow', row)
-       }
+       },
+       onSubMenu(menu, local = false) {
+                util.submenu(menu,this,lime.cookie_get('login_token'), local);
+      },
+      onRefresh() {
+          this.$emit('onref')
+      },
+      handleAdd() {
+          this.$emit('handleAdd')
+      },    
+      onPageChange(page) {
+          this.$emit('pageChange', page)
+      }
    }
   };
 </script>
