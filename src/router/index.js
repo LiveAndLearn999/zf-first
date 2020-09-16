@@ -71,6 +71,9 @@ const Dangertmp   = () => import('../views/Gtrack/Dangertmp.vue');
 const Information   = () => import('../views/Isetting/Information.vue');
 const Shopset   = () => import('../views/Isetting/Shopset.vue');
 const Help   = () => import('../views/Isetting/Help.vue');
+//关联企业
+const Enterprise   = () => import('../views/Krelation/Enterprise.vue');
+
 
 
 const routes = [
@@ -385,6 +388,17 @@ const routes = [
                 meta: {
                     rbac: 'logins',
                     title: '使用帮助'
+                }
+            },
+
+
+
+            {
+                path: 'relation_enterprise/:menu_uuid',
+                component: Enterprise,
+                meta: {
+                    rbac: 'logins',
+                    title: '企业列表'
                 }
             },
 

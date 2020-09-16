@@ -362,7 +362,7 @@
                 {
                     module:'ShopRoleSetMenu',
                     ver:'1.0.0',
-                    relation_module:'ShopRoleList',
+                    relation_module:'ShopMenuList',
                     relation_ver:'1.0.0'
                 },
                 {
@@ -379,7 +379,7 @@
                     lime.req({
                         module:'ShopRoleSetMenu',
                         ver:'1.0.0',
-                        relation_module:'ShopRoleList',
+                        relation_module:'ShopMenuList',
                         relation_ver:'1.0.0'
                     }, {
                         login_token:lime.cookie_get('login_token'),

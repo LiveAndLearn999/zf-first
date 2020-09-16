@@ -1,7 +1,7 @@
 <!--
  * @Author:  xk
  * @Date: 2020-09-09 14:31:39
- * @LastEditTime: 2020-09-14 15:22:25
+ * @LastEditTime: 2020-09-16 16:40:32
  * @LastEditors: Please set LastEditors
  * @Description: 与平台交易
  * @FilePath: /shop/src/views/Admin/Transaction.vue
@@ -69,12 +69,19 @@
             </div>
         </div>
 
-        <!-- 详情模板 -->
-        <el-dialog  
-            title="详情"
-            :visible.sync="detail_show"
-            width="500px">
-            <h1>dddd</h1>
+        <!-- 详细 -->
+        <el-dialog 
+            title=""
+            width="450px"
+            :visible.sync="detail_show">
+            <el-form :model="DetailFormData" label-width="120px">
+                <el-form-item label="交易类型:">{{DetailFormData.trade_type || '----'}}</el-form-item>
+                <el-form-item label="关联交易编码:">{{DetailFormData.trade || '----'}}</el-form-item>
+                <el-form-item label="交易金额:">{{DetailFormData.trade_money || '----'}}</el-form-item>
+                <el-form-item label="记录时间:">{{DetailFormData.add_time || '----'}}</el-form-item>
+                <el-form-item label="记录ip:">{{DetailFormData.add_ip || '----'}}</el-form-item>
+                <el-form-item label="备注:">{{DetailFormData.remark || '----'}}</el-form-item>
+            </el-form>
         </el-dialog>
 
     </div>
@@ -101,7 +108,8 @@
                 order_field:'add_time',
                 order_sort:'desc'
             },
-            detail_show:false
+            detail_show:false,
+            DetailFormData: {}
         });
     }
 
@@ -128,7 +136,6 @@
             // 数据初始化
             init() {
                 this.loading = true;
-
                 lime.req('ShopManageTradeList', {
                     login_token:lime.cookie_get('login_token'),
                     page_num:this.SearchFormData.page_num,
@@ -179,6 +186,7 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
+                this.DetailFormData = this.curr_row
                 this.detail_show = true
             }
         }

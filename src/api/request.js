@@ -1,7 +1,7 @@
 /*
  * @Author: xk
  * @Date: 2020-09-11 16:51:53
- * @LastEditTime: 2020-09-15 18:07:11
+ * @LastEditTime: 2020-09-16 17:28:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/api/request.js
@@ -27,7 +27,24 @@ export const workOrderEdit = (params, callback) => { return lime.req("ShopWorkOr
 
 // 财务中心-资金账户-账户列表
 export const ShopAccountList = (params, callback) => { return lime.req("ShopAccountDetails", params).then(callback)};
+// 财务中心-资金账户-账户详细
+export const ShopAccountDetail = (params, callback) => { return lime.req("ShopAccountDetail", params).then(callback)};
 
+
+// 车辆与设备-车辆管理-列表
+export const ShopVehExtendList = (params, callback) => { return lime.req("ShopVehExtendList", params).then(callback)};
+// 车辆与设备-车辆管理-添加
+export const ShopVehExtendAdd = (params, callback) => { return lime.req("ShopVehExtendAdd", params).then(callback)};
+// 车辆与设备-车辆管理-删除
+export const ShopVehExtendDel = (params, callback) => { return lime.req("ShopVehExtendDel", params).then(callback)};
+// 车辆与设备-车辆管理-编辑
+export const ShopVehExtendEdit = (params, callback) => { return lime.req("ShopVehExtendEdit", params).then(callback)};
+// 车辆与设备-车辆管理-详细
+export const ShopVehExtendDetail = (params, callback) => { return lime.req("ShopVehExtendDetail", params).then(callback)};
+// 车辆与设备-车辆管理-车辆与设备绑定
+export const ShopVehExtendBind = (params, callback) => { return lime.req("ShopVehExtendBind", params).then(callback)};
+// 车辆与设备-车辆管理-车辆与设备解绑
+export const ShopVehExtendUnbind = (params, callback) => { return lime.req("ShopVehExtendUnbind", params).then(callback)};
 // 车辆与设备-Sim卡管理-列表
 export const ShopSimList = (params, callback) => { return lime.req("ShopSimList", params).then(callback)};
 // 车辆与设备-Sim卡管理-添加
@@ -98,3 +115,10 @@ export const EbGoodsTypeDetail = (params, callback) => { return lime.req("EbGood
 export const ShopChildList = (params, callback) => { return lime.req("ShopChildList", params).then(callback)};
 // 子企业-企业列表-详细
 export const ShopChildDetail = (params, callback) => { return lime.req("ShopChildDetail", params).then(callback)};
+
+
+
+// 关联企业-企业列表-列表
+export const ShopAgentShopList = (params, callback) => { return lime.req("ShopAgentShopList", params).then(callback)};
+// 关联企业-企业列表-详细
+export const ShopAgentShopDetail = (params, callback) => { return lime.req("ShopAgentShopDetail", params).then(callback)};

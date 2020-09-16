@@ -1,11 +1,10 @@
 <!--
  * @Author: xk
  * @Date: 2020-09-14 09:26:53
- * @LastEditTime: 2020-09-15 18:35:30
+ * @LastEditTime: 2020-09-16 17:53:45
  * @LastEditors: Please set LastEditors
  * @Description: the components of base-table
  * @FilePath: /shop/src/components/myTables/baseTable.vue
- http://test-open-admin.ggjtaq.com/admin/index/admin.html
 -->
 <template>
       <div>
@@ -87,12 +86,22 @@ export default {
     columns: {type: Array, default: () => []},
     onSortChange: {type: Function, default: () => () => {console.log(11111)}},
     // onSelectRow: {type: Function, default: () => () => {console.log(22222)}},
-    // page_num: {type: Number, default: () => 1},
+    page_nums: {type: Number, default: () => 1},
     // onPageChange: {type: Function, default: () => () => {console.log(33333)}},
     total: {type: Number, default: () => 1},
     loading: {type: Boolean, default: () => false},
     // onSubMenu: {type: Function, default: () => () => {console.log(99999)}}
     // columns: { ype: Array, default: () => [] }
+  },
+  data() {
+      return {
+          page_num: this.page_nums
+      }
+  },
+  watch: {
+     page_nums(val) {
+         this.page_num = val;
+     }
   },
   computed:{
         width:() => {
@@ -114,7 +123,22 @@ export default {
       },
       handleAdd() {
           this.$emit('handleAdd')
-      },    
+      }, 
+      handleDel() {
+          this.$emit('handleDel')
+      },
+      handleDetail() {
+          this.$emit('handleDetail')
+      },
+      handleEdit() {
+          this.$emit('handleEdit')
+      },
+      handleBindSim() {
+          this.$emit('handleBindSim')
+      },
+      handleLookPath() {
+          this.$emit('handleLookPath')
+      },
       onPageChange(page) {
           this.$emit('pageChange', page)
       }

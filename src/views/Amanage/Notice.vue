@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 11:07:57
- * @LastEditTime: 2020-09-11 17:50:04
+ * @LastEditTime: 2020-09-16 16:05:31
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Amanage/Notice.vue
@@ -55,6 +55,15 @@
                 </el-table-column>
                 <el-table-column prop="is_show" label="显示"></el-table-column>
             </el-table>
+
+            <div class="page" :style="{width:width - 250 + 'px'}">
+                <el-pagination
+                    :current-page.sync="SearchFormData.page_num"
+                    @current-change="onPageChange"
+                    layout="prev, pager, next"
+                    :total="total">
+                </el-pagination>
+            </div>
         </div>
 
         <!-- 添加 -->
@@ -74,7 +83,16 @@
                     <input type="file" @change="getImg">
                 </el-form-item> -->
                 <el-form-item label="状态:" required>
-                    <el-input v-model="AddFormData.state" />
+                    <!-- <el-input v-model="AddFormData.state" /> -->
+                    <!-- <el-switch v-model="AddFormData.state"></el-switch> -->
+                    <!-- <el-radio v-model="AddFormData.state" label="-1">作废</el-radio>
+                    <el-radio v-model="AddFormData.state" label="0">待审</el-radio>
+                    <el-radio v-model="AddFormData.state" label="1">已审</el-radio> -->
+                    <el-radio-group v-model="AddFormData.state">
+                        <el-radio :label="-1">作废</el-radio>
+                        <el-radio :label="0">待审</el-radio>
+                        <el-radio :label="1">已审</el-radio>
+                    </el-radio-group>
                 </el-form-item>
                  <!-- <el-form-item label="显示:">
                     <el-switch v-model="AddFormData.is_show"></el-switch>
@@ -95,14 +113,23 @@
             :visible.sync="edit_show">
             <el-form :model="EditFormData" label-width="80px">
 
-                <el-form-item label="标题:" required>
+                <el-form-item label="标题:">
                     <el-input v-model="EditFormData.title" @input="change($event)"/>
                 </el-form-item>
-                <el-form-item label="内容:" required>
+                <el-form-item label="内容:">
                     <el-input type="textarea" v-model="EditFormData.content" @input="change($event)"></el-input>
                 </el-form-item>
-                <el-form-item label="状态:" required>
-                    <el-input v-model="EditFormData.state" @input="change($event)"/>
+                <el-form-item label="状态:">
+                    <!-- <el-input v-model="EditFormData.state" @input="change($event)"/> -->
+                    <!-- <el-radio v-model="EditFormData.state" label="-1">作废</el-radio>
+                    <el-radio v-model="EditFormData.state" label="0">待审</el-radio>
+                    <el-radio v-model="EditFormData.state" label="1">已审</el-radio> -->
+                    <el-radio-group v-model="EditFormData.state">
+                        <el-radio :label="-1">作废</el-radio>
+                        <el-radio :label="0">待审</el-radio>
+                        <el-radio :label="1">已审</el-radio>
+                    </el-radio-group>
+                    <!-- <el-switch v-model="EditFormData.state"></el-switch> -->
                 </el-form-item>
 
             </el-form>
@@ -121,7 +148,7 @@
             <el-form  label-width="80px">
                 <el-form-item label="标题:">{{DetailFormData.title}}</el-form-item>
                 <el-form-item label="内容:">{{DetailFormData.content}}</el-form-item>
-                <el-form-item label="状态:">{{DetailFormData.state}}</el-form-item>
+                <el-form-item label="状态:">{{DetailFormData.state == 0 ? '待审' : (DetailFormData.state == 1 ? '已审' : '作废')}}</el-form-item>
             </el-form>
         </el-dialog>
 
@@ -158,7 +185,9 @@
             AddFormData:{},
             // 编辑
             edit_show:false,
-            EditFormData:{},
+            EditFormData:{
+                state: 0
+            },
             //删除
             delete_show: false,
             //详细
@@ -229,6 +258,11 @@
             onSelectCurrRow(row) {
                 this.curr_row = row;
             },
+            // 分页处理
+            onPageChange(page){
+                this.SearchFormData.page_num = page;
+                this.init();
+            },
             // 添加,
             handleAdd() {
                 this.add_show = true;
@@ -236,10 +270,11 @@
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
                 let pam = {
-                    content: "add测试",
-                    title: "测试",
-                    login_token: "2460bd0cc450b26b2d12e536b64db657",
-                    state: (0 - 0)
+                    content: this.AddFormData.content,
+                    title: this.AddFormData.title,
+                    login_token: this.AddFormData.login_token,
+                    // state: this.AddFormData.state ? 1 : 0?
+                    state: this.AddFormData.state 
                 }
                 noticeAdd(pam,res => {
                    this.init();

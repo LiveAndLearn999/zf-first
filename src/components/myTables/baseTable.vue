@@ -1,7 +1,7 @@
 <!--
  * @Author: xk
  * @Date: 2020-09-14 09:26:53
- * @LastEditTime: 2020-09-15 09:55:12
+ * @LastEditTime: 2020-09-16 16:18:13
  * @LastEditors: Please set LastEditors
  * @Description: the components of base-table
  * @FilePath: /shop/src/components/myTables/baseTable.vue
@@ -53,12 +53,17 @@ export default {
     columns: {type: Array, default: () => []},
     onSortChange: {type: Function, default: () => () => {console.log(11111)}},
     // onSelectRow: {type: Function, default: () => () => {console.log(22222)}},
-    page_num: {type: Number, default: () => 1},
-    onPageChange: {type: Function, default: () => () => {console.log(33333)}},
+    page_nums: {type: Number, default: () => 1},
+    // onPageChange: {type: Function, default: () => () => {console.log(33333)}},
     total: {type: Number, default: () => 1},
     loading: {type: Boolean, default: () => false},
     // onSubMenu: {type: Function, default: () => () => {console.log(99999)}}
     // columns: { ype: Array, default: () => [] }
+  },
+  data() {
+      return {
+          page_num: this.page_nums
+      }
   },
   computed:{
         width:() => {
@@ -68,13 +73,18 @@ export default {
             return store.state.AppData.height;
         }
    },
+   watch: {
+     page_nums(val) {
+         this.page_num = val;
+     }
+  },
    methods: {
        onSelectRow(row) {
-        //    console.log(2222)
-        //    console.log(row)
-        //    console.log(3333)
            this.$emit('selRow', row)
-       }
+       },
+       onPageChange(page) {
+          this.$emit('pageChange', page)
+      }
    }
   };
 </script>

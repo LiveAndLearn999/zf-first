@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:35:35
- * @LastEditTime: 2020-09-14 17:33:51
+ * @LastEditTime: 2020-09-16 17:05:20
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Egoods/Electronic.vue
@@ -145,7 +145,7 @@
             :append-to-body="true"
             :visible.sync="detail_show">
              <div slot="title">详细</div>
-             <div style="width: 100%;height: 54%;overflow: auto;border: 1px solid red">
+             <div style="width: 100%;height: 52%;overflow: auto;">
                     <el-form label-width="160px">
                         <el-form-item label="托运人名称:">
                             {{DetailFormData.consignor}}

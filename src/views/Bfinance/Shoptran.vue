@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:13:58
- * @LastEditTime: 2020-09-11 14:54:41
+ * @LastEditTime: 2020-09-16 16:58:05
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Bfinance/Shoptran.vue
@@ -72,15 +72,18 @@
 
         <!-- 详情模板 -->
         <el-dialog  
-            title="详情"
+            title=""
             :visible.sync="detail_show"
             width="500px">
-            <h1>dddd</h1>
-
-            <!-- <span slot="footer">
-                <el-button @click="detail_show = false">取消</el-button>
-                <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span> -->
+            <el-form  label-width="120px">
+                <el-form-item label="交易类型:">{{DetailFormData.trade_type}}</el-form-item>
+                <el-form-item label="交易编号:">{{DetailFormData.trade_code}}</el-form-item>
+                <el-form-item label="交易状态:">{{DetailFormData.trade_state}}</el-form-item>
+                <el-form-item label="学币数:">{{DetailFormData.coins}}</el-form-item>
+                <el-form-item label="交易金额:">{{DetailFormData.trade_money}}</el-form-item>
+                <el-form-item label="交易备注:">{{DetailFormData.remark}}</el-form-item>
+                <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
+            </el-form>
         </el-dialog>
 
     </div>
@@ -106,7 +109,8 @@
                 order_field:'add_time',
                 order_sort:'desc'
             },
-            detail_show:false
+            detail_show:false,
+            DetailFormData: {}
         });
     }
     export default {
@@ -183,6 +187,7 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
+                this.DetailFormData = this.curr_row
                 this.detail_show = true
             }
         }

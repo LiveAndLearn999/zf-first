@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:05:37
- * @LastEditTime: 2020-09-14 15:00:37
+ * @LastEditTime: 2020-09-16 16:29:47
  * @LastEditors: Please set LastEditors
  * @Description: 工单管理
  * @FilePath: /shop/src/views/Amanage/Order.vue
@@ -38,7 +38,7 @@
             </el-row>
         </div>
         <!-- <h6>{{cpname}}</h6> -->
-        <TableBase :loading="loading" :rows="rows" :columns="columns" :onRefresh="onRefresh"/>
+        <TableBase :loading="loading" :rows="rows" :columns="columns" :page_num="page_num" :total="total" @selRow="onSelectCurrRow" @pageChange="onPageChange" :onRefresh="onRefresh"/>
         <!-- 添加 -->
         <el-dialog  
             title="添加"
@@ -122,11 +122,13 @@
         Vue.set(store.state, 'OrderData', {
             rows:[],
             total:0,
+            page_num:1,
+            page_len:10,
             loading:false,
             curr_row:null,
              // 添加
             add_show:false,
-            AddFormData:{},
+            AddFormData:{}, 
             //详细
             detail_show: false,
             DetailFormData:{},
@@ -190,6 +192,15 @@
             onRefresh() {
                 this.init();
             },
+            // 点击单选
+            onSelectCurrRow(row) {
+                this.curr_row = row;
+            },
+            // 分页处理
+            onPageChange(page){
+                this.page_num = page;
+                this.init();
+            },
             //添加
             handleAdd() {
                 this.add_show = true
@@ -239,6 +250,7 @@
                     this.$message.error('请选择一条数据');
                     return false;
                 }
+                this.EditFormData = this.curr_row
                 this.edit_show = true
             },
             onEditSubmit() {
@@ -262,6 +274,7 @@
                     this.$message.error('请选择一条数据');
                     return false;
                 }
+                this.DetailFormData = this.curr_row
                 this.detail_show = true
             }
         }

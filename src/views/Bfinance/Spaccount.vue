@@ -1,7 +1,7 @@
 <!--
  * @Author: xk
  * @Date: 2020-09-09 14:21:35
- * @LastEditTime: 2020-09-14 15:19:40
+ * @LastEditTime: 2020-09-16 16:51:05
  * @LastEditors: Please set LastEditors
  * @Description: 资金账户
  * @FilePath: /shop/src/views/Admin/Spaccount.vue
@@ -54,7 +54,7 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-    import { ShopAccountList} from "@/api/request"
+    import { ShopAccountList, ShopAccountDetail} from "@/api/request"
     import TableBase from "@/components/myTables/baseTable.vue"
 
     if (!store.state.SpaccountData) {
@@ -103,6 +103,19 @@
             // 数据初始化
             init() {
                 this.loading = true;
+                //  lime.req({
+                //         module:'ShopAccountDetails',
+                //         ver:'1.0.0',
+                //         relation_module:'CommShopList',
+                //         relation_ver:'1.0.0'
+                //     }, {
+                //         login_token:lime.cookie_get('login_token'),
+                //         city_uuid: 1001
+                     
+                //     }).then( res => {
+                //         console.log(res)
+                //     })
+
                 let pam = {
                     login_token:lime.cookie_get('login_token')
                 }

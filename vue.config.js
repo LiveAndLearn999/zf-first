@@ -7,7 +7,9 @@ module.exports = {
         //     }
         // },
         externals: {
-            Lime:'Lime'
+            Lime:'Lime',
+            'AMap': 'AMap' // 高德地图配置
+            // "BMap": "BMap"
         }
     }
 }
