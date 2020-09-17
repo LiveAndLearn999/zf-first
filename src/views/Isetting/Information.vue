@@ -112,6 +112,7 @@ if (!store.state.GetShopConfigData) {
     all_uuid: [],
     check_uuid: [],
     allCheck: [],
+
     
   })
 }
@@ -176,11 +177,11 @@ export default {
       this.ready_uuid = []
       if(row) {
         row.role_list.forEach((item, index) => {
-        this.ready_uuid.push(item.role_uuid)
-      })
+          this.ready_uuid.push(item.role_uuid)
+        })
+        this.role_type = row.config_key
       }
-      // this.ready_uuid = [...row.role_list.role_uuid]
-      console.log(this.ready_uuid)
+      // console.log(row.config_key)
     },
     // 分页处理
     onPageChange (page) {
@@ -222,8 +223,9 @@ export default {
             this.check_uuid.push(item.uuid)
         }
       })
-      console.log(this.check_uuid)
       this.EditFormData.login_token = lime.cookie_get('login_token')
+      let that = this
+      console.log("=====" + this.role_type)
       lime.req(
                 {
                     module:'SetShopSave',
@@ -233,7 +235,7 @@ export default {
                 },
                 {
                     login_token:lime.cookie_get('login_token'),
-                    driver:this.check_uuid
+                    [that.role_type]:this.check_uuid
                 }).then(res => {
                   this.edit_show = false
                   this.init()
