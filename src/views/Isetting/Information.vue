@@ -48,13 +48,10 @@
         size="mini"
       >
         <el-table-column prop="name" label="名称"  />
-        <!-- <el-table-column prop="role_name" label="角色"> -->
-            
-        <el-table-column prop="role_list" label="角色">
+        <el-table-column label="角色">
             <template slot-scope="scope">
-                <span v-for="item in scope.row.role_list" :key="item.id" style="display: inline-block;padding-right:30px">{{item.name}}</span>
+                <span v-for="(item, index) in rows[scope.$index].role_list" :key="index" style="display: inline-block;padding-right:30px">{{scope.row.role_list[index].name}}</span>
              </template>
-          <!--  -->
         </el-table-column>
       </el-table>
 
@@ -70,17 +67,11 @@
 
     <!-- 编辑 -->
     <el-dialog title="编辑" width="650px" :visible.sync="edit_show">
-      <el-form :model="EditFormData" label-width="80px" class="dialog-box">
         <div>
-          <el-checkbox
-            style="margin-bottom:30px;"
-            v-for="item in EditFormData.allCheck"
-            v-bind:key="item.id"
-            :label="item.name"
-          ></el-checkbox>
+          <el-checkbox-group v-model="checkedAry">
+            <el-checkbox v-for="item in all_uuid" :label="item" :key="item"></el-checkbox>
+          </el-checkbox-group>
         </div>
-      </el-form>
-
       <span slot="footer">
         <el-button @click="edit_show = false">取消</el-button>
         <el-button type="primary" @click="onEditSubmit">保存</el-button>
@@ -115,8 +106,12 @@ if (!store.state.GetShopConfigData) {
     edit_rows: [],
     EditFormData: {},
 
-
+    ready_uuid: [],
     role_type: 'auditor',
+    checkedAry: [],
+    all_uuid: [],
+    check_uuid: [],
+    allCheck: [],
     
   })
 }
@@ -155,10 +150,10 @@ export default {
     // 数据初始化
     init () {
       this.loading = true
-
       lime.req('SetShopDetail', {
         login_token: lime.cookie_get('login_token')
       }).then(res => {
+        console.log(res.data)
         this.loading = false
         this.rows = res.data.config
         this.total = this.rows.length
@@ -176,7 +171,16 @@ export default {
 
     // 选择单行
     onSelectRow (row) {
+      console.log(row)
       this.curr_row = row
+      this.ready_uuid = []
+      if(row) {
+        row.role_list.forEach((item, index) => {
+        this.ready_uuid.push(item.role_uuid)
+      })
+      }
+      // this.ready_uuid = [...row.role_list.role_uuid]
+      console.log(this.ready_uuid)
     },
     // 分页处理
     onPageChange (page) {
@@ -191,14 +195,49 @@ export default {
         return
       }
       ShopRoleList({login_token: lime.cookie_get('login_token')},res => {
-         this.EditFormData.allCheck = res.data
+         this.allCheck = res.data
+         this.checkedAry = []
+         this.all_uuid = []
+         res.data.forEach((item, index) => { 
+          if(this.ready_uuid.includes(item.uuid, 0)) {
+            this.checkedAry.push(item.name)
+            this.all_uuid.push(item.name)
+          }else {
+            this.all_uuid.push(item.name)
+          }
+
+         })
+         // check_uuid: [],
+         // allCheck: [],
          this.edit_show = true
       })
       // this.edit_show = true
     },
     // 保存编辑提交
     onEditSubmit () {
+      console.log(this.checkedAry)
+      this.check_uuid = []
+      this.allCheck.forEach((item, index) => {
+        if(this.checkedAry.includes(item.name, 0)) {
+            this.check_uuid.push(item.uuid)
+        }
+      })
+      console.log(this.check_uuid)
       this.EditFormData.login_token = lime.cookie_get('login_token')
+      lime.req(
+                {
+                    module:'SetShopSave',
+                    ver:'1.0.0',
+                    relation_module:'ShopRoleList',
+                    relation_ver:'1.0.0'
+                },
+                {
+                    login_token:lime.cookie_get('login_token'),
+                    driver:this.check_uuid
+                }).then(res => {
+                  this.edit_show = false
+                  this.init()
+                })
       
     },
   }
