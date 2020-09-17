@@ -53,26 +53,51 @@ const Study   = () => import('../views/Ctrain/Study.vue');
 const Question   = () => import('../views/Ctrain/Question.vue');
 const Template   = () => import('../views/Ctrain/Template.vue');
 const Group   = () => import('../views/Ctrain/Group.vue');
+
+
 // 货物与运单
 const Customer   = () => import('../views/Egoods/Customer.vue');
 const Electronic   = () => import('../views/Egoods/Electronic.vue');
 const Goods   = () => import('../views/Egoods/Goods.vue');
 const Pack   = () => import('../views/Egoods/Pack.vue');
 const Type   = () => import('../views/Egoods/Type.vue');
+
+
 // 子企业
 const Cshop   = () => import('../views/Fsubsidiary/Cshop.vue');
 const  fStatistic   = () => import('../views/Fsubsidiary/Statistic.vue');
 const Verhcile   = () => import('../views/Fsubsidiary/Verhcile.vue');
 const Cstaff   = () => import('../views/Fsubsidiary/Cstaff.vue');
+
+
 // 隐患追踪
 const Danger   = () => import('../views/Gtrack/Danger.vue');
 const Dangertmp   = () => import('../views/Gtrack/Dangertmp.vue');
+
+//第三方服务
+const Insurancecpy   = () => import('../views/Hservices/Insurancecpy.vue');
+const Financingchl   = () => import('../views/Hservices/Financingchl.vue');
+const Maintenance   = () => import('../views/Hservices/Maintenance.vue');
+const Lookingtrp   = () => import('../views/Hservices/Lookingtrp.vue');
+const Talentretm   = () => import('../views/Hservices/Talentretm.vue');
+const Lookingood   = () => import('../views/Hservices/Lookingood.vue');
+const Secondtrsf   = () => import('../views/Hservices/Secondtrsf.vue');
+
+
 // 系统与设置
 const Information   = () => import('../views/Isetting/Information.vue');
 const Shopset   = () => import('../views/Isetting/Shopset.vue');
 const Help   = () => import('../views/Isetting/Help.vue');
+
+
 //关联企业
 const Enterprise   = () => import('../views/Krelation/Enterprise.vue');
+const Hidangering   = () => import('../views/Krelation/Hidangering.vue');
+const Electronicway   = () => import('../views/Krelation/Electronicway.vue');
+
+//我的服务
+const Myinsurance   = () => import('../views//Jmy/Myinsurance.vue');
+const Myfinancing   = () => import('../views//Jmy/Myfinancing.vue');
 
 
 
@@ -366,11 +391,69 @@ const routes = [
 
 
             {
+                path: 'insurance_company/:menu_uuid',
+                component: Insurancecpy,
+                meta: {
+                    rbac: 'logins',
+                    title: '保险公司'
+                }
+            },
+            {
+                path: 'financing_channel/:menu_uuid',
+                component: Financingchl,
+                meta: {
+                    rbac: 'logins',
+                    title: '融资渠道'
+                }
+            },
+            {
+                path: 'maintenance/:menu_uuid',
+                component: Maintenance,
+                meta: {
+                    rbac: 'logins',
+                    title: '维修保养'
+                }
+            },
+            {
+                path: 'looking_transport/:menu_uuid',
+                component: Lookingtrp,
+                meta: {
+                    rbac: 'logins',
+                    title: '找运力'
+                }
+            },
+            {
+                path: 'talent_recruitment/:menu_uuid',
+                component: Talentretm,
+                meta: {
+                    rbac: 'logins',
+                    title: '人才招聘'
+                }
+            },
+            {
+                path: 'looking_goods/:menu_uuid',
+                component: Lookingood,
+                meta: {
+                    rbac: 'logins',
+                    title: '找货物'
+                }
+            },
+            {
+                path: 'second_transfer/:menu_uuid',
+                component: Secondtrsf,
+                meta: {
+                    rbac: 'logins',
+                    title: '二手转让'
+                }
+            },
+
+
+            {
                 path: 'shop_information/:menu_uuid',
                 component: Information,
                 meta: {
                     rbac: 'logins',
-                    title: '商户信息'
+                    title: '机构信息'
                 }
             },
 
@@ -399,6 +482,41 @@ const routes = [
                 meta: {
                     rbac: 'logins',
                     title: '企业列表'
+                }
+            },
+            {
+                path: 'relation_hidger/:menu_uuid',
+                component: Hidangering,
+                meta: {
+                    rbac: 'logins',
+                    title: '隐患排查'
+                }
+            },
+            {
+                path: 'relation_electrway/:menu_uuid',
+                component: Electronicway,
+                meta: {
+                    rbac: 'logins',
+                    title: '电子运单'
+                }
+            },
+
+            
+
+            {
+                path: 'my_insurance/:menu_uuid',
+                component: Myinsurance,
+                meta: {
+                    rbac: 'logins',
+                    title: '我的保险'
+                }
+            },
+            {
+                path: 'my_financing/:menu_uuid',
+                component: Myfinancing,
+                meta: {
+                    rbac: 'logins',
+                    title: '我的融资'
                 }
             },
 

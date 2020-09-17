@@ -6,6 +6,7 @@
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Ctrain/Plain.vue
 -->
+<!-- 计划分组 -->
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
@@ -146,6 +147,17 @@
 
             curr_row:null,
 
+            // 搜索
+            search_show:false,
+            SearchFormData:{
+                title:'',
+
+                page_num:1,
+                page_len:10,
+                order_field:'add_time',
+                order_sort:'desc'
+            },
+
             // 添加
             add_show:false,
             AddFormData:{
@@ -227,7 +239,9 @@
                     this.loading = false;
                     this.rows = res.data.rows;
                     this.total = res.data.total;
-                    // console.log(this.rows)
+                    console.log('计划分组')
+                    console.log(this.rows)
+                    console.log('计划分组')
                 });
 
 

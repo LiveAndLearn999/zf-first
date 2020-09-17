@@ -1,11 +1,12 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:31:32
- * @LastEditTime: 2020-09-16 15:37:34
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-09-10 17:32:04
+ * @LastEditors: your name
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Ctrain/Group.vue
 -->
+<!-- 试题分组 -->
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
@@ -74,8 +75,8 @@
             :visible.sync="search_show"
             width="30%">
             <el-form :model="SearchFormData" label-width="120px">
-                <el-form-item label="计划名称:">
-                    <el-input v-model="SearchFormData.cname" />
+                <el-form-item label="分组名:">
+                    <el-input v-model="SearchFormData.title" />
                 </el-form-item>
             </el-form>
 
@@ -91,17 +92,17 @@
             :visible.sync="add_show"
             width="500px">
             <el-form :model="AddFormData" label-width="80px">
-                <el-form-item label="计划组名称" label-width="85px">
-                    <el-input v-model="AddFormData.name" />
+                <el-form-item label="分组名:" label-width="85px">
+                    <el-input v-model="AddFormData.title" :required='true'/>
                 </el-form-item>
 
-                <!-- <el-form-item label="父级uuid:">
-                    <el-input v-model="AddFormData.parent_uuid" />
+                <el-form-item label="备注:">
+                    <el-input v-model="AddFormData.remark" />
+                </el-form-item>
+
+                <!-- <el-form-item label="标签唯一值数组:">
+                    <el-input v-model="AddFormData.tag_uuids" />
                 </el-form-item> -->
-
-                <el-form-item label="img:">
-                    <el-input v-model="AddFormData.img" />
-                </el-form-item>
             </el-form>
 
             <span slot="footer">
@@ -116,17 +117,17 @@
             :visible.sync="edit_show"
             width="500px">
             <el-form :model="EditFormData" label-width="80px">
-                <el-form-item label="计划组名称" label-width="85px">
-                    <el-input v-model="EditFormData.name" />
+               <el-form-item label="分组名:" label-width="85px">
+                    <el-input v-model="EditFormData.title" :required='true'/>
                 </el-form-item>
 
-                <!-- <el-form-item label="父级uuid:">
-                    <el-input v-model="EditFormData.parent_uuid" />
+                <el-form-item label="备注:">
+                    <el-input v-model="EditFormData.remark" />
+                </el-form-item>
+
+                <!-- <el-form-item label="标签唯一值数组:">
+                    <el-input v-model="EditFormData.tag_uuids" />
                 </el-form-item> -->
-
-                <el-form-item label="img:">
-                    <el-input v-model="EditFormData.img" />
-                </el-form-item>
             </el-form>
 
             <span slot="footer">
@@ -172,8 +173,6 @@
             // 搜索
             search_show:false,
             SearchFormData:{
-                cname:'',
-                
                 title:''
             },
 
@@ -181,21 +180,21 @@
             add_show:false,
             AddFormData:{
                 login_token:'',
-                parent_uuid: '',
-                name:'',
-                img:'',
+                // tag_uuids: [],
+                title:'',
+                remark:'',
             },
 
             // 编辑
             edit_show:false,
             EditFormData:{
                 login_token:'',
-                parent_uuid: '',
-                name:'',
-                img:'',
+                // tag_uuids: [],
+                title:'',
+                remark:'',
             },
 
-            // 搜索
+            // 详细
             detail_show:false,
             DetailFormData:{
                 data:[]
@@ -205,7 +204,7 @@
 
     export default {
         data() {
-            return store.state.ManageData;
+            return store.state.QuesShopGroupData;
         },
         computed:{
             width:() => {
@@ -258,9 +257,9 @@
                     this.loading = false;
                     this.rows = res.data.rows;
                     this.total = res.data.total;
-                    console.log('this.rows')
+                    console.log('试题分组')
                     console.log(this.rows)
-                    console.log('this.rows')
+                    console.log('试题分组')
                 });
 
 
@@ -316,16 +315,12 @@
 
             // 添加展示
             handleAdd(r) {
-                this.add_show = true;
-                console.log('qqq')
-                console.log(r)
-                this.AddFormData.parent_uuid = r.uuid;
-                console.log('qqq')
+                this.add_show = true;               
             },
             // 添加向后台提交
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                lime.req('ShopPlanGroupAdd', this.AddFormData).then(res => {
+                lime.req('QuesShopGroupAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
                     this.add_show = false;
@@ -343,14 +338,14 @@
                 }
 
                 this.EditFormData = this.curr_row;
-                this.edit_show;
+                this.edit_show = true;
             },
             // 编辑后台提交
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
                 this.EditFormData.uuid        = this.curr_row.uuid;
 
-                lime.req('ShopPlanGroupEdit', this.EditFormData).then(res => {
+                lime.req('QuesShopGroupEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
                 }).catch(err => {
@@ -367,7 +362,7 @@
 
 
                 this.$confirm('确认删除?', '提示').then(() => {
-                    lime.req('ShopPlanGroupDel', {
+                    lime.req('QuesShopGroupDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
                     }).then(res => {

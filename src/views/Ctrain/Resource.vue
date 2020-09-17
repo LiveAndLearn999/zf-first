@@ -6,6 +6,7 @@
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Admin/Resource.vue
 -->
+<!-- 学习资料 -->
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
@@ -241,7 +242,7 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-
+    
     if (!store.state.ShopResourceData) {
         Vue.set(store.state, 'ShopResourceData', {
             rows:[],
@@ -372,8 +373,10 @@
                     order_field:this.SearchFormData.order_field,
                     order_sort:this.SearchFormData.order_sort
                 }).then(res => {
-                    console.log(this.SearchFormData.real_name)
+                    // console.log(this.SearchFormData.real_name)
+                    console.log("学习资料")
                     console.log(res)
+                    console.log("学习资料")
                     this.loading = false;
                     if(res.code=== 0){
                         console.log("成功")

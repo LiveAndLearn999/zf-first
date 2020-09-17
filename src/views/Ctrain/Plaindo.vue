@@ -6,6 +6,7 @@
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Ctrain/Plaindo.vue
 -->
+<!-- 计划管理 -->
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
@@ -139,16 +140,16 @@
         <!-- 详细 -->
         <el-dialog title="详细" :visible.sync="detail_show" width="40%">
             <el-form :model="DetailFormData" label-width="120px">
-                <el-form-item label="计划名称:">{{DetailFormData.title}}</el-form-item>
-                <el-form-item label="开始时间:">{{DetailFormData.start_time}}</el-form-item>
-                <el-form-item label="实际开始时间:">{{DetailFormData.real_start}}</el-form-item>
-                <el-form-item label="实际结束时间:">{{DetailFormData.real_end}}</el-form-item>
-                <el-form-item label="资源列表:">{{DetailFormData.resoure_list}}</el-form-item>
-                <el-form-item label="问题规则:">{{DetailFormData.question_rule}}</el-form-item>
-                <el-form-item label="学员类型:">{{DetailFormData.study_user_type}}</el-form-item>
-                <el-form-item label="员工列表:">{{DetailFormData.staff_list}}</el-form-item>
-                <el-form-item label="用户列表:">{{DetailFormData.user_list}}</el-form-item>
-                <el-form-item label="学员列表:">{{DetailFormData.member_list}}</el-form-item>
+                <el-form-item class="mbstyle" label="计划名称:">{{DetailFormData.title}}</el-form-item>
+                <el-form-item class="mbstyle" label="开始时间:">{{DetailFormData.start_time}}</el-form-item>
+                <el-form-item class="mbstyle" label="实际开始时间:">{{DetailFormData.real_start}}</el-form-item>
+                <el-form-item class="mbstyle" label="实际结束时间:">{{DetailFormData.real_end}}</el-form-item>
+                <el-form-item class="mbstyle" label="资源列表:">{{DetailFormData.resoure_list}}</el-form-item>
+                <el-form-item class="mbstyle" label="问题规则:">{{DetailFormData.question_rule}}</el-form-item>
+                <el-form-item class="mbstyle" label="学员类型:">{{DetailFormData.study_user_type}}</el-form-item>
+                <el-form-item class="mbstyle" label="员工列表:">{{DetailFormData.staff_list}}</el-form-item>
+                <el-form-item class="mbstyle" label="用户列表:">{{DetailFormData.user_list}}</el-form-item>
+                <el-form-item class="mbstyle" label="学员列表:">{{DetailFormData.member_list}}</el-form-item>
             </el-form>
             <span slot="footer">
                 <el-button type="primary" @click="detail_show = false">确 定</el-button>
@@ -199,7 +200,7 @@
                 img:'',
             },
 
-            // 搜索
+            // 详细
             detail_show:false,
             DetailFormData:[],
         });
@@ -249,9 +250,9 @@
                     this.rows = res.data.rows;
                     this.total = res.data.total;
                     this.SearchFormData.title = ''
-                    console.log('this')
+                    console.log('计划管理')
                     console.log(this.rows)
-                    console.log('this')
+                    console.log('计划管理')
                 });
 
 
@@ -408,5 +409,9 @@
         bottom: 0;
         right:0;
         overflow: hidden;
+    }
+
+    .mbstyle{
+        margin-bottom: 0px;
     }
 </style>

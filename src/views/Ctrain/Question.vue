@@ -6,6 +6,7 @@
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Ctrain/Question.vue
 -->
+<!-- 试题管理 -->
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
@@ -32,6 +33,8 @@
                             :key="index">
                             {{item.name}}
                         </el-link>
+
+                        <el-link @click="onSubMenu('onAddOption',true)" class="menu">添加选项</el-link>
                     </div>
                 </el-col>
             </el-row>
@@ -53,11 +56,24 @@
                 style="width: 100%" 
                 size="mini">
                 <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="uuid" label="UUID" align="center"></el-table-column>
+                <el-table-column prop="title" label="题目" align="center"></el-table-column>
+                <!-- <el-table-column prop="uuid" label="UUID" align="center"></el-table-column> -->
+                <el-table-column prop="is_pay" label="是否付费" align="center"></el-table-column>
+                <el-table-column prop="is_show" label="是否展示" align="center">
+                    <template slot-scope="scope">
+                        {{formatDate(scope.row.is_show * 1000)}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="tag" label="标签" align="center"></el-table-column>
+                <el-table-column prop="ques_type" label="题型" align="center"></el-table-column>
                 <el-table-column prop="answer" label="答案" align="center"></el-table-column>
-                <el-table-column prop="correct_answer" label="正确答案" align="center"></el-table-column>
-                <el-table-column prop="score" label="分数" align="center"></el-table-column>
-                <el-table-column prop="question_type" label="试题类型" align="center"></el-table-column>
+                <el-table-column prop="check_state" label="审核状态" align="center"></el-table-column>
+                <el-table-column prop="add_time" label="添加时间" align="center"></el-table-column>
+                <el-table-column prop="last_time" label="最后修改时间" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.last_time == '' ? '还未登陆' : scope.row.last_time}}
+                    </template>
+                </el-table-column>
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
@@ -76,8 +92,8 @@
             :visible.sync="search_show"
             width="30%">
             <el-form :model="SearchFormData" label-width="120px">
-                <el-form-item label="计划名称:">
-                    <el-input v-model="SearchFormData.cname" />
+                <el-form-item label="题目:">
+                    <el-input v-model="SearchFormData.title" />
                 </el-form-item>
             </el-form>
 
@@ -92,17 +108,33 @@
             title="添加"
             :visible.sync="add_show"
             width="500px">
-            <el-form :model="AddFormData" label-width="80px">
-                <el-form-item label="计划组名称" label-width="85px">
-                    <el-input v-model="AddFormData.name" />
+            <el-form :model="AddFormData" label-width="85px">
+                <el-form-item label="题目:" :required='true'>
+                    <el-input v-model="AddFormData.title" />
                 </el-form-item>
-
-                <!-- <el-form-item label="父级uuid:">
-                    <el-input v-model="AddFormData.parent_uuid" />
+                <el-form-item label="是否需支付" label-width="110px" :required='true'>
+                    <el-input v-model="AddFormData.is_pay" />
+                </el-form-item>
+                <el-form-item label="是否展示:" :required='true'>
+                    <el-input v-model="AddFormData.is_show" />
+                </el-form-item>
+                <el-form-item label="分析:">
+                    <el-input v-model="AddFormData.analysis" />
+                </el-form-item>
+                <!-- <el-form-item label="标签:">
+                    <el-input v-model="AddFormData.tag_uuids" />
                 </el-form-item> -->
-
-                <el-form-item label="img:">
-                    <el-input v-model="AddFormData.img" />
+                <el-form-item label="题型:" :required='true'>
+                    <el-input v-model="AddFormData.ques_type" />
+                </el-form-item>
+                <!-- <el-form-item label="图片地址:">
+                    <el-input v-model="AddFormData.pic_urls" />
+                </el-form-item> -->
+                <el-form-item label="答案:" :required='true'>
+                    <el-input v-model="AddFormData.answer" />
+                </el-form-item>
+                <el-form-item label="最小金额:">
+                    <el-input v-model="AddFormData.min_num" />
                 </el-form-item>
             </el-form>
 
@@ -118,16 +150,32 @@
             :visible.sync="edit_show"
             width="500px">
             <el-form :model="EditFormData" label-width="80px">
-                <el-form-item label="计划组名称" label-width="85px">
-                    <el-input v-model="EditFormData.name" />
+                 <el-form-item label="题目:" :required='true'>
+                    <el-input v-model="EditFormData.title" />
                 </el-form-item>
-
-                <!-- <el-form-item label="父级uuid:">
-                    <el-input v-model="EditFormData.parent_uuid" />
+                <el-form-item label="是否需支付" label-width="110px" :required='true'>
+                    <el-input v-model="EditFormData.is_pay" />
+                </el-form-item>
+                <el-form-item label="是否展示" :required='true'>
+                    <el-input v-model="EditFormData.is_show" />
+                </el-form-item>
+                <el-form-item label="分析:">
+                    <el-input v-model="EditFormData.analysis" />
+                </el-form-item>
+                <!-- <el-form-item label="标签:">
+                    <el-input v-model="EditFormData.tag_uuids" />
                 </el-form-item> -->
-
-                <el-form-item label="img:">
-                    <el-input v-model="EditFormData.img" />
+                <el-form-item label="题型:" :required='true'>
+                    <el-input v-model="EditFormData.ques_type" />
+                </el-form-item>
+                <!-- <el-form-item label="图片地址:">
+                    <el-input v-model="EditFormData.pic_urls" />
+                </el-form-item> -->
+                <el-form-item label="答案:" :required='true'>
+                    <el-input v-model="EditFormData.answer" />
+                </el-form-item>
+                <el-form-item label="最小金额:">
+                    <el-input v-model="EditFormData.min_num" />
                 </el-form-item>
             </el-form>
 
@@ -139,17 +187,18 @@
 
         <!-- 详细 -->
         <el-dialog title="详细" :visible.sync="detail_show" width="40%">
-            <el-form :model="DetailFormData" label-width="120px">
-                <el-form-item label="计划名称:">{{DetailFormData.data.title}}</el-form-item>
-                <el-form-item label="开始时间:">{{DetailFormData.data.start_time}}</el-form-item>
-                <el-form-item label="实际开始时间:">{{DetailFormData.data.real_start}}</el-form-item>
-                <el-form-item label="实际结束时间:">{{DetailFormData.data.real_end}}</el-form-item>
-                <el-form-item label="资源列表:">{{DetailFormData.data.resoure_list}}</el-form-item>
-                <el-form-item label="问题规则:">{{DetailFormData.data.question_rule}}</el-form-item>
-                <el-form-item label="学员类型:">{{DetailFormData.data.study_user_type}}</el-form-item>
-                <el-form-item label="员工列表:">{{DetailFormData.data.staff_list}}</el-form-item>
-                <el-form-item label="用户列表:">{{DetailFormData.data.user_list}}</el-form-item>
-                <el-form-item label="学员列表:">{{DetailFormData.data.member_list}}</el-form-item>
+            <el-form :model="DetailFormData" label-width="80px">
+                <el-form-item class="mbstyle" label="题目:">{{DetailFormData.data.title}}</el-form-item>
+                <el-form-item class="mbstyle" label="是否需支付:" label-width="90px">{{DetailFormData.data.is_pay}}</el-form-item>
+                <el-form-item class="mbstyle" label="是否展示:">{{DetailFormData.data.is_show}}</el-form-item>
+                <el-form-item class="mbstyle" label="答案:">{{DetailFormData.data.answer}}</el-form-item>
+                <el-form-item class="mbstyle" label="分析:">{{DetailFormData.data.analysis}}</el-form-item>
+                <el-form-item class="mbstyle" label="标签:">{{DetailFormData.data.tag}}</el-form-item>
+                <el-form-item class="mbstyle" label="题型:">{{DetailFormData.data.ques_type}}</el-form-item>
+                <el-form-item class="mbstyle" label="选项:">{{DetailFormData.data.content}}</el-form-item>
+                <el-form-item class="mbstyle" label="图片地址:">{{DetailFormData.data.pic_urls}}</el-form-item>
+                <el-form-item class="mbstyle" label="审核状态:">{{DetailFormData.data.check_state}}</el-form-item>
+                <el-form-item class="mbstyle" label="添加时间:">{{DetailFormData.data.add_time}}</el-form-item>
             </el-form>
             <span slot="footer">
                 <el-button type="primary" @click="detail_show = false">确 定</el-button>
@@ -163,8 +212,8 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
 
-    if (!store.state.ManageData) {
-        Vue.set(store.state, 'ManageData', {
+    if (!store.state.QuesShopQuestionData) {
+        Vue.set(store.state, 'QuesShopQuestionData', {
             rows:[],
             total:0,
             loading:false,
@@ -174,45 +223,72 @@
             // 搜索
             search_show:false,
             SearchFormData:{
-                cname:'',
-
+                title:'',
+                
+                // is_pay:0,
+                // is_show:0,
+                // ques_type:0,
                 page_num:1,
                 page_len:10,
-                start_date:'2020-08-02',
-                end_date:'2020-09-02',
-                order_field:'add_time',
-                order_sort:'desc'
+                // add_time:'2020-08-02',
+
+                // 没有下面的字段
+                // order_field:'add_time',
+                // order_sort:'desc'
             },
 
             // 添加
             add_show:false,
             AddFormData:{
                 login_token:'',
-                parent_uuid: '',
-                name:'',
-                img:'',
+                title: '',
+                is_pay:0,
+                is_show:1,
+                analysis: '',	
+                // tag_uuids:[],	
+                ques_type:2,
+                // pic_urls:[],	
+                answer:'',
+                min_num:0,
             },
 
             // 编辑
             edit_show:false,
             EditFormData:{
+                uuid:'',
                 login_token:'',
-                parent_uuid: '',
-                name:'',
-                img:'',
+                title: '',
+                is_pay:0,
+                is_show:1,
+                analysis: '',	
+                // tag_uuids:[],	
+                ques_type:2,
+                // pic_urls:[],	
+                answer:'',
+                min_num:0,
             },
 
-            // 搜索
+            // 详细
             detail_show:false,
             DetailFormData:{
                 data:[]
+            },
+
+            
+            // 添加选项
+            addoption_show:false,
+            AddOptionFormData:{
+                question_uuid:'',
+                login_token:'',
+                content:'',
+                is_answer:0,//1代表正确答案；0代表错误
             },
         });
     }
 
     export default {
         data() {
-            return store.state.ManageData;
+            return store.state.QuesShopQuestionData;
         },
         computed:{
             width:() => {
@@ -258,20 +334,22 @@
             init() {
                 this.loading = true;
 
-                lime.req('ShopExamQuestionList', {
+                lime.req('ShopQuesQuestionList', {
                     login_token:lime.cookie_get('login_token'),
 
+                    title:this.SearchFormData.title,
                     page_num:this.SearchFormData.page_num,
                     page_len:this.SearchFormData.page_len,
-                    order_field:this.SearchFormData.order_field,
-                    order_sort:this.SearchFormData.order_sort
+                    // order_field:this.SearchFormData.order_field,
+                    // order_sort:this.SearchFormData.order_sort
                 }).then(res => {
                     this.loading = false;
                     this.rows = res.data.rows;
                     this.total = res.data.total;
-                    console.log('this.rows')
+                    this.SearchFormData.title='';
+                    console.log('试题管理')
                     console.log(this.rows)
-                    console.log('this.rows')
+                    console.log('试题管理')
                 });
 
 
@@ -300,6 +378,7 @@
             },
             // 搜索提交
             onSearchSubmit(){
+                this.search_show = false;
                 this.SearchFormData.page_num = 1;
                 this.init();
             },
@@ -328,15 +407,24 @@
             // 添加展示
             handleAdd(r) {
                 this.add_show = true;
-                console.log('qqq')
-                console.log(r)
-                this.AddFormData.parent_uuid = r.uuid;
-                console.log('qqq')
+                
+                lime.req('QuesShopTagList', {
+                    login_token:lime.cookie_get('login_token'),
+                    // title:this.curr_row.title
+                }).then(res => {
+                    console.log('标签列表')
+                    console.log(res.data)
+                    console.log('标签列表')
+                    // this.DetailFormData.data = res.data
+                    // this.detail_show = true;
+                }).catch(err => {
+                    this.$message.error(err.msg);
+                })
             },
             // 添加向后台提交
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                lime.req('ShopPlanGroupAdd', this.AddFormData).then(res => {
+                lime.req('QuesShopQuestionAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
                     this.add_show = false;
@@ -345,7 +433,6 @@
                 })
             },
 
-
             // 编辑展示
             handleEdit() {
                 if (util.empty(this.curr_row)) {
@@ -353,15 +440,23 @@
                     return;
                 }
 
-                this.EditFormData = this.curr_row;
-                this.edit_show;
+                this.EditFormData.uuid = this.curr_row.uuid;
+                this.EditFormData.title = this.curr_row.title;
+                this.EditFormData.is_pay = this.curr_row.is_pay;
+                this.EditFormData.is_show = this.curr_row.is_show;
+                this.EditFormData.analysis = this.curr_row.analysis;
+                // this.EditFormData.tag_uuids = this.curr_row.tag_uuids;
+                this.EditFormData.ques_type = this.curr_row.ques_type;
+                // this.EditFormData.pic_urls = this.curr_row.pic_urls;
+                this.EditFormData.answer = this.curr_row.answer.toString();
+                this.EditFormData.min_num = this.curr_row.min_num;
+                this.edit_show = true;
             },
             // 编辑后台提交
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
-                this.EditFormData.uuid        = this.curr_row.uuid;
 
-                lime.req('ShopPlanGroupEdit', this.EditFormData).then(res => {
+                lime.req('QuesShopQuestionEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
                 }).catch(err => {
@@ -376,9 +471,28 @@
                     return;
                 }
 
-
                 this.$confirm('确认删除?', '提示').then(() => {
-                    lime.req('ShopPlanGroupDel', {
+                    lime.req('QuesShopQuestionDel', {
+                        login_token:lime.cookie_get('login_token'),
+                        uuid:this.curr_row.uuid
+                    }).then(res => {
+                        this.init();
+                        this.$message.success('操作成功');
+                    }).catch(err => {
+                        this.$message.error(err.msg);
+                    })
+                })
+            },
+
+            // 审核 
+            handleCheck(){
+                if (util.empty(this.curr_row)) {
+                    this.$message.error('请选择一条数据');
+                    return;
+                }
+
+                this.$confirm('提交审核?', '提示').then(() => {
+                    lime.req('QuesShopQuestionUpCheck', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
                     }).then(res => {
@@ -397,17 +511,32 @@
                     return;
                 }
 
-                lime.req('ShopPlanDetail', {
+                lime.req('QuesShopQuestionDetail', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid
                 }).then(res => {
-                    console.log(res.data)
+                    // console.log(res.data)
                     this.DetailFormData.data = res.data
                     this.detail_show = true;
                 }).catch(err => {
                     this.$message.error(err.msg);
                 })
             },
+
+             // 添加选项
+            onAddOption() {
+                console.log(this.curr_row)
+                if (util.empty(this.curr_row)) {
+                    this.$message.error('请选择一条数据');
+                    return;
+                }
+            },
+            // 添加选项
+            // onAddOptionSubmit(){
+            //     this.search_show = false;
+            //     this.SearchFormData.page_num = 1;
+            //     this.init();
+            // },
 
         }
     }
@@ -428,5 +557,9 @@
         bottom: 0;
         right:0;
         overflow: hidden;
+    }
+
+    .mbstyle{
+        margin-bottom: 0px;
     }
 </style>

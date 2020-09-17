@@ -7,13 +7,17 @@
                 </el-col>
                 <el-col :span="16" style="text-align: right">
                     <div style="padding-right: 20px;">
-                        <el-button type="text">消息</el-button>
+                        <span class="msg_icon"></span>
+                        <el-button type="text" @click="handleMsg">消息</el-button>
                         <el-button type="text">我的</el-button>
                         <el-button type="danger" @click="onLogout" plain size="mini">退出</el-button>
                     </div>
                 </el-col>
             </el-row>
         </div>
+
+        <audio controls="controls" hidden  src="../assets/msg.mp3" ref="audio"></audio>
+
 
         <div class="content" :style="{width:width + 'px', height:height - 62 +'px'}">
             <div class="left">
@@ -45,6 +49,53 @@
             </div>
                 
         </div>
+
+        <el-drawer
+            title="消息列表"
+            size="40%"
+            :visible.sync="msg_show"
+            :direction="direction">
+            <!-- border -->
+            <!-- 数据表格 -->
+            <div style="border-top: solid 1px #f2f1f4;">
+                <el-table 
+                    :data="rows"
+                    :height="height - 60 - 46 - 48"
+                    v-loading="loading"
+                    element-loading-text="拼命加载中"
+                    element-loading-spinner="el-icon-loading"
+                    element-loading-background="rgba(0, 0, 0, 0.8)"
+
+                    @sort-change="onSortChange"
+                    :highlight-current-row="true"
+                    @current-change="onSelectRow"
+                    style="width: 100%" 
+                    size="mini" ref="configurationTable">
+                    <el-table-column type="index" label="#"></el-table-column>
+                    <el-table-column prop="content_type" label="内容类型"></el-table-column>
+                    <el-table-column prop="content" label="消息内容"></el-table-column>
+                    <el-table-column prop="send_time" label="发送时间" :sortable=true></el-table-column>
+                    <el-table-column
+                    fixed="right"
+                    label="操作">
+                        <template slot-scope="scope">
+                            <el-button @click="handleClick(scope.row)" type="text" size="small">详细</el-button>
+                            <el-button @click="handleDel(scope.row)" type="text" size="small">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+
+                <div class="page" style="width: 100%;text-align: right">
+                    <el-pagination
+                        :current-page.sync="SearchFormData.page_num"
+                        @current-change="onPageChange"
+                        layout="prev, pager, next"
+                        :total="total">
+                    </el-pagination>
+                </div>
+            </div>
+        </el-drawer>
+
     </div>
 </template>
 
@@ -53,6 +104,7 @@
     import lime from "@/lime.js";
     import store from "@/store";
     import util from "@/util.js";
+    import { ShopMsgList, ShopMsgDel } from "@/api/request"
 
     if (!store.state.AdminData) {
         Vue.set(store.state, 'AdminData', {
@@ -68,6 +120,21 @@
                 name: '',
                 old_pwd: '',
                 new_pwd: '',
+            },
+
+            msg_show: false,
+            direction: 'rtl',
+            countDownNum:15,
+            timer:null,
+            rows:[],
+            total:0,
+            loading:false,
+            curr_row:null,
+             SearchFormData:{
+                page_num:1,
+                page_len:10,
+                order_field:'add_time',
+                order_sort:'desc'
             },
         })
     }
@@ -88,8 +155,91 @@
         created() {
             this.initMenuList();
         },
+        mounted() {
+            this.countDown()
+        },
         methods:{
-            /**
+            countDown(){
+                let that = this
+                this.timer=setInterval(() => {
+                    this.countDownNum--;
+                    console.log(1111)
+                    if(this.countDownNum % 3 === 0) {
+                        that.playAudio()
+                        that.$message.success({message: '您有一条新消息',
+          center: true});
+                    }
+                    if(this.countDownNum<=0){
+                        clearInterval(this.timer);
+                    }
+                },1000);
+            },
+            playAudio() {
+                this.$refs.audio.currentTime = 0; //从头开始播放提示音
+                this.$refs.audio.play(); //播放
+
+            },
+            handleMsg() {
+                this.msg_show = true;
+                this.initTable()
+            },
+            initTable() {
+                let pam = {
+                    login_token:lime.cookie_get('login_token'),
+                }
+                this.loading = true;
+                ShopMsgList(pam, res => {
+                    this.$refs.configurationTable.doLayout()
+                    this.loading = false;
+                    this.rows = res.data.rows;
+                    this.total = res.data.total;
+                }).catch(err => {
+                    this.$message.error(err.msg);
+                })
+            },
+            handleClick(row) {
+                console.log(row);
+            },
+            handleDel(row) {
+                console.log(row)
+                this.$confirm('确认删除?', '提示').then(() => {
+                    let pam = {
+                        login_token:lime.cookie_get('login_token'),
+                        uuid:row.uuid
+                    }
+                    ShopMsgDel(pam, res => {
+                        this.initTable();
+                        this.$message.success('操作成功');
+                    }).catch(err => {
+                        this.$message.error(err.msg);
+                    })
+                }).catch(err => {
+                    console.log(111)
+                })
+            },
+            // 排序处理
+            onSortChange(sort) {
+                this.SearchFormData.order_field = sort.prop;
+                if (sort.order == 'ascending') {
+                    this.SearchFormData.order_sort  = 'asc';
+                } else {
+                    this.SearchFormData.order_sort  = 'desc';
+                }
+                this.initTable();
+            },
+             // 选择单行
+            onSelectRow(row){
+                this.curr_row = row;
+            },
+            // 分页处理
+            onPageChange(page){
+                this.SearchFormData.page_num = page;
+                this.init();
+            },
+
+
+
+             /**
              * 获取菜单列表
              */
             initMenuList() {
@@ -170,6 +320,23 @@
 </script>
 
 <style scoped>
+    .msg_icon {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: red;
+      border-radius: 50%;
+      position: relative;
+      left: 2px;
+      top: -8px;
+      -webkit-animation-name: cirlceAnimate;
+      -webkit-animation-duration: 0.5s;
+      -webkit-animation-iteration-count: infinite;
+      -webkit-animation-direction: alternate;
+      -webkit-animation-timing-function: ease;
+      -webkit-animation-play-state: running;
+    }
+
     .head{
         height: 60px;
         line-height: 60px;
@@ -210,4 +377,14 @@
         -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
         background-color: #b5b1b1;
     }
+
+    @-webkit-keyframes cirlceAnimate{
+        0% {opacity: 1;}
+        50% {opacity: 0.5;}
+        100% {opacity: 0;}
+    }
+
+    /* .el-table th.gutter{
+        display: table-cell!important;
+    } */
 </style>

@@ -1,12 +1,18 @@
 /*
  * @Author: xk
  * @Date: 2020-09-11 16:51:53
- * @LastEditTime: 2020-09-16 17:28:48
+ * @LastEditTime: 2020-09-17 19:51:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/api/request.js
  */
 import lime from "@/lime.js";
+
+//admin-消息-列表
+export const ShopMsgList = (params, callback) => { return lime.req("ShopMsgList", params).then(callback)};
+//admin-消息-删除
+export const ShopMsgDel = (params, callback) => { return lime.req("ShopMsgDel", params).then(callback)};
+
 
 // 通知公告-列表
 export const noticeList = (params, callback) => { return lime.req("ShopNoticeList", params).then(callback)};
@@ -29,6 +35,8 @@ export const workOrderEdit = (params, callback) => { return lime.req("ShopWorkOr
 export const ShopAccountList = (params, callback) => { return lime.req("ShopAccountDetails", params).then(callback)};
 // 财务中心-资金账户-账户详细
 export const ShopAccountDetail = (params, callback) => { return lime.req("ShopAccountDetail", params).then(callback)};
+// 财务中心-财务统计-列表
+export const ShopTradeAccountList = (params, callback) => { return lime.req("ShopTradeAccountList", params).then(callback)};
 
 
 // 车辆与设备-车辆管理-列表
@@ -122,3 +130,9 @@ export const ShopChildDetail = (params, callback) => { return lime.req("ShopChil
 export const ShopAgentShopList = (params, callback) => { return lime.req("ShopAgentShopList", params).then(callback)};
 // 关联企业-企业列表-详细
 export const ShopAgentShopDetail = (params, callback) => { return lime.req("ShopAgentShopDetail", params).then(callback)};
+
+
+// 系统与设置-机构信息-获取配置项
+export const ShopRoleList = (params, callback) => { return lime.req("ShopRoleList", params).then(callback)};
+//系统与设置-机构信息-保存
+export const SetShopSave = (params, callback) => { return lime.req("SetShopSave", params).then(callback)};
