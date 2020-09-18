@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:38:37
- * @LastEditTime: 2020-09-15 10:15:19
+ * @LastEditTime: 2020-09-18 13:45:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Egoods/Goods.vue
@@ -66,7 +66,7 @@
             width="500px">
             <el-form :model="EditFormData" label-width="120px">
                 <el-form-item label="货物名称:">
-                    <el-input v-model="EditFormData.name" />
+                    <el-input v-model="EditFormData.name" @input="change($event)"/>
                 </el-form-item>
             </el-form>
 
@@ -139,6 +139,9 @@
                 this.init()
         },
         methods: {
+            change(e) {
+                this.$forceUpdate()
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);

@@ -124,7 +124,7 @@
 
             msg_show: false,
             direction: 'rtl',
-            countDownNum:15,
+            countDownNum:120,
             timer:null,
             rows:[],
             total:0,
@@ -158,13 +158,16 @@
         mounted() {
             this.countDown()
         },
+        destroyed() {
+            clearInterval(this.timer);
+        },
         methods:{
             countDown(){
                 let that = this
                 this.timer=setInterval(() => {
                     this.countDownNum--;
                     console.log(1111)
-                    if(this.countDownNum % 3 === 0) {
+                    if(this.countDownNum % 5 === 0) {
                         that.playAudio()
                         that.$message.success({message: '您有一条新消息',
           center: true});

@@ -1,7 +1,7 @@
 <!--
  * @Author: zs
  * @Date: 2020-09-10 11:35:01
- * @LastEditTime: 2020-09-17 19:55:48
+ * @LastEditTime: 2020-09-18 14:20:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Admin/Information.vue
@@ -85,35 +85,27 @@ import Vue from "vue"
 import store from "@/store"
 import lime from "@/lime.js"
 import util from "@/util.js"
-import {ShopRoleList, SetShopSave} from  "@/api/request"
-
+// import {ShopRoleList, SetShopSave} from  "@/api/request"
 if (!store.state.GetShopConfigData) {
   Vue.set(store.state, 'GetShopConfigData', {
     rows: [],
     total: 0,
     loading: false,
-
     curr_row: null,
-
     SearchFormData: {
       real_name: '',
       aa: [],
       page_num: 1,
       page_len: 10,
     },
-
     edit_show: false,
     edit_rows: [],
-    EditFormData: {},
-
     ready_uuid: [],
     role_type: 'auditor',
     checkedAry: [],
     all_uuid: [],
     check_uuid: [],
-    allCheck: [],
-
-    
+    allCheck: []
   })
 }
 
@@ -181,7 +173,6 @@ export default {
         })
         this.role_type = row.config_key
       }
-      // console.log(row.config_key)
     },
     // 分页处理
     onPageChange (page) {
@@ -195,51 +186,79 @@ export default {
         this.$message.error('请选择一条数据')
         return
       }
-      ShopRoleList({login_token: lime.cookie_get('login_token')},res => {
-         this.allCheck = res.data
-         this.checkedAry = []
-         this.all_uuid = []
-         res.data.forEach((item, index) => { 
-          if(this.ready_uuid.includes(item.uuid, 0)) {
-            this.checkedAry.push(item.name)
-            this.all_uuid.push(item.name)
-          }else {
-            this.all_uuid.push(item.name)
-          }
+      lime.req('ShopRoleList',{
+              login_token: lime.cookie_get('login_token')
+      }).then(res => {
+              this.allCheck = res.data
+              this.checkedAry = []
+              this.all_uuid = []
+              res.data.forEach((item, index) => { 
+                if(this.ready_uuid.includes(item.uuid, 0)) {
+                  this.checkedAry.push(item.name)
+                  this.all_uuid.push(item.name)
+                }else {
+                  this.all_uuid.push(item.name)
+                }
 
-         })
-         // check_uuid: [],
-         // allCheck: [],
-         this.edit_show = true
+              })
+              this.edit_show = true
       })
-      // this.edit_show = true
+      // ShopRoleList({login_token: lime.cookie_get('login_token')},res => {
+      //    this.allCheck = res.data
+      //    this.checkedAry = []
+      //    this.all_uuid = []
+      //    res.data.forEach((item, index) => { 
+      //     if(this.ready_uuid.includes(item.uuid, 0)) {
+      //       this.checkedAry.push(item.name)
+      //       this.all_uuid.push(item.name)
+      //     }else {
+      //       this.all_uuid.push(item.name)
+      //     }
+
+      //    })
+      //    this.edit_show = true
+      // })
     },
     // 保存编辑提交
     onEditSubmit () {
-      console.log(this.checkedAry)
       this.check_uuid = []
       this.allCheck.forEach((item, index) => {
         if(this.checkedAry.includes(item.name, 0)) {
             this.check_uuid.push(item.uuid)
         }
       })
-      this.EditFormData.login_token = lime.cookie_get('login_token')
       let that = this
-      console.log("=====" + this.role_type)
-      lime.req(
-                {
-                    module:'SetShopSave',
-                    ver:'1.0.0',
-                    relation_module:'ShopRoleList',
-                    relation_ver:'1.0.0'
-                },
-                {
-                    login_token:lime.cookie_get('login_token'),
-                    [that.role_type]:this.check_uuid
-                }).then(res => {
-                  this.edit_show = false
-                  this.init()
-                })
+      lime.req('SetShopSave',{
+              login_token:lime.cookie_get('login_token'),
+              [that.role_type]:this.check_uuid
+      }).then(res => {
+              this.edit_show = false
+              this.init()
+      })
+
+      // SetShopSave({
+      //   login_token:lime.cookie_get('login_token'),
+      //   [that.role_type]:this.check_uuid,
+      // }, res => {
+      //   this.edit_show = false
+      //   this.init()
+      // })
+
+      // lime.req(
+      //           {
+      //               module:'SetShopSave',
+      //               ver:'1.0.0',
+      //               relation_module:'ShopRoleList',
+      //               relation_ver:'1.0.0'
+      //           },
+      //           {
+      //               login_token:lime.cookie_get('login_token'),
+      //               [that.role_type]:this.check_uuid
+      //           }
+      //           ).then(res => {
+      //             this.edit_show = false
+      //             this.init()
+      //           })
       
     },
   }
