@@ -48,6 +48,22 @@ function toTree(data, parent_uuid = '') {
     return tree;
 }
 
+function toTrees(data, parent_uuid = 0) {
+    let tree = [];
+    let temp;
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].parent_uuid == parent_uuid) {
+            let obj = data[i];
+            temp = toTrees(data, data[i].uuid);
+            if (temp.length > 0) {
+                obj.children = temp;
+            }
+            tree.push(obj);
+        }
+    }
+    return tree;
+}
+
 
 function number_format(number, decimals, dec_point, thousands_sep) {
     /*
@@ -335,6 +351,7 @@ function empty(val) {
 export default {
     buildTree,
     toTree,
+    toTrees,
     
     number_format,
     

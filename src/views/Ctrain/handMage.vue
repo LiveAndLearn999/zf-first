@@ -1,12 +1,12 @@
 <!--
  * @Author: your name
- * @Date: 2020-09-10 17:31:32
- * @LastEditTime: 2020-09-10 17:32:04
+ * @Date: 2020-09-21 08:48:39
+ * @LastEditTime: 2020-09-21 08:48:59
  * @LastEditors: your name
  * @Description: In User Settings Edit
- * @FilePath: /shop/src/views/Ctrain/Group.vue
+ * @FilePath: /shop/src/views/Ctrain/handMage.vue
 -->
-<!-- 试题分组 -->
+<!-- 标签管理 -->
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
@@ -33,6 +33,8 @@
                             :key="index">
                             {{item.name}}
                         </el-link>
+
+                        <!-- <el-link @click="onSubMenu('onAddOption',true)" class="menu">添加选项</el-link> -->
                     </div>
                 </el-col>
             </el-row>
@@ -54,8 +56,7 @@
                 style="width: 100%" 
                 size="mini">
                 <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标签组名" align="center"></el-table-column>
-                <!-- <el-table-column prop="uuid" label="UUID" align="center"></el-table-column> -->
+                <el-table-column prop="title" label="标签" align="center"></el-table-column>
                 <el-table-column prop="remark" label="备注" align="center"></el-table-column>
             </el-table>
 
@@ -75,7 +76,7 @@
             :visible.sync="search_show"
             width="30%">
             <el-form :model="SearchFormData" label-width="120px">
-                <el-form-item label="分组名:">
+                <el-form-item label="标签:">
                     <el-input v-model="SearchFormData.title" />
                 </el-form-item>
             </el-form>
@@ -91,18 +92,13 @@
             title="添加"
             :visible.sync="add_show"
             width="500px">
-            <el-form :model="AddFormData" label-width="80px">
-                <el-form-item label="分组名:" label-width="85px">
-                    <el-input v-model="AddFormData.title" :required='true'/>
+            <el-form :model="AddFormData" label-width="85px">
+                <el-form-item label="标签:" :required='true'>
+                    <el-input v-model="AddFormData.title" />
                 </el-form-item>
-
                 <el-form-item label="备注:">
                     <el-input v-model="AddFormData.remark" />
                 </el-form-item>
-
-                <!-- <el-form-item label="标签唯一值数组:">
-                    <el-input v-model="AddFormData.tag_uuids" />
-                </el-form-item> -->
             </el-form>
 
             <span slot="footer">
@@ -117,17 +113,12 @@
             :visible.sync="edit_show"
             width="500px">
             <el-form :model="EditFormData" label-width="80px">
-               <el-form-item label="分组名:" label-width="85px">
-                    <el-input v-model="EditFormData.title" :required='true'/>
+                 <el-form-item label="标签:" :required='true'>
+                    <el-input v-model="EditFormData.title" />
                 </el-form-item>
-
                 <el-form-item label="备注:">
                     <el-input v-model="EditFormData.remark" />
                 </el-form-item>
-
-                <!-- <el-form-item label="标签唯一值数组:">
-                    <el-input v-model="EditFormData.tag_uuids" />
-                </el-form-item> -->
             </el-form>
 
             <span slot="footer">
@@ -144,8 +135,8 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
 
-    if (!store.state.ShopQuesGroupData) {
-        Vue.set(store.state, 'ShopQuesGroupData', {
+    if (!store.state.ShopQuesTagData) {
+        Vue.set(store.state, 'ShopQuesTagData', {
             rows:[],
             total:0,
             loading:false,
@@ -155,33 +146,40 @@
             // 搜索
             search_show:false,
             SearchFormData:{
-                title:''
+                title:'',
+                
+                page_num:1,
+                page_len:10,
+                // add_time:'2020-08-02',
+
+                // 没有下面的字段
+                // order_field:'add_time',
+                // order_sort:'desc'
             },
 
             // 添加
             add_show:false,
             AddFormData:{
                 login_token:'',
-                // tag_uuids: [],
-                title:'',
-                remark:'',
+                title: '',
+                remark: '',
             },
 
             // 编辑
             edit_show:false,
             EditFormData:{
+                uuid:'',
                 login_token:'',
-                // tag_uuids: [],
-                title:'',
-                remark:'',
+                title: '',
+                remark: '',
             },
-        
+
         });
     }
 
     export default {
         data() {
-            return store.state.ShopQuesGroupData;
+            return store.state.ShopQuesTagData;
         },
         computed:{
             width:() => {
@@ -227,17 +225,22 @@
             init() {
                 this.loading = true;
 
-                lime.req('ShopQuesGroupList', {
+                lime.req('ShopQuesTagList', {
                     login_token:lime.cookie_get('login_token'),
+
                     title:this.SearchFormData.title,
+                    page_num:this.SearchFormData.page_num,
+                    page_len:this.SearchFormData.page_len,
+                    // order_field:this.SearchFormData.order_field,
+                    // order_sort:this.SearchFormData.order_sort
                 }).then(res => {
                     this.loading = false;
                     this.rows = res.data.rows;
                     this.total = res.data.total;
                     this.SearchFormData.title='';
-                    console.log('试题分组')
+                    console.log('标签管理')
                     console.log(this.rows)
-                    console.log('试题分组')
+                    console.log('标签管理')
                 });
 
 
@@ -266,8 +269,8 @@
             },
             // 搜索提交
             onSearchSubmit(){
-                this.SearchFormData.page_num = 1;
                 this.search_show = false;
+                this.SearchFormData.page_num = 1;
                 this.init();
             },
             // 选择单行
@@ -294,15 +297,18 @@
 
             // 添加展示
             handleAdd() {
-                this.add_show = true;               
+                this.add_show = true;
             },
             // 添加向后台提交
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                lime.req('ShopQuesGroupAdd', this.AddFormData).then(res => {
+                lime.req('ShopQuesTagAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
-                    this.add_show = false;
+                    this.AddFormData.login_token='';
+                    this.AddFormData.title= '';
+                    this.AddFormData.remark= '';
+                    this.add_show = false;	
                 }).catch(err => {
                     this.$message.error(err.msg);
                 })
@@ -315,15 +321,16 @@
                     return;
                 }
 
-                this.EditFormData = this.curr_row;
+                this.EditFormData.uuid = this.curr_row.uuid;
+                this.EditFormData.title = this.curr_row.title;
+                this.EditFormData.remark = this.curr_row.remark;
                 this.edit_show = true;
             },
             // 编辑后台提交
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
-                this.EditFormData.uuid        = this.curr_row.uuid;
 
-                lime.req('ShopQuesGroupEdit', this.EditFormData).then(res => {
+                lime.req('ShopQuesTagEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
                 }).catch(err => {
@@ -338,9 +345,8 @@
                     return;
                 }
 
-
                 this.$confirm('确认删除?', '提示').then(() => {
-                    lime.req('ShopQuesGroupDel', {
+                    lime.req('ShopQuesTagDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
                     }).then(res => {
@@ -371,5 +377,9 @@
         bottom: 0;
         right:0;
         overflow: hidden;
+    }
+
+    .mbstyle{
+        margin-bottom: 0px;
     }
 </style>

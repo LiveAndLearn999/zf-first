@@ -1,7 +1,7 @@
 <!--
  * @Author: xk
  * @Date: 2020-09-14 09:26:53
- * @LastEditTime: 2020-09-16 17:53:45
+ * @LastEditTime: 2020-09-25 13:55:42
  * @LastEditors: Please set LastEditors
  * @Description: the components of base-table
  * @FilePath: /shop/src/components/myTables/baseTable.vue
@@ -129,6 +129,9 @@ export default {
       },
       handleDetail() {
           this.$emit('handleDetail')
+      },
+      handleBindDevice() {
+          this.$emit('handleBindDevice')
       },
       handleEdit() {
           this.$emit('handleEdit')

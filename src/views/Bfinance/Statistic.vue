@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:16:53
- * @LastEditTime: 2020-09-17 16:58:01
+ * @LastEditTime: 2020-09-21 09:58:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Bfinance/Statistic.vue
@@ -23,7 +23,6 @@
     if (!store.state.ShopTradeAccountData) {
         Vue.set(store.state, 'ShopTradeAccountData', {
             show_map: false,
-            rows:[],
             total:0,
             charge_show: false,
             loading:false,

@@ -53,7 +53,9 @@
                 </el-table-column>
                 <el-table-column prop="look_num" label="查看次数" align="center"></el-table-column>
                 <el-table-column prop="state" label="状态">
-                    
+                     <template slot-scope="scope">
+                        {{stateFormat(scope.row.state)}}
+                    </template>
                 </el-table-column>
                 <el-table-column prop="is_pay" label="收费类型" align="center" >
                     <template slot-scope="scope">
@@ -85,7 +87,7 @@
         <el-dialog title="搜索" :visible.sync="search_show" width="30%">
             <el-form :model="SearchFormData" label-width="120px">
                 <el-form-item label="资料标题:">
-                    <el-input v-model="SearchFormData.real_name" />
+                    <el-input v-model="SearchFormData.title" />
                 </el-form-item>
             </el-form>
 
@@ -216,24 +218,6 @@
                 <el-button @click="onEditSubmit" type="primary">确定</el-button>
             </span>
         </el-dialog>
-
-        <!-- 提审 -->
-         <el-dialog title="提审" width="450px" :visible.sync="submit_show">
-            <el-form :model="SubmitAuthData" label-width="80px">
-                <el-form-item label="是否审核:">
-                    <el-select v-model="SubmitAuthData.state" :value="SubmitAuthData.state">
-                        <el-option value="草稿">草稿</el-option>
-                        <el-option value="待审核">待审核</el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
-
-            <span slot="footer">
-                <el-button @click="submit_show = false">取消</el-button>
-                <el-button type="primary" @click="onSubmitAuth">确认</el-button>
-            </span>
-        </el-dialog>
-    
     </div>
 </template>
 
@@ -253,7 +237,7 @@
 
             // 搜索
             SearchFormData:{
-                real_name:'',
+                title:'',
 
                 page_no:1,
                 page_len:10,
@@ -303,14 +287,6 @@
                 title: "",
                 uuid: "",
                 parent_uuid:'',
-            },
-
-            // 设置角色
-            submit_show:false,
-            submit_rows:[],
-            SubmitAuthData:{
-                uuid:'',
-                state:''
             },
 
         });
@@ -366,7 +342,7 @@
 
                 lime.req('ShopResourceList', {
                     login_token:lime.cookie_get('login_token'),
-                    title:this.SearchFormData.real_name,
+                    title:this.SearchFormData.title,
 
                     page_no:this.SearchFormData.page_no,
                     page_len:this.SearchFormData.page_len,
@@ -382,26 +358,7 @@
                         console.log("成功")
                         this.rows = res.data.rows;
                         this.total = res.data.total;
-                        // 状态：0是草稿 -1作废 1审核通过，2待审核， 3审核不通过
-                        for(let i=0;i<res.data.rows.length;i++){
-                            switch(res.data.rows[i].state){
-                                case 0:
-                                    this.rows[i].state = '草稿'
-                                    break
-                                case 1:
-                                    this.rows[i].state = '审核通过'
-                                    break
-                                case 2:
-                                    this.rows[i].state = '待审核'
-                                    break
-                                case 3:
-                                    this.rows[i].state = '审核不通过'
-                                    break
-                                case -1:
-                                    this.rows[i].state = '作废'
-                                    break
-                            }
-                        }
+                        this.SearchFormData.title = '';
                     } else
                         console.log("数据获取失败")
                 });
@@ -414,12 +371,19 @@
 
             // 状态格式化
             stateFormat(state) {
+                // 状态：0是草稿 -1作废 1审核通过，2待审核， 3审核不通过
                 if (state == 0) {
-                    return '待审';
+                    return '草稿';
                 } else if (state == 1) {
-                    return '已审';
-                } else {
+                    return '审核通过';
+                } else if (state == 2) {
+                    return '待审核';
+                } else if (state == 3) {
+                    return '审核不通过';
+                } else if (state == -1) {
                     return '作废';
+                } else {
+                    return '';
                 }
             },
 
@@ -442,6 +406,7 @@
 
             // 搜索提交
             onSearchSubmit(){
+                this.search_show = false;
                 this.SearchFormData.page_no = 1;
                 this.init();
             },
@@ -594,28 +559,19 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
-                // console.log(this.curr_row)
-                this.SubmitAuthData.state = this.curr_row.state
-                this.SubmitAuthData.uuid = this.curr_row.uuid
-                this.submit_show = true;
-            },
-            
-            // 提审提交
-            onSubmitAuth(){
-                // 状态：0是草稿 -1作废 1审核通过，2待审核， 3审核不通过
-                // console.log(this.SubmitAuthData.state)
-                this.submit_show=false
-                
+                // console.log(this.curr_row)  
+                              
+                // 提审提交
                 lime.req('ShopResourceSubmitAuth', {
                     login_token:lime.cookie_get('login_token'),
-                    uuid:this.SubmitAuthData.uuid
+                    uuid:this.curr_row.uuid
                 }).then(res =>{
                     this.init();
                 }).catch(err => {
                     this.$message.error(err.msg)
-                })
-            }
+                }) 
+
+            },
         }
     }
 </script>

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:05:37
- * @LastEditTime: 2020-09-16 16:29:47
+ * @LastEditTime: 2020-09-24 18:31:00
  * @LastEditors: Please set LastEditors
  * @Description: 工单管理
  * @FilePath: /shop/src/views/Amanage/Order.vue
@@ -38,65 +38,131 @@
             </el-row>
         </div>
         <!-- <h6>{{cpname}}</h6> -->
-        <TableBase :loading="loading" :rows="rows" :columns="columns" :page_num="page_num" :total="total" @selRow="onSelectCurrRow" @pageChange="onPageChange" :onRefresh="onRefresh"/>
+        <!-- <TableBase  :loading="loading" :rows="rows" :columns="columns" :page_num="page_num" :total="total" @stateFmt="stateFormat" @selRow="onSelectCurrRow" @pageChange="onPageChange" :onRefresh="onRefresh"/> -->
+        <!-- <TableBase :loading="loading"  :rows="rows" :columns="columns" :page_num="page_num" :total="total" @selRow="onSelectCurrRow" @pageChange="onPageChange" :onRefresh="onRefresh"/> -->
+        <!-- 表格 -->
+        <div style="border-top: solid 1px #f2f1f4;">
+            <el-table 
+                @current-change="onSelectCurrRow"
+                :data="rows" 
+                :height="height - 60 - 50"
+                v-loading="loading"
+                :default-expand-all="true"
+                element-loading-text="拼命加载中"
+                element-loading-spinner="el-icon-loading"
+                element-loading-background="rgba(0, 0, 0, 0.8)"
+                :highlight-current-row="true" 
+                size="mini">
+                <el-table-column type="index" label="#"></el-table-column>
+                <el-table-column align="center" prop="title" label="主题"></el-table-column>
+                <el-table-column align="center" prop="add_time" label="添加时间"></el-table-column>
+                <el-table-column align="center" show-overflow-tooltip prop="content" label="内容"></el-table-column>
+                <el-table-column align="center" prop="feedback" label="内容反馈"></el-table-column>
+                <el-table-column align="center" prop="last_time" label="结束时间"></el-table-column>
+                <el-table-column align="center" prop="status" label="状态">
+                    <template slot-scope="scope">
+                        {{stateFormat(scope.row.status)}}
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" prop="to_department" label="接收部门"></el-table-column>
+                <el-table-column align="center" prop="to_person" label="接收人"></el-table-column>
+            </el-table>
+
+            <div class="page" :style="{width:width - 250 + 'px'}">
+                <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    layout="prev, pager, next, jumper"
+                    :total="total">
+                </el-pagination>
+            </div>
+        </div>
+
+
+
         <!-- 添加 -->
-        <el-dialog  
+        <el-drawer
             title="添加"
             :visible.sync="add_show"
-            width="500px">
-            <el-form :model="AddFormData" label-width="120px">
-                <el-form-item label="接收部门:" required>
-                    <el-input v-model="AddFormData.to_department" />
-                </el-form-item>
+            :direction="direction" size="45%">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+                <el-form :model="AddFormData" label-width="120px" label-position="left">
+                    <el-form-item label="接收部门:" required>
+                        <el-input v-model="AddFormData.to_department" />
+                    </el-form-item>
 
-                <el-form-item label="接收人:" required>
-                    <el-input v-model="AddFormData.to_person" />
-                </el-form-item>
+                    <el-form-item label="接收人:" required>
+                        <el-input v-model="AddFormData.to_person" />
+                    </el-form-item>
 
-                <el-form-item label="主题:" required>
-                    <el-input v-model="AddFormData.title" />
-                </el-form-item>
-                <el-form-item label="内容:" required>
-                    <el-input type="textarea" v-model="AddFormData.content"></el-input>
-                </el-form-item>
-            </el-form>
+                    <el-form-item label="主题:" required>
+                        <el-input v-model="AddFormData.title" />
+                    </el-form-item>
+                    <el-form-item label="内容:" required>
+                        <el-input type="textarea" v-model="AddFormData.content"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                    <el-button @click="add_show = false">取消</el-button>
+                    <el-button @click="onAddSubmit" type="primary">确定</el-button>
+                </div>
+            </div>
+        </el-drawer>
 
-            <span slot="footer">
-                <el-button @click="add_show = false">取消</el-button>
-                <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+        
         <!-- 编辑 -->
-        <el-dialog 
+        <el-drawer
             title="编辑"
-            width="450px"
-            :visible.sync="edit_show">
-            <el-form :model="EditFormData" label-width="120px">
+            :visible.sync="edit_show"
+            :direction="direction" size="45%">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+                <el-form :model="EditFormData" label-width="120px" label-position="left">
+                    <el-form-item label="接收部门:" required>
+                        <el-input v-model="EditFormData.to_department" />
+                    </el-form-item>
 
-                <el-form-item label="接收部门:">
-                    <el-input v-model="EditFormData.to_department"/>
-                </el-form-item>
-                <el-form-item label="接收人:">
-                    <el-input v-model="EditFormData.to_person" />
-                </el-form-item>
+                    <el-form-item label="接收人:" required>
+                        <el-input v-model="EditFormData.to_person" />
+                    </el-form-item>
 
-                <el-form-item label="主题:">
-                    <el-input v-model="EditFormData.title" />
-                </el-form-item>
-                <el-form-item label="内容:">
-                    <el-input type="textarea" v-model="EditFormData.content"></el-input>
-                </el-form-item>
-
-            </el-form>
-
-            <span slot="footer">
-                <el-button @click="edit_show = false">取消</el-button>
-                <el-button type="primary" @click="onEditSubmit">确认</el-button>
-            </span>
-        </el-dialog>
+                    <el-form-item label="主题:" required>
+                        <el-input v-model="EditFormData.title" />
+                    </el-form-item>
+                    <el-form-item label="内容:" required>
+                        <el-input type="textarea" v-model="EditFormData.content"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                    <el-button @click="edit_show = false">取消</el-button>
+                    <el-button @click="onEditSubmit" type="primary">确定</el-button>
+                </div>
+            </div>
+        </el-drawer>
 
          <!-- 详细 -->
-        <el-dialog 
+         <el-drawer
+            title="详细"
+            :visible.sync="detail_show"
+            :direction="direction" size="45%">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+                <el-form :model="DetailFormData" label-width="120px" label-position="left">
+                    <el-form-item label="接收部门:">{{DetailFormData.to_department || '----'}}</el-form-item>
+                    <el-form-item label="接收人:">{{DetailFormData.to_person || '----'}}</el-form-item>
+                    <el-form-item label="主题:">{{DetailFormData.title || '----'}}</el-form-item>
+                    <el-form-item label="内容:">
+                        <div style="width: 100%;height: auto;word-wrap:break-word;">
+                            {{DetailFormData.content}}
+                        </div>
+                    </el-form-item>
+                </el-form>
+                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                    <el-button @click="detail_show = false" type="primary">确定</el-button>
+                </div>
+            </div>
+        </el-drawer>
+        <!-- <el-dialog 
             title=""
             width="450px"
             :visible.sync="detail_show">
@@ -106,7 +172,7 @@
                 <el-form-item label="主题:">{{DetailFormData.title || '----'}}</el-form-item>
                 <el-form-item label="内容:">{{DetailFormData.content || '----'}}</el-form-item>
             </el-form>
-        </el-dialog>
+        </el-dialog> -->
 
     </div>
 </template>
@@ -116,14 +182,13 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
     import { workOrderList, workOrderAdd, workOrderEdit, workOrderDel } from "@/api/request"
-    import TableBase from "@/components/myTables/baseTable.vue"
+    // import TableBase from "@/components/myTables/baseTable.vue"
 
     if (!store.state.OrderData) {
         Vue.set(store.state, 'OrderData', {
-            rows:[],
             total:0,
-            page_num:1,
-            page_len:10,
+            // page_num:1,
+            // page_len:10,
             loading:false,
             curr_row:null,
              // 添加
@@ -137,29 +202,34 @@
             //编辑
             edit_show:false,
             EditFormData:{},
+            SearchFormData:{
+                // name:'',
+                page_num:1,
+                page_len:10,
+                order_field:'add_time',
+                order_sort:'desc'
+            },
             //表格数据
             rows: [],
-            //表头设置
-            columns: [
-                {prop: 'add_time', label: '添加时间'},
-                {prop: 'content', label: '内容'},
-                {prop: 'feedback', label: '内容反馈'},
-                {prop: 'last_time', label: '结束时间'},
-                {prop: 'status', label: '状态'},
-                {prop: 'title', label: '主题'},
-                {prop: 'to_department', label: '接收部门'},
-                {prop: 'to_person', label: '接收人'}    
-            ],
             cpname: '工单管理--api 平台未找到相关接口',
+            direction: 'rtl',
 
         });
     }
     export default {
-        components: {
-            TableBase
-        },
+        // components: {
+        //     TableBase
+        // },
         data() {
             return store.state.OrderData;
+        },
+        computed:{
+            width:() => {
+                return store.state.AppData.width;
+            },
+            height:() => {
+                return store.state.AppData.height;
+            },
         },
         created() {
                 this.init()
@@ -172,7 +242,11 @@
            init() {
                 this.loading = true;
                 let pam = {
-                    login_token:lime.cookie_get('login_token')
+                    login_token:lime.cookie_get('login_token'),
+                    page_num:this.SearchFormData.page_num,
+                    page_len:this.SearchFormData.page_len,
+                    order_field:this.SearchFormData.order_field,
+                    order_sort:this.SearchFormData.order_sort
                 }
                 workOrderList(pam, res => {
                     this.loading = false;
@@ -198,8 +272,11 @@
             },
             // 分页处理
             onPageChange(page){
-                this.page_num = page;
+                this.SearchFormDatapage_num = page;
                 this.init();
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
             },
             //添加
             handleAdd() {
@@ -254,14 +331,9 @@
                 this.edit_show = true
             },
             onEditSubmit() {
-                let pam = {
-                   login_token: this.EditFormData.login_token,
-                   to_department: this.EditFormData.to_department,
-                   to_person: this.EditFormData.to_person,
-                   title: this.EditFormData.title,
-                   content: this.EditFormData.content,
-               }
-                workOrderEdit(pam, res => {
+               this.EditFormData.login_token = lime.cookie_get('login_token'),
+               this.EditFormData.uuid = this.curr_row.uuid
+                workOrderEdit(this.EditFormData, res => {
                    this.init();
                    this.edit_show = false;
                 }).catch(err => {
@@ -276,7 +348,18 @@
                 }
                 this.DetailFormData = this.curr_row
                 this.detail_show = true
-            }
+            },
+            stateFormat(state) {
+                if (state == 0) {
+                    return '未开始';
+                } else if (state == 1) {
+                    return '处理中';
+                } else if (state == 2){
+                    return '已处理';
+                }else{
+                    return '已接收';
+                }
+            },
         }
 
         

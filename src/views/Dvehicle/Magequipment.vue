@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-15 16:10:18
- * @LastEditTime: 2020-09-16 10:03:27
+ * @LastEditTime: 2020-09-23 16:14:57
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Dvehicle/Magequipment.vue
@@ -142,13 +142,14 @@
                 {prop: 'access_ip', label: '设备接入系统的IP'}
             ],
             cpname: '设备管理',
+            direction: 'rtl'
 
         });
     }
 
     export default {
         components: {
-            TableBase
+            TableBase,
         },
         data() {
             return store.state.ShopDeviceData

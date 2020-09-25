@@ -1,7 +1,7 @@
 /*
  * @Author: xk
  * @Date: 2020-09-11 16:51:53
- * @LastEditTime: 2020-09-17 19:51:35
+ * @LastEditTime: 2020-09-24 17:18:48
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/api/request.js
@@ -37,6 +37,17 @@ export const ShopAccountList = (params, callback) => { return lime.req("ShopAcco
 export const ShopAccountDetail = (params, callback) => { return lime.req("ShopAccountDetail", params).then(callback)};
 // 财务中心-财务统计-列表
 export const ShopTradeAccountList = (params, callback) => { return lime.req("ShopTradeAccountList", params).then(callback)};
+
+// 培训学习-计划管理-列表
+export const ShopPlanList = (params, callback) => { return lime.req("ShopPlanList", params).then(callback)};
+// 培训学习-计划管理-添加
+export const ShopPlanAdd = (params, callback) => { return lime.req("ShopPlanAdd", params).then(callback)};
+// 培训学习-计划管理-删除
+export const ShopPlanDel = (params, callback) => { return lime.req("ShopPlanDel", params).then(callback)};
+// 培训学习-计划管理-编辑
+export const ShopPlanEdit = (params, callback) => { return lime.req("ShopPlanEdit", params).then(callback)};
+// 培训学习-计划管理-详细
+export const ShopPlanDetail = (params, callback) => { return lime.req("ShopPlanDetail", params).then(callback)};
 
 
 // 车辆与设备-车辆管理-列表
@@ -82,12 +93,41 @@ export const ShopDeviceEditStatus = (params, callback) => { return lime.req("Sho
 
 // 货物与运单-电子运单-列表
 export const EbShopList = (params, callback) => { return lime.req("EbShopList", params).then(callback)};
+// 货物与运单-电子运单-城市 uuid
+export const GetCityUuid = (params, callback) => { return lime.req("GetCityUuid", params).then(callback)};
+// 货物与运单-电子运单-审核人
+export const EbStaffList = (params, callback) => { return lime.req("EbStaffList", params).then(callback)};
+// 货物与运单-电子运单-承运方列表
+export const EbCarrierList = (params, callback) => { return lime.req("EbCarrierList", params).then(callback)};
+// 货物与运单-电子运单-承运方编辑
+export const EbCarrierEdit = (params, callback) => { return lime.req("EbCarrierEdit", params).then(callback)};
+
+
+// 货物与运单-电子运单-关联车辆
+export const EbShopVehicleList = (params, callback) => { return lime.req("EbShopVehicleList", params).then(callback)};
 // 货物与运单-电子运单-添加
 export const EbShopAdd = (params, callback) => { return lime.req("EbAdd", params).then(callback)};
-// 行政区域接口
-export const GetArea = (params, callback) => { return lime.req("GetArea", params).then(callback)};
+// 货物与运单-电子运单-作废
+export const EbShopCancel = (params, callback) => { return lime.req("EbShopCancel", params).then(callback)};
+// 货物与运单-电子运单-审核
+export const EbShopAudit = (params, callback) => { return lime.req("EbShopAudit", params).then(callback)};
+// 货物与运单-电子运单-接单
+export const EbShopStaffReceiveBillAudit = (params, callback) => { return lime.req("EbShopStaffReceiveBillAudit", params).then(callback)};
+// 货物与运单-电子运单-完成
+export const EbShopConfirm = (params, callback) => { return lime.req("EbShopConfirm", params).then(callback)};
+
+
+
+
+
+// 货物与运单-电子运单-详细
+export const EbDetail = (params, callback) => { return lime.req("EbDetail", params).then(callback)};
+// 货物与运单-电子运单-添加-参与人
+export const EbShopListCertificate = (params, callback) => { return lime.req("EbShopListCertificate", params).then(callback)};
+
 // 货物与运单-货物管理-列表
 export const EbGoodList = (params, callback) => { return lime.req("EbGoodList", params).then(callback)};
+
 // 货物与运单-货物管理-添加
 export const EbGoodAdd = (params, callback) => { return lime.req("EbGoodAdd", params).then(callback)};
 // 货物与运单-货物管理-删除

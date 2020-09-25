@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:38:37
- * @LastEditTime: 2020-09-18 13:45:13
+ * @LastEditTime: 2020-09-23 08:34:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Egoods/Goods.vue
@@ -46,7 +46,7 @@
             title="添加"
             :visible.sync="add_show"
             width="500px">
-            <el-form :model="AddFormData" label-width="120px">
+            <el-form :model="AddFormData" label-width="120px" label-position="left">
                 <el-form-item label="货物名称:" required>
                     <el-input v-model="AddFormData.name" />
                 </el-form-item>
@@ -64,7 +64,7 @@
             title="编辑"
             :visible.sync="edit_show"
             width="500px">
-            <el-form :model="EditFormData" label-width="120px">
+            <el-form :model="EditFormData" label-width="120px" label-position="left">
                 <el-form-item label="货物名称:">
                     <el-input v-model="EditFormData.name" @input="change($event)"/>
                 </el-form-item>
@@ -78,10 +78,10 @@
 
          <!-- 详细 -->
         <el-dialog  
-            title=""
+            title="详细"
             :visible.sync="detail_show"
             width="500px">
-            <el-form :model="DetailFormData" label-width="120px">
+            <el-form :model="DetailFormData" label-width="120px" label-position="left">
                 <el-form-item label="货物名称:">{{DetailFormData.name}}</el-form-item>
                 <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
                 <el-form-item label="修改时间:">{{DetailFormData.last_time}}</el-form-item>

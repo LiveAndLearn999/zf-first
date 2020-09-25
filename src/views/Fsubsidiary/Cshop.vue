@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:44:01
- * @LastEditTime: 2020-09-14 15:00:02
+ * @LastEditTime: 2020-09-21 10:02:00
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Fsubsidiary/Cshop.vue
@@ -67,7 +67,6 @@
 
     if (!store.state.CshopData) {
         Vue.set(store.state, 'CshopData', {
-            rows:[],
             total:0,
             loading:false,
             curr_row:null,

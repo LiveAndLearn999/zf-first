@@ -7,9 +7,9 @@
                 </el-col>
                 <el-col :span="16" style="text-align: right">
                     <div style="padding-right: 20px;">
-                        <span class="msg_icon"></span>
+                        <span class="msg_icon" v-if="showCircle"></span>
                         <el-button type="text" @click="handleMsg">消息</el-button>
-                        <el-button type="text">我的</el-button>
+                        <el-button type="text" @click="my_show = true">我的</el-button>
                         <el-button type="danger" @click="onLogout" plain size="mini">退出</el-button>
                     </div>
                 </el-col>
@@ -50,22 +50,25 @@
                 
         </div>
 
-        <el-drawer
+        <!-- 消息 -->
+        <el-drawer align="left"
             title="消息列表"
             size="40%"
             :visible.sync="msg_show"
             :direction="direction">
             <!-- border -->
             <!-- 数据表格 -->
+            <div style="width: 100%;height: 30px;text-align: left;padding-left: 24px;box-sizing: border-box;font-size: 13px;color: #909399">
+                    声音:  <el-switch  v-model="autoPlay"></el-switch>
+                </div>
             <div style="border-top: solid 1px #f2f1f4;">
                 <el-table 
                     :data="rows"
-                    :height="height - 60 - 46 - 48"
+                    :height="height - 140"
                     v-loading="loading"
                     element-loading-text="拼命加载中"
                     element-loading-spinner="el-icon-loading"
                     element-loading-background="rgba(0, 0, 0, 0.8)"
-
                     @sort-change="onSortChange"
                     :highlight-current-row="true"
                     @current-change="onSelectRow"
@@ -85,16 +88,37 @@
                     </el-table-column>
                 </el-table>
 
-                <div class="page" style="width: 100%;text-align: right">
+                <!-- <div class="page" style="width: 100%;text-align: right">
                     <el-pagination
                         :current-page.sync="SearchFormData.page_num"
                         @current-change="onPageChange"
                         layout="prev, pager, next"
                         :total="total">
                     </el-pagination>
-                </div>
+                </div> -->
             </div>
         </el-drawer>
+
+        <!-- 我的 -->
+        <el-dialog
+            title="我的"
+            :visible.sync="my_show"
+            width="400px" align="left">
+            <el-form ref="form" :model="myFormDate" label-width="80px" label-position="left">
+                <el-form-item label="原用户名">{{'---'}}</el-form-item>
+                <el-form-item label="新用户名">
+                    <el-input prefix-icon="el-icon-mobile-phone" v-model="myFormDate.username"></el-input>
+                </el-form-item>
+                <el-form-item label="原密码">{{'---'}}</el-form-item>
+                <el-form-item label="新密码">
+                    <el-input prefix-icon="el-icon-key" show-password v-model="myFormDate.pwd" type="password"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="my_show = false">取 消</el-button>
+                <el-button type="primary" @click="my_show = false">确 定</el-button>
+            </span>
+        </el-dialog>
 
     </div>
 </template>
@@ -121,21 +145,27 @@
                 old_pwd: '',
                 new_pwd: '',
             },
-
             msg_show: false,
             direction: 'rtl',
-            countDownNum:120,
+            countDownNum:12,
             timer:null,
-            rows:[],
-            total:0,
-            loading:false,
-            curr_row:null,
              SearchFormData:{
                 page_num:1,
                 page_len:10,
                 order_field:'add_time',
                 order_sort:'desc'
             },
+            autoPlay: true,
+            showCircle: false,
+            my_show: false,
+            myFormDate: {
+                username: '',
+                pwd: ''
+            },
+            rows:[],
+            total:0,
+            loading:false,
+            curr_row:null,
         })
     }
 
@@ -167,7 +197,32 @@
                 this.timer=setInterval(() => {
                     this.countDownNum--;
                     console.log(1111)
-                    if(this.countDownNum % 5 === 0) {
+                    if(this.countDownNum % 2 === 0) {
+                        let newMsg = {
+                             uuid: '11111111111' + this.countDownNum,
+                             content_type: 10,
+                             content: 'test' + this.countDownNum,
+                             msg_type: 0,
+                             msg_type_about_detail: [],
+                             send_type: 0,
+                             send_time: '2020-09-' + this.countDownNum,
+                             send_ip: '192.114.'+ this.countDownNum,
+                             send_group_detail: [],
+                             send_about_detail: [],
+                             get_typ: 10,
+                             get_group_detail: [],
+                             get_about_detail: [],
+                             add_time: '2020-08-0' + this.countDownNum,
+                             look_num: 1
+                        }
+                        this.rows.push(newMsg)
+                        this.total = this.total - 0 + 1
+                        if(this.total - 0 > 0) {
+                            this.showCircle = true
+                        }else {
+                            this.showCircle = false
+                        }
+                        // this.rows = newRows
                         that.playAudio()
                         that.$message.success({message: '您有一条新消息',
           center: true});
@@ -178,8 +233,12 @@
                 },1000);
             },
             playAudio() {
-                this.$refs.audio.currentTime = 0; //从头开始播放提示音
-                this.$refs.audio.play(); //播放
+                if(this.autoPlay) {
+                  this.$refs.audio.currentTime = 0; //从头开始播放提示音
+                  this.$refs.audio.play(); //播放
+              }else {
+                  this.$refs.audio.pause(); //暂停
+              }
 
             },
             handleMsg() {
@@ -187,39 +246,67 @@
                 this.initTable()
             },
             initTable() {
-                let pam = {
-                    login_token:lime.cookie_get('login_token'),
-                }
-                this.loading = true;
-                ShopMsgList(pam, res => {
+                    if(this.total - 0  > 0) {
+                        this.showCircle = true
+                    }else {
+                        this.showCircle = false
+                    }
                     this.$refs.configurationTable.doLayout()
-                    this.loading = false;
-                    this.rows = res.data.rows;
-                    this.total = res.data.total;
-                }).catch(err => {
-                    this.$message.error(err.msg);
-                })
+                // let pam = {
+                //     login_token:lime.cookie_get('login_token'),
+                // }
+                // this.loading = true;
+                // ShopMsgList(pam, res => {
+                //     this.$refs.configurationTable.doLayout()
+                //     this.loading = false;
+                //     this.rows = res.data.rows;
+                //     this.total = res.data.total;
+                //     if(res.data.total - 0  > 0) {
+                //         this.showCircle = true
+                //     }else {
+                //         this.showCircle = false
+                //     }
+                // }).catch(err => {
+                //     this.$message.error(err.msg);
+                // })
             },
             handleClick(row) {
                 console.log(row);
             },
             handleDel(row) {
-                console.log(row)
                 this.$confirm('确认删除?', '提示').then(() => {
-                    let pam = {
-                        login_token:lime.cookie_get('login_token'),
-                        uuid:row.uuid
+                    this.rows.splice(this.rows.findIndex(v => v.uuid === row.uuid), 1)
+                    if(this.rows.length < 1) {
+                        this.showCircle = false
+                        this.total = 0
                     }
-                    ShopMsgDel(pam, res => {
-                        this.initTable();
-                        this.$message.success('操作成功');
-                    }).catch(err => {
-                        this.$message.error(err.msg);
-                    })
-                }).catch(err => {
-                    console.log(111)
                 })
+                // this.$confirm('确认删除?', '提示').then(() => {
+                //     let pam = {
+                //         login_token:lime.cookie_get('login_token'),
+                //         uuid:row.uuid
+                //     }
+                //     ShopMsgDel(pam, res => {
+                //         this.initTable();
+                //         this.$message.success('操作成功');
+                //     }).catch(err => {
+                //         this.$message.error(err.msg);
+                //     })
+                // }).catch(err => {
+                //     this.$message.error(err.msg);
+                // })
             },
+            // audioChange() {
+            //   if(this.autoPlay) {
+            //       this.$refs.audio.currentTime = 0;
+            //       this.$refs.audio.play();
+            //   }else {
+            //       this.$refs.audio.pause();
+            //   }
+            // },
+
+
+
             // 排序处理
             onSortChange(sort) {
                 this.SearchFormData.order_field = sort.prop;
@@ -322,6 +409,12 @@
     }
 </script>
 
+<style>
+ :focus{
+        outline:0;
+    }
+ </style>
+
 <style scoped>
     .msg_icon {
       display: inline-block;
@@ -390,4 +483,5 @@
     /* .el-table th.gutter{
         display: table-cell!important;
     } */
+
 </style>

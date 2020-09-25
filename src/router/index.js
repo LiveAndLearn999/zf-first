@@ -53,6 +53,8 @@ const Study   = () => import('../views/Ctrain/Study.vue');
 const Question   = () => import('../views/Ctrain/Question.vue');
 const Template   = () => import('../views/Ctrain/Template.vue');
 const Group   = () => import('../views/Ctrain/Group.vue');
+const handList   = () => import('../views/Ctrain/handList.vue');
+const handMage   = () => import('../views/Ctrain/handMage.vue');
 
 
 // 货物与运单
@@ -265,6 +267,22 @@ const routes = [
                 meta: {
                     rbac: 'logins',
                     title: '试卷分组'
+                }
+            },
+            {
+                path: 'hand_mag/:menu_uuid',
+                component: handMage,
+                meta: {
+                    rbac: 'logins',
+                    title: '标签管理'
+                }
+            },
+            {
+                path: 'hand_mag/handleList/:menu_uuid',
+                component: handList,
+                meta: {
+                    rbac: 'logins',
+                    title: '标签分组'
                 }
             },
 

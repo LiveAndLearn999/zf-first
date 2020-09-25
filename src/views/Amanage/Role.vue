@@ -34,7 +34,7 @@
                 ref="role"
                 :data="rows"
                 row-key="uuid"
-                :height="height - 60 - 48"
+                :height="height - 60 - 95"
                 v-loading="loading"
                 :default-expand-all="true"
                 element-loading-text="拼命加载中"
@@ -55,19 +55,19 @@
             title="添加"
             width="450px"
             :visible.sync="add_show">
-            <el-form :model="AddFormData" label-width="80px">
+            <el-form :model="AddFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
                         clearable 
                         :options="add_rows"
-                        :props="{checkStrictly:true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
-                        placeholder="不选择则为顶级"
-                        v-model="AddFormData.parent_uuid">
+                        :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        placeholder="请选择"
+                        v-model="AddFormData.parent_uuid" style="width: 330px">
                     </el-cascader>
                 </el-form-item>
 
                 <el-form-item label="角色名称:">
-                    <el-input v-model="AddFormData.name" />
+                    <el-input v-model="AddFormData.name" style="width: 330px"/>
                 </el-form-item>
 
 
@@ -84,19 +84,19 @@
             title="编辑"
             width="450px"
             :visible.sync="edit_show">
-            <el-form :model="EditFormData" label-width="80px">
+            <el-form :model="EditFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
                         clearable 
                         :options="edit_rows"
-                        :props="{checkStrictly:true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
-                        placeholder="不选择则为顶级"
-                        v-model="EditFormData.parent_uuid">
+                        :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        placeholder="请选择"
+                        v-model="EditFormData.parent_uuid" style="width: 320px">
                     </el-cascader>
                 </el-form-item>
 
                 <el-form-item label="角色名称:">
-                    <el-input v-model="EditFormData.name" />
+                    <el-input v-model="EditFormData.name" style="width: 320px"/>
                 </el-form-item>
             </el-form>
 

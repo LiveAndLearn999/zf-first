@@ -13,3 +13,11 @@
     right:0;
     overflow: hidden;
 }
+
+.footer {
+    position: absolute;
+    bottom: 10px;
+    width: 96%;
+    padding-right: 50px!important;
+    box-sizing: border-box;
+}

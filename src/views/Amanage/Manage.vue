@@ -11,12 +11,10 @@
                         </span>
                     </div>
                 </el-col>
-
                 <el-col :span="18">
                     <div style="text-align: right; ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
-                        <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
-
+                        <el-link :style="{color: havaSeatch ? 'red' : ''}" @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
                         <el-link
                             class="menu" 
                             @click="onSubMenu(item)"
@@ -28,7 +26,6 @@
                 </el-col>
             </el-row>
         </div>
-
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
             <el-table 
@@ -38,21 +35,22 @@
                 element-loading-text="拼命加载中"
                 element-loading-spinner="el-icon-loading"
                 element-loading-background="rgba(0, 0, 0, 0.8)"
-
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
                 <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="姓名"></el-table-column>
-                <el-table-column prop="mobile" label="登录手机"></el-table-column>
-                <el-table-column prop="role_name" label="角色">
+                <el-table-column align="center" prop="name" label="姓名"></el-table-column>
+                <el-table-column align="center" prop="mobile" label="登录手机"></el-table-column>
+                <el-table-column align="center" prop="role_name" label="角色" >
                     <template slot-scope="scope">
-                        {{scope.row.role_name == '' ? '未设置' : scope.row.role_name}}
+                        <span class="no_role" v-if="scope.row.role_name == '' ">未设置</span>
+                        <span v-else>{{scope.row.role_name}}</span>
+                        <!-- {{scope.row.role_name == '' ? '未设置'  : scope.row.role_name}} -->
                     </template>
                 </el-table-column>
-                <el-table-column prop="add_time" label="添加时间" :sortable=true></el-table-column>
+                <el-table-column align="center" prop="add_time" label="添加时间" :sortable=true></el-table-column>
                 <el-table-column 
                     prop="last_time" 
                     label="最近登录时间" 
@@ -70,12 +68,21 @@
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
+                <!-- <span class="demonstration">直接前往</span> -->
                 <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
@@ -83,13 +90,10 @@
         <el-dialog
             title="搜索"
             :visible.sync="search_show"
-            width="30%">
-            <el-form :model="SearchFormData" label-width="120px">
-                <el-form-item label="员工姓名:">
-                    <el-input v-model="SearchFormData.real_name" />
-                </el-form-item>
+            width="35%">
+            <el-form :model="SearchFormData" label-width="120px" label-position="left">
+                <el-form-item label="员工姓名:"><el-input v-model="SearchFormData.real_name" /></el-form-item>
             </el-form>
-
             <span slot="footer">
                 <el-button @click="search_show = false">取 消</el-button>
                 <el-button type="primary" @click="onSearchSubmit">确 定</el-button>
@@ -97,104 +101,375 @@
         </el-dialog>
 
         <!-- 详细模板 -->
-        <el-dialog  
-            title=""
+        <el-drawer
+            title="详细"
             :visible.sync="detail_show"
-            width="500px">
-            <el-form :model="DetailFormData" label-width="120px">
-                <el-form-item label="登陆手机:">
-                    {{DetailFormData.mobile}}
-                </el-form-item>
-
-
-                <el-form-item label="员工姓名:">
-                    {{DetailFormData.name}}
-                </el-form-item>
-                <el-form-item label="状态:">
-                    {{DetailFormData.state === 1 ? '启用' : '禁用'}}
-                </el-form-item>
-            </el-form>
-        </el-dialog>
+            :direction="direction" size="45%">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+                <el-form :model="DetailFormData" label-width="140px" label-position="left">
+                    <el-form-item label="员工名称:">{{DetailFormData.name}}</el-form-item>
+                    <el-form-item label="登录手机号:">{{DetailFormData.mobile }}</el-form-item>
+                    <el-form-item label="角色名称:">{{DetailFormData.role_name }}</el-form-item>
+                    <el-form-item label="状态:">{{DetailFormData.state == 1 ? '启用' : '冻结'}}</el-form-item>
+                    <el-form-item label="添加时间:">{{DetailFormData.add_time }}</el-form-item>
+                    <el-form-item label="最近修改时间:">{{DetailFormData.last_time}}</el-form-item>
+                    <el-form-item label="最近修改ip:">{{DetailFormData.last_ip}}</el-form-item>
+                    <el-form-item label="紧急联系人:">{{DetailFormData.emergency_contact || '---' }}</el-form-item>
+                    
+                    <el-form-item label="紧急联系电话:">
+                        {{DetailFormData.emergency_conttel}}
+                    </el-form-item>
+                    <el-form-item label="与紧急联系人关系:">
+                        {{DetailFormData.emergency_about}}
+                    </el-form-item>
+                    <el-form-item label="银行卡号:">
+                        {{DetailFormData.bank_code }}
+                    </el-form-item>
+                    <el-form-item label="银行名称:">
+                        {{DetailFormData.bank_name}}
+                    </el-form-item>
+                    <el-form-item label="银行卡姓名:">
+                        {{DetailFormData.bank_staff_name}}
+                    </el-form-item>
+                    <el-form-item label="入职时间:">
+                        {{DetailFormData.start_time}}
+                    </el-form-item>
+                    <el-form-item label="试用期时间:">
+                        {{DetailFormData.try_time}}
+                    </el-form-item>
+                    <el-form-item label="离职时间:">
+                        {{DetailFormData.out_time}}
+                    </el-form-item>
+                    <el-form-item label="身份证:">
+                        {{DetailFormData.person_code}}
+                    </el-form-item>
+                    <el-form-item label="性别:">
+                        {{DetailFormData.sex == 1 ? '男' : '女'}}
+                    </el-form-item>
+                    <el-form-item label="当前居住地:">
+                        {{DetailFormData.now_addr}}
+                    </el-form-item>
+                    <el-form-item label="籍贯所在地:">
+                        {{DetailFormData.home_addr}}
+                    </el-form-item>
+                    <el-form-item label="身份证正面:">
+                        <!-- {{DetailFormData.person_code_img0}} -->
+                        <img src="../../assets/imgs/car.png" alt="">
+                    </el-form-item>
+                    <el-form-item label="身份证反面:">
+                        <img src="../../assets/imgs/car.png" alt="">
+                        <!-- {{DetailFormData.person_code_img1}} -->
+                    </el-form-item>
+                    <el-form-item label="学历类型:">
+                        <span v-if="DetailFormData.edu_type == 0 "> 保密</span>
+                        <span v-else-if="DetailFormData.edu_type == 1">初中及以上</span>
+                        <span v-else-if="DetailFormData.edu_type == 2">高中及以上</span>
+                        <span v-else-if="DetailFormData.edu_type == 3">大专及以上</span>
+                        <span v-else-if="DetailFormData.edu_type == 4">本科及以上</span>
+                        <span v-else>研究生及以上</span>
+                        <!-- {{DetailFormData.edu_type}} -->
+                    </el-form-item>
+                    <el-form-item label="婚姻状况:">
+                        <span v-if="DetailFormData.is_marry == 0 ">未婚</span>
+                        <span v-else-if="DetailFormData.is_marry == 1 ">已婚</span>
+                        <span v-else-if="DetailFormData.is_marry == 2 ">离异</span>
+                        <span v-else> 丧偶</span>
+                        <!-- {{DetailFormData.is_marry}} -->
+                    </el-form-item>
+                    <el-form-item label="民族:">
+                        {{DetailFormData.nation}}
+                    </el-form-item>
+                    <el-form-item label="微信号:">
+                        {{DetailFormData.weixin_code}}
+                    </el-form-item>
+                   <el-form-item label="薪资:">
+                       {{((DetailFormData.salary - 0) / 100) + '元'}}
+                    </el-form-item> 
+                    <el-form-item label="是否已交社保:">
+                        <span v-if="DetailFormData.is_social == 0 ">未交</span>
+                        <span v-else>已交</span>
+                        <!-- {{DetailFormData.is_social}} -->
+                    </el-form-item> 
+                </el-form>
+                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                    <el-button @click="detail_show = false" type="primary">确定</el-button>
+                </div>
+            </div>
+        </el-drawer>
 
         <!-- 添加模板 -->
-        <el-dialog  
+        <el-drawer
             title="添加"
             :visible.sync="add_show"
-            width="500px">
-            <el-form :model="AddFormData" label-width="120px">
-                <el-form-item label="登陆手机:" required>
-                    <el-input v-model="AddFormData.mobile" />
-                </el-form-item>
-
-                <el-form-item label="登陆密码:" required>
-                    <el-input show-password v-model="AddFormData.pwd" />
-                </el-form-item>
-
-                <el-form-item label="员工姓名:" required>
-                    <el-input v-model="AddFormData.name" />
-                </el-form-item>
-                <el-form-item label="启用:" required>
-                    <el-switch v-model="AddFormData.state"></el-switch>
-                </el-form-item>
-            </el-form>
-
-            <span slot="footer">
-                <el-button @click="add_show = false">取消</el-button>
-                <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+            :direction="direction" size="45%">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+                <el-form :model="AddFormData" label-width="140px" label-position="left">
+                    <el-form-item label="员工名称:" required><el-input v-model="AddFormData.name" /></el-form-item>
+                    <el-form-item label="登录手机号:" required><el-input v-model="AddFormData.mobile" /></el-form-item>
+                    <el-form-item label="密码:" required><el-input v-model="AddFormData.pwd" /></el-form-item>
+                    <el-form-item label="状态:" required>
+                        <el-radio v-model="AddFormData.state" label="0">冻结</el-radio>
+                        <el-radio v-model="AddFormData.state" label="1">启用</el-radio>
+                    </el-form-item>
+                    <el-form-item label="添加时间:">
+                         <el-date-picker
+                            v-model="AddFormData.add_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.add_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="最近修改时间:">
+                        <el-date-picker
+                            v-model="AddFormData.last_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.last_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="最近修改ip:"><el-input v-model="AddFormData.last_ip" /></el-form-item>
+                    <el-form-item label="紧急联系人:"><el-input v-model="AddFormData.emergency_contact" /></el-form-item>
+                    <el-form-item label="紧急联系电话:">
+                        <el-input v-model="AddFormData.emergency_conttel" />
+                    </el-form-item>
+                    <el-form-item label="与紧急联系人关系:">
+                        <el-input v-model="AddFormData.emergency_about" />
+                    </el-form-item>
+                    <el-form-item label="银行卡号:">
+                         <el-input v-model="AddFormData.bank_code" />
+                    </el-form-item>
+                    <el-form-item label="银行名称:">
+                        <el-input v-model="AddFormData.bank_name" />
+                    </el-form-item>
+                    <el-form-item label="银行卡姓名:">
+                        <el-input v-model="AddFormData.bank_staff_name" />
+                    </el-form-item>
+                    <el-form-item label="入职时间:">
+                        <el-date-picker
+                            v-model="AddFormData.start_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.start_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="试用期时间:">
+                        <el-date-picker
+                            v-model="AddFormData.try_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.try_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="离职时间:">
+                        <el-date-picker
+                            v-model="AddFormData.out_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.out_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="身份证:">
+                        <el-input v-model="AddFormData.person_code" />
+                    </el-form-item>
+                    <el-form-item label="性别:">
+                        <el-radio v-model="AddFormData.sex" label="0">女</el-radio>
+                        <el-radio v-model="AddFormData.sex" label="1">男</el-radio>
+                    </el-form-item>
+                    <el-form-item label="当前居住地:">
+                        <el-input v-model="AddFormData.now_addr" />
+                    </el-form-item>
+                    <el-form-item label="籍贯所在地:">
+                        <el-input v-model="AddFormData.home_addr" />
+                    </el-form-item>
+                    <el-form-item label="身份证正面:">
+                        <el-input v-model="AddFormData.person_code_img0" />
+                    </el-form-item>
+                    <el-form-item label="身份证反面:">
+                        <el-input v-model="AddFormData.person_code_img1" />
+                    </el-form-item>
+                    <el-form-item label="受教育类型:">
+                        <el-radio v-model="AddFormData.edu_type" label="0">保密</el-radio>
+                        <el-radio v-model="AddFormData.edu_type" label="1">初中及以上</el-radio>
+                        <el-radio v-model="AddFormData.edu_type" label="2">高中及以上</el-radio>
+                        <el-radio v-model="AddFormData.edu_type" label="3">大专及以上</el-radio>
+                        <el-radio v-model="AddFormData.edu_type" label="4"> 本科及以上</el-radio>
+                        <el-radio v-model="AddFormData.edu_type" label="5"> 研究生及以上</el-radio>
+                    </el-form-item>
+                    <el-form-item label="婚姻状况:">
+                        <el-radio v-model="AddFormData.is_marry" label="0">未婚</el-radio>
+                        <el-radio v-model="AddFormData.is_marry" label="1">已婚</el-radio>
+                        <el-radio v-model="AddFormData.is_marry" label="2">离异</el-radio>
+                        <el-radio v-model="AddFormData.is_marry" label="3">丧偶</el-radio>
+                    </el-form-item>
+                    <el-form-item label="民族:">
+                        <el-input v-model="AddFormData.nation" />
+                    </el-form-item>
+                    <el-form-item label="微信号:">
+                        <el-input v-model="AddFormData.weixin_code" />
+                    </el-form-item>
+                   <el-form-item label="薪资:">
+                       <el-input v-model="AddFormData.salary" />
+                    </el-form-item> 
+                    <el-form-item label="是否已交社保:">
+                        <el-radio v-model="AddFormData.is_social" label="0">未缴</el-radio>
+                        <el-radio v-model="AddFormData.is_social" label="1">已缴</el-radio>
+                    </el-form-item> 
+                </el-form>
+                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                    <el-button @click="add_show = false">取消</el-button>
+                    <el-button @click="onAddSubmit" type="primary">确定</el-button>
+                </div>
+            </div>
+        </el-drawer>
 
         <!-- 编辑模板 -->
-        <el-dialog  
+        <el-drawer
             title="编辑"
             :visible.sync="edit_show"
-            width="500px">
-            <el-form :model="EditFormData" label-width="120px">
-                <el-form-item label="员工姓名:">
-                    <el-input v-model="EditFormData.name" />
-                </el-form-item>
-                <el-form-item label="启用:">
-                    <el-switch v-model="EditFormData.state"></el-switch>
-                    <!-- <el-input v-model="EditFormData.state" /> -->
-                </el-form-item>
-
-            </el-form>
-
-            <span slot="footer">
-                <el-button @click="edit_show = false">取消</el-button>
-                <el-button @click="onEditSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+            :direction="direction" size="45%">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+                <el-form :model="EditFormData" label-width="140px" label-position="left">
+                    <el-form-item label="员工名称:"><el-input v-model="EditFormData.name" /></el-form-item>
+                    <el-form-item label="登录手机号:"><el-input v-model="EditFormData.mobile" /></el-form-item>
+                    <el-form-item label="状态:">
+                        <el-radio v-model="EditFormDataState" label="0">冻结</el-radio>
+                        <el-radio v-model="EditFormDataState" label="1">启用</el-radio>
+                    </el-form-item>
+                    <el-form-item label="添加时间:">
+                        <el-date-picker
+                            v-model="EditFormData.add_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="最近修改时间:">
+                        <el-date-picker
+                            v-model="EditFormData.last_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="最近修改ip:"><el-input v-model="EditFormData.last_ip" /></el-form-item>
+                    <el-form-item label="紧急联系人:"><el-input v-model="EditFormData.emergency_contact" /></el-form-item>
+                    <el-form-item label="紧急联系电话:">
+                        <el-input v-model="EditFormData.emergency_conttel" />
+                    </el-form-item>
+                    <el-form-item label="与紧急联系人关系:">
+                        <el-input v-model="EditFormData.emergency_about" />
+                    </el-form-item>
+                    <el-form-item label="银行卡号:">
+                         <el-input v-model="EditFormData.bank_code" />
+                    </el-form-item>
+                    <el-form-item label="银行名称:">
+                        <el-input v-model="EditFormData.bank_name" />
+                    </el-form-item>
+                    <el-form-item label="银行卡姓名:">
+                        <el-input v-model="EditFormData.bank_staff_name" />
+                    </el-form-item>
+                    <el-form-item label="入职时间:">
+                        <el-date-picker
+                            v-model="EditFormData.start_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="试用期时间:">
+                        <el-date-picker
+                            v-model="EditFormData.try_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="离职时间:">
+                        <el-date-picker
+                            v-model="EditFormData.out_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="身份证:">
+                        <el-input v-model="EditFormData.person_code" />
+                    </el-form-item>
+                    <el-form-item label="性别:">
+                        <el-radio v-model="EditFormDataSex" label="0">女</el-radio>
+                        <el-radio v-model="EditFormDataSex" label="1">男</el-radio>
+                    </el-form-item>
+                    <el-form-item label="当前居住地:">
+                        <el-input v-model="EditFormData.now_addr" />
+                    </el-form-item>
+                    <el-form-item label="籍贯所在地:">
+                        <el-input v-model="EditFormData.home_addr" />
+                    </el-form-item>
+                    <el-form-item label="身份证正面:">
+                        <el-input v-model="EditFormData.person_code_img0" />
+                    </el-form-item>
+                    <el-form-item label="身份证反面:">
+                        <el-input v-model="EditFormData.person_code_img1" />
+                    </el-form-item>
+                    <el-form-item label="受教育类型:">
+                        <el-radio v-model="EditFormDataEdutype" label="0">保密</el-radio>
+                        <el-radio v-model="EditFormDataEdutype" label="1">初中及以上</el-radio>
+                        <el-radio v-model="EditFormDataEdutype" label="2">高中及以上</el-radio>
+                        <el-radio v-model="EditFormDataEdutype" label="3">大专及以上</el-radio>
+                        <el-radio v-model="EditFormDataEdutype" label="4"> 本科及以上</el-radio>
+                        <el-radio v-model="EditFormDataEdutype" label="5"> 研究生及以上</el-radio>
+                    </el-form-item>
+                    <el-form-item label="婚姻状况:">
+                        <el-radio v-model="EditFormDataIsmarry" label="0">未婚</el-radio>
+                        <el-radio v-model="EditFormDataIsmarry" label="1">已婚</el-radio>
+                        <el-radio v-model="EditFormDataIsmarry" label="2">离异</el-radio>
+                        <el-radio v-model="EditFormDataIsmarry" label="3">丧偶</el-radio>
+                    </el-form-item>
+                    <el-form-item label="民族:">
+                        <el-input v-model="EditFormData.nation" />
+                    </el-form-item>
+                    <el-form-item label="微信号:">
+                        <el-input v-model="EditFormData.weixin_code" />
+                    </el-form-item>
+                   <el-form-item label="薪资:">
+                       <el-input v-model="EditFormData.salary" />
+                    </el-form-item> 
+                    <el-form-item label="是否已交社保:">
+                        <el-radio v-model="Issocial" label="0">未缴</el-radio>
+                        <el-radio v-model="Issocial" label="1">已缴</el-radio>
+                    </el-form-item> 
+                </el-form>
+                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                    <el-button @click="edit_show = false">取消</el-button>
+                    <el-button @click="onEditSubmit" type="primary">确定</el-button>
+                </div>
+            </div>
+        </el-drawer>
 
         <!-- 设置角色 -->
          <el-dialog 
             title="设置角色"
             width="450px"
             :visible.sync="role_show">
-            <el-form :model="RoleFormData" label-width="80px">
+            <el-form :model="RoleFormData" label-width="80px" label-position="left">
                 <el-form-item label="拥有角色:">
                     <el-cascader 
                         clearable 
                         :options="role_rows"
-                        :props="{checkStrictly:true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
-                        placeholder="不选择,无权限"
+                        :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        placeholder="请选择"
                         v-model="RoleFormData.role_uuid">
                     </el-cascader>
                 </el-form-item>
             </el-form>
-
             <span slot="footer">
                 <el-button @click="role_show = false">取消</el-button>
                 <el-button type="primary" @click="onRoleSubmit">确认</el-button>
             </span>
         </el-dialog>
 
-        <!-- 设置角色 -->
+        <!-- 重置密码 -->
          <el-dialog 
             title="重置密码"
             width="450px"
             :visible.sync="setpwd_show">
-            <el-form :model="PwdFormDate" label-width="80px">
+            <el-form :model="PwdFormDate" label-width="80px" label-position="left">
+                <el-form-item label="原密码:">{{oldEditpwd || '---'}}</el-form-item>
                 <el-form-item label="新密码:">
                     <el-input v-model="PwdFormDate.pwd" />
                 </el-form-item>
@@ -205,7 +480,6 @@
                 <el-button type="primary" @click="onPwdSubmit">确认</el-button>
             </span>
         </el-dialog>
-
     
     </div>
 </template>
@@ -221,19 +495,15 @@
             rows:[],
             total:0,
             loading:false,
-
             curr_row:null,
-
             SearchFormData:{
                 real_name:'',
-
                 page_num:1,
                 page_len:10,
                 order_field:'add_time',
                 order_sort:'desc'
             },
             search_show:false,
-
             //详细
             detail_show: false,
             DetailFormData:{},
@@ -244,13 +514,11 @@
                 mobile:'',
                 pwd:'',
             },
-
             //编辑
             edit_show:false,
             EditFormData:{
                 real_name:''
             },
-
             //设置角色
             role_show:false,
             role_rows:[],
@@ -259,15 +527,21 @@
                 role_uuid:'',
             },
             setpwd_show: false,
-            PwdFormDate: {}
-
+            PwdFormDate: {},
+            havaSeatch: false,
+            roleColor: '',
+            direction: 'rtl',
+            EditFormDataState: '0',
+            EditFormDataSex: '0',
+            EditFormDataEdutype: '0',
+            Issocial: '0',
+            EditFormDataIsmarry: '0',
+            oldEditpwd: ''
         });
     }
 
     export default {
-        data() {
-            return store.state.ManageData;
-        },
+        data() {return store.state.ManageData;},
         computed:{
             width:() => {
                 return store.state.AppData.width;
@@ -282,24 +556,18 @@
                 return store.state.AppData.img_host;
             }
         },
-        created(){
-            this.init();
-        },
+        created(){this.init();},
         methods:{
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
             },
-
-            
             // 数据初始化
             init() {
                 this.loading = true;
-
                 lime.req('ShopStaffList', {
                     login_token:lime.cookie_get('login_token'),
                     real_name:this.SearchFormData.real_name,
-
                     page_num:this.SearchFormData.page_num,
                     page_len:this.SearchFormData.page_len,
                     order_field:this.SearchFormData.order_field,
@@ -309,8 +577,6 @@
                     this.rows = res.data.rows;
                     this.total = res.data.total;
                 });
-
-
                 // 超时关闭遮罩层
                 setTimeout(() => {
                     this.loading = false;
@@ -333,11 +599,14 @@
             // 搜索页面打开
             onSearch() {
                 this.search_show = true;
-            },
+                this.havaSeatch = true
+                },
             // 搜索提交
             onSearchSubmit(){
+                
                 this.SearchFormData.page_num = 1;
                 this.init();
+                this.search_show = false
             },
             // 选择单行
             onSelectRow(row){
@@ -347,6 +616,9 @@
             onPageChange(page){
                 this.SearchFormData.page_num = page;
                 this.init();
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
             },
             // 排序处理
             onSortChange(sort) {
@@ -367,19 +639,33 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-               this.DetailFormData.name = this.curr_row.name
-               this.DetailFormData.mobile = this.curr_row.mobile
-               this.DetailFormData.state = this.curr_row.state
-               this.detail_show = true; 
+                lime.req('ShopStaffDetail', {
+                    login_token:lime.cookie_get('login_token'),
+                    uuid: this.curr_row.uuid
+                }).then(res => {
+                    this.detail_show = true;
+                    this.DetailFormData= res.data
+                    // this.rows = res.data.rows;
+                    // this.total = res.data.total;
+                });
+            //    this.DetailFormData.name = this.curr_row.name
+            //    this.DetailFormData.mobile = this.curr_row.mobile
+            //    this.DetailFormData.state = this.curr_row.state
+            //    this.detail_show = true; 
             },
             // 添加展示
             handleAdd() {
+                this.AddFormData = {}
                 this.add_show = true;
             },
             // 添加向后台提交
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                this.AddFormData.state = this.AddFormData.state ? 1 : 0;
+                this.AddFormData.edu_type =  this.AddFormData.edu_type - 0
+                this.AddFormData.is_marry =  this.AddFormData.is_marry - 0
+                // this.AddFormData.is_social =  this.AddFormData.is_social - 0
+                this.AddFormData.sex =  this.AddFormData.sex - 0
+                this.AddFormData.state =  this.AddFormData.state - 0
                 lime.req('ShopStaffAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
@@ -389,22 +675,29 @@
                 })
             },
 
-
             // 编辑展示
             handleEdit() {
                 if (util.empty(this.curr_row)) {
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
-                this.EditFormData.name = this.curr_row.name;
+                console.log(this.curr_row)
+                this.EditFormData = this.curr_row
+                this.EditFormDataState = this.curr_row.state + ''
+                this.Issocial =  this.curr_row.is_social == 0 ? this.curr_row.is_social + '' : '1'
+                this.EditFormDataSex = this.curr_row.sex + ''
+                this.EditFormDataEdutype = this.curr_row.edu_type + ''
+                this.EditFormDataIsmarry = this.curr_row.is_marry + ''
                 this.edit_show =true;
             },
-            // 编辑后台提交
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
                 this.EditFormData.uuid        = this.curr_row.uuid;
-                this.EditFormData.state = this.EditFormData.state ? 1 : 0;
+                this.EditFormData.state = this.EditFormDataState;
+                this.EditFormData.sex  = this.EditFormDataSex;
+                this.EditFormData.edu_type  = this.EditFormDataEdutype;
+                this.EditFormData.is_social  = this.Issocial;
+                this.EditFormData.is_marry  = this.EditFormDataIsmarry;
                 lime.req('ShopStaffEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
@@ -420,8 +713,6 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
-
                 this.$confirm('确认删除?', '提示').then(() => {
                     lime.req('ShopStaffDel', {
                         login_token:lime.cookie_get('login_token'),
@@ -440,8 +731,7 @@
                 if (util.empty(this.curr_row)) {
                     this.$message.error('请选择一条数据');
                     return;
-                }
-                
+                }               
                 // 获取当前登录账号拥有的角色
                 lime.req({
                     module:'ShopStaffSetRole',
@@ -453,6 +743,7 @@
                 }).then(res => {
                     this.role_rows = util.toTree(res.data);
                     this.role_show = true;
+                    console.log(this.role_rows)
                 })
             },
             // 设置角色提交
@@ -468,11 +759,13 @@
                     this.$message.error(err.msg)
                 })
             },
+            
             handleResetPwd() {
                 if (util.empty(this.curr_row)) {
                     this.$message.error('请选择一条数据');
                     return;
                 }
+                this.oldEditpwd = this.curr_row.pwd
                 this.setpwd_show = true;
 
             },
@@ -491,7 +784,14 @@
         }
     }
 </script>
-
+<style>
+    :focus{
+        outline:0;
+    }
+    /* .el-table td, .el-table th {
+        text-align: center!important;
+    } */
+</style>
 <style scoped>
     .menu{
         display: inline-block;
@@ -508,4 +808,21 @@
         right:0;
         overflow: hidden;
     }
+
+    .no_role  {
+        color: red;
+        cursor: pointer;
+    }
+
+    .footer {
+        position: absolute;
+        bottom: 10px;
+        width: 96%;
+        padding-right: 50px!important;
+        box-sizing: border-box;
+    }
+
+    /* /deep/ :focus {
+        outline: 0;
+    } */
 </style>

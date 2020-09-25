@@ -1,7 +1,7 @@
 <!--
  * @Author: xk
  * @Date: 2020-09-14 09:26:53
- * @LastEditTime: 2020-09-16 16:18:13
+ * @LastEditTime: 2020-09-24 18:26:57
  * @LastEditors: Please set LastEditors
  * @Description: the components of base-table
  * @FilePath: /shop/src/components/myTables/baseTable.vue
@@ -21,10 +21,19 @@
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
-                size="mini">
+                size="mini" >
                     <el-table-column type="index" label="#"></el-table-column>
                     <template v-for="(column, index) in columns">
-                         <el-table-column :key="index" :prop="column.prop" :label="column.label"></el-table-column>
+                         <el-table-column  show-overflow-tooltip  align="center" :key="index" :prop="column.prop" :label="column.label">
+                             <span v-if="column.showSt">
+                                 <!-- slot-scope="scope" -->
+                                 <!-- stateFormat(scope.row.state) -->
+                                 <template>
+                                    {{column.status}}
+                                    <!-- {{scope.row.status + '111111'}} -->
+                                </template>
+                             </span>
+                         </el-table-column>
                     </template>
             </el-table>
 
@@ -84,6 +93,17 @@ export default {
        },
        onPageChange(page) {
           this.$emit('pageChange', page)
+      },
+      stateFormat(state) {
+          if (state == 0) {
+                    return '未开始';
+                } else if (state == 1) {
+                    return '处理中';
+                } else if (state == 2){
+                    return '已处理';
+                }else{
+                    return '已接收';
+                }
       }
    }
   };

@@ -34,7 +34,7 @@
                             {{item.name}}
                         </el-link>
 
-                        <el-link @click="onSubMenu('onAddOption',true)" class="menu">添加选项</el-link>
+                        <!-- <el-link @click="onSubMenu('onAddOption',true)" class="menu">添加选项</el-link> -->
                     </div>
                 </el-col>
             </el-row>
@@ -57,14 +57,18 @@
                 size="mini">
                 <el-table-column type="index" label="#"></el-table-column>
                 <el-table-column prop="title" label="题目" align="center"></el-table-column>
-                <!-- <el-table-column prop="uuid" label="UUID" align="center"></el-table-column> -->
+                <el-table-column prop="content" label="选项" align="center">
+                    <template slot-scope="scope">
+                       <p v-for="(item,index) in scope.row.content" :key="index">{{item.opt}}:{{item.content}}</p>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="is_pay" label="是否付费" align="center"></el-table-column>
                 <el-table-column prop="is_show" label="是否展示" align="center">
                     <template slot-scope="scope">
                         {{formatDate(scope.row.is_show * 1000)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="tag" label="标签" align="center"></el-table-column>
+                <el-table-column prop="tag" label="题目" align="center"></el-table-column>
                 <el-table-column prop="ques_type" label="题型" align="center"></el-table-column>
                 <el-table-column prop="answer" label="答案" align="center"></el-table-column>
                 <el-table-column prop="check_state" label="审核状态" align="center"></el-table-column>
@@ -109,7 +113,7 @@
             :visible.sync="add_show"
             width="500px">
             <el-form :model="AddFormData" label-width="85px">
-                <el-form-item label="题目:" :required='true'>
+                <el-form-item label="标签:" :required='true'>
                     <el-input v-model="AddFormData.title" />
                 </el-form-item>
                 <el-form-item label="是否需支付" label-width="110px" :required='true'>
@@ -121,9 +125,12 @@
                 <el-form-item label="分析:">
                     <el-input v-model="AddFormData.analysis" />
                 </el-form-item>
-                <!-- <el-form-item label="标签:">
-                    <el-input v-model="AddFormData.tag_uuids" />
-                </el-form-item> -->
+                <el-form-item label="标签:">
+                    <!-- <el-button @click="tags_show = true">添加标签</el-button> -->
+                    <el-button @click="handleTag" type="primary" style="margin-right: 20px;">添加标签</el-button>
+                    <span v-for="(item,index) in AddFormData.tag_list" :key="index">{{item.title}}  </span>
+                    <!-- <el-input v-model="AddFormData.tag_uuids" /> -->
+                </el-form-item>
                 <el-form-item label="题型:" :required='true'>
                     <el-input v-model="AddFormData.ques_type" />
                 </el-form-item>
@@ -141,6 +148,26 @@
             <span slot="footer">
                 <el-button @click="add_show = false">取消</el-button>
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog
+            title="标签列表"
+            :visible.sync="tags_show"
+            width="30%">
+            <el-form :model="TagsFormData" label-width="60px">
+                <el-form-item label="标签:">
+                    <el-input v-model="TagsFormData.title" class="tagsinput"/>
+                    <el-button type="primary" @click="handleTag">搜索</el-button>
+                </el-form-item>
+                <el-checkbox-group v-model="TagsFormData.tag_uuids">
+                    <el-checkbox v-for="(item,index) in TagsFormData.tag_list" :key="index" :label="item">{{item.title}}</el-checkbox>
+                </el-checkbox-group>
+            </el-form>
+
+            <span slot="footer">
+                <el-button @click="tags_show = false">取 消</el-button>
+                <el-button type="primary" @click="onTagsSubmit">确 定</el-button>
             </span>
         </el-dialog>
 
@@ -212,8 +239,8 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
 
-    if (!store.state.QuesShopQuestionData) {
-        Vue.set(store.state, 'QuesShopQuestionData', {
+    if (!store.state.ShopQuesQuestionData) {
+        Vue.set(store.state, 'ShopQuesQuestionData', {
             rows:[],
             total:0,
             loading:false,
@@ -252,6 +279,19 @@
                 min_num:0,
             },
 
+            // 标签列表
+            tags_show:false,
+            TagsFormData:{
+                title:'',
+                page_num:1,
+                page_len:10,
+                order_field:'add_time',
+                order_sort:'desc',
+
+                tag_list:[],
+                tag_uuids:[],	
+            },
+
             // 编辑
             edit_show:false,
             EditFormData:{
@@ -261,7 +301,7 @@
                 is_pay:0,
                 is_show:1,
                 analysis: '',	
-                // tag_uuids:[],	
+                tag_uuids:[],	
                 ques_type:2,
                 // pic_urls:[],	
                 answer:'',
@@ -274,7 +314,6 @@
                 data:[]
             },
 
-            
             // 添加选项
             addoption_show:false,
             AddOptionFormData:{
@@ -288,7 +327,7 @@
 
     export default {
         data() {
-            return store.state.QuesShopQuestionData;
+            return store.state.ShopQuesQuestionData;
         },
         computed:{
             width:() => {
@@ -405,33 +444,67 @@
             },
 
             // 添加展示
-            handleAdd(r) {
+            handleAdd() {
                 this.add_show = true;
                 
-                lime.req('QuesShopTagList', {
-                    login_token:lime.cookie_get('login_token'),
-                    // title:this.curr_row.title
-                }).then(res => {
-                    console.log('标签列表')
-                    console.log(res.data)
-                    console.log('标签列表')
-                    // this.DetailFormData.data = res.data
-                    // this.detail_show = true;
-                }).catch(err => {
-                    this.$message.error(err.msg);
-                })
             },
             // 添加向后台提交
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                lime.req('QuesShopQuestionAdd', this.AddFormData).then(res => {
+                lime.req('ShopQuesQuestionAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
                     this.add_show = false;
+                    this.login_token='';
+                    this.title= '';
+                    this.is_pay=0;
+                    this.is_show=1;
+                    this.analysis= '';	
+                    // this.tag_uuids=[];	
+                    this.ques_type=2;
+                    // this.pic_urls=[];	
+                    this.answer ='';
+                    this.min_num =0;
                 }).catch(err => {
                     this.$message.error(err.msg);
                 })
             },
+
+            // 搜索、添加标签展示
+            handleTag() {
+                this.tags_show = true;
+
+                lime.req('ShopQuesTagList', {
+                    login_token:lime.cookie_get('login_token'),
+                    
+                    title:this.TagsFormData.title,
+                    page_num:this.TagsFormData.page_num,
+                    page_len:this.TagsFormData.page_len,
+                    order_field:this.TagsFormData.order_field,
+                    order_sort:this.TagsFormData.order_sort
+                }).then(res => {
+                    this.TagsFormData.tag_list = res.data.rows;
+                    this.TagsFormData.title='';
+                    this.TagsFormData.tag_uuids=[];
+
+                    console.log('标签')
+                    console.log(this.TagsFormData.tag_list)
+                    console.log('标签')
+                });
+                
+            },
+            // 添加标签 向 添加列表 提交
+            onTagsSubmit() {
+                this.AddFormData.tag_list = this.TagsFormData.tag_uuids;
+
+                this.tags_show = false;
+                console.log('标签提交')
+                console.log(this.TagsFormData.tag_uuids)
+                console.log(this.AddFormData.tag_list)
+                console.log('标签提交') 
+                // this.TagsFormData.tag_uuids=[]
+            },
+
 
             // 编辑展示
             handleEdit() {
@@ -456,7 +529,7 @@
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
 
-                lime.req('QuesShopQuestionEdit', this.EditFormData).then(res => {
+                lime.req('ShopQuesQuestionEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
                 }).catch(err => {
@@ -472,7 +545,7 @@
                 }
 
                 this.$confirm('确认删除?', '提示').then(() => {
-                    lime.req('QuesShopQuestionDel', {
+                    lime.req('ShopQuesQuestionDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
                     }).then(res => {
@@ -492,7 +565,7 @@
                 }
 
                 this.$confirm('提交审核?', '提示').then(() => {
-                    lime.req('QuesShopQuestionUpCheck', {
+                    lime.req('ShopQuesQuestionUpCheck', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
                     }).then(res => {
@@ -511,7 +584,7 @@
                     return;
                 }
 
-                lime.req('QuesShopQuestionDetail', {
+                lime.req('ShopQuesQuestionDetail', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid
                 }).then(res => {
@@ -524,13 +597,13 @@
             },
 
              // 添加选项
-            onAddOption() {
-                console.log(this.curr_row)
-                if (util.empty(this.curr_row)) {
-                    this.$message.error('请选择一条数据');
-                    return;
-                }
-            },
+            // onAddOption() {
+            //     console.log(this.curr_row)
+            //     if (util.empty(this.curr_row)) {
+            //         this.$message.error('请选择一条数据');
+            //         return;
+            //     }
+            // },
             // 添加选项
             // onAddOptionSubmit(){
             //     this.search_show = false;
@@ -561,5 +634,10 @@
 
     .mbstyle{
         margin-bottom: 0px;
+    }
+
+    .tagsinput{
+        width: 200px;
+        margin-right: 20px;
     }
 </style>

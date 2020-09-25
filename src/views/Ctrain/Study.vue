@@ -54,8 +54,12 @@
                 style="width: 100%" 
                 size="mini">
                 <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="uuid" label="UUID" align="center"></el-table-column>
-                <el-table-column prop="state" label="状态" align="center"></el-table-column>
+                <el-table-column prop="plan_name" label="计划名称" align="center"></el-table-column>
+                <el-table-column prop="state" label="状态" align="center">
+                    <template slot-scope="scope">
+                        {{stateFormat(scope.row.state)}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="start_time" label="开始时间" align="center" :sortable=true></el-table-column>
                 <el-table-column prop="end_time" label="结束时间" align="center" :sortable=true>
                     <template slot-scope="scope">
@@ -130,8 +134,8 @@
         <!-- 详细 -->
         <el-dialog title="详细" :visible.sync="detail_show" width="40%">
             <el-form :model="DetailFormData" label-width="120px">
-                <el-form-item label="UUID:">{{DetailFormData.uuid}}</el-form-item>
-                <el-form-item label="状态:">{{DetailFormData.state}}</el-form-item>
+                <!-- <el-form-item label="UUID:">{{DetailFormData.uuid}}</el-form-item> -->
+                <el-form-item label="状态:">{{stateFormat(DetailFormData.state)}}</el-form-item>
                 <el-form-item label="开始时间:">{{DetailFormData.start_time}}</el-form-item>
                 <el-form-item label="结束时间:">{{DetailFormData.end_time== '' ? '未结束' : DetailFormData.end_time}}</el-form-item>
                 <el-form-item label="类型:">{{  DetailFormData.is_online == 1 ? '现场' : '线上'}}</el-form-item>
@@ -162,8 +166,8 @@
             // 搜索
             search_show:false,
             SearchFormData:{
-                start_date:'2020-08-02',
-                end_date:'2020-08-03',
+                start_date:'',
+                end_date:'',
 
                 page_num:1,
                 page_len:10,
@@ -257,20 +261,6 @@
                     this.loading = false;
                     this.rows = res.data.rows;
                     this.total = res.data.total;
-                    // 状态：1未开始2正在进行3已结束
-                    for(let i=0;i<res.data.rows.length;i++){
-                        switch(res.data.rows[i].state){
-                            case 1:
-                                this.rows[i].state = '未开始'
-                                break
-                            case 2:
-                                this.rows[i].state = '正在进行'
-                                break
-                            case 3:
-                                this.rows[i].state = '已结束'
-                                break
-                        }
-                    }
 
                     // console.log('我的学习1')
                     // console.log(this.SearchFormData)
@@ -290,12 +280,15 @@
             },
             // 状态格式化
             stateFormat(state) {
-                if (state == 0) {
-                    return '待审';
-                } else if (state == 1) {
-                    return '已审';
+                // 状态：1未开始 2正在进行 3已结束
+                if (state == 1) {
+                    return '未开始';
+                } else if (state == 2) {
+                    return '正在进行';
+                } else if (state == 3) {
+                    return '已结束';
                 } else {
-                    return '作废';
+                    return '';
                 }
             },
             // 表格数据刷新
@@ -370,18 +363,6 @@
                 }).then(res => {
                     console.log(res.data)
                     this.DetailFormData = res.data
-                        switch(res.data.state){
-                            case 1:
-                                this.DetailFormData.state = '未开始'
-                                break
-                            case 2:
-                                this.DetailFormData.state = '正在进行'
-                                break
-                            case 3:
-                                this.DetailFormData.state = '已结束'
-                                break
-                        }
-                    
                     this.detail_show = true;
                 }).catch(err => {
                     this.$message.error(err.msg);

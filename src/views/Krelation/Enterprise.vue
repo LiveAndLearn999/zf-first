@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-16 17:13:46
- * @LastEditTime: 2020-09-16 18:00:31
+ * @LastEditTime: 2020-09-21 10:03:02
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Krelation/enterprise.vue
@@ -43,7 +43,6 @@
 
     if (!store.state.relationEntpsData) {
         Vue.set(store.state, 'relationEntpsData', {
-            rows:[],
             total:0,
             charge_show: false,
             loading:false,
