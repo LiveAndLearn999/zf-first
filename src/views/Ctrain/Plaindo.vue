@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:23:13
- * @LastEditTime: 2020-09-21 14:34:45
+ * @LastEditTime: 2020-09-28 14:16:06
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Ctrain/Plaindo.vue
@@ -89,9 +89,47 @@
             <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
                 <el-form :model="AddFormData" label-width="140px" label-position="left">
                     <el-form-item label="计划组名称:" required><el-input v-model="AddFormData.title"/></el-form-item>
-                    <el-form-item label="计划组唯一标识:" required><el-input v-model="AddFormData.plan_group_uuid"/></el-form-item>
+                    <el-form-item label="计划组:" required>
+                        <el-select
+                            v-model="plaing_value"
+                            @change="chosePlaing"
+                            placeholder="计划组">
+                            <el-option
+                            v-for="item in plaingAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input v-model="AddFormData.plan_group_uuid"/> -->
+                    </el-form-item>
                     <el-form-item label="开始时间:" required>
-                        <el-date-picker v-model="AddFormData.start_time"    type="datetime" placeholder="选择日期时间:"></el-date-picker>
+                        <el-date-picker 
+                        v-model="AddFormData.start_time"  
+                        type="date" 
+                        placeholder="选择日期:">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="结束时间:" required>
+                        <el-date-picker 
+                        v-model="AddFormData.end_time"  
+                        type="date" 
+                        placeholder="选择日期:">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="资源:" required>
+                        <el-select
+                            v-model="resource_value"
+                            @change="choseResource"
+                            placeholder="计划组">
+                            <el-option
+                            v-for="item in resourceAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input v-model="AddFormData.plan_group_uuid"/> -->
                     </el-form-item>
                     <el-form-item label="学员组成类型:" required>
                         <el-radio v-model="AddFormData.study_user_type" label="1">员工</el-radio>
@@ -121,6 +159,66 @@
                         <el-radio v-model="AddFormData.exam_start_photo" label="0">不拍照</el-radio>
                         <el-radio v-model="AddFormData.exam_start_photo" label="1">拍照 </el-radio>
                     </el-form-item>
+                    <el-form-item label="单选:" label-width="60px">
+                         <el-form-item></el-form-item>
+                         <el-form-item label-width="80px" label="题目数:"><el-input type="text" v-model="s_num" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="每题分数:" style="margin-top: 8px"><el-input type="text" v-model="s_score" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="付费:" style="margin-top: 8px">
+                             <el-radio v-model="s_radio" label="0">免费</el-radio>
+                             <el-radio v-model="s_radio" label="1">收费</el-radio>
+                         </el-form-item>
+                    </el-form-item>
+                    <el-form-item label="多选:" label-width="60px">
+                        <el-form-item></el-form-item>
+                        <el-form-item label-width="80px" label="题目数:"><el-input type="text" v-model="m_num" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="每题分数:" style="margin-top: 8px"><el-input type="text" v-model="m_score" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="付费:" style="margin-top: 8px">
+                             <el-radio v-model="m_radio" label="0">免费</el-radio>
+                             <el-radio v-model="m_radio" label="1">收费</el-radio>
+                         </el-form-item>
+                    </el-form-item>
+                    <el-form-item label="判断:" label-width="60px">
+                        <el-form-item></el-form-item>
+                        <el-form-item label-width="80px" label="题目数:"><el-input type="text" v-model="c_num" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="每题分数:" style="margin-top: 8px"><el-input type="text" v-model="c_score" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="付费:" style="margin-top: 8px">
+                             <el-radio v-model="c_radio" label="0">免费</el-radio>
+                             <el-radio v-model="c_radio" label="1">收费</el-radio>
+                         </el-form-item>
+                    </el-form-item>
+                    <el-form-item label="简答:" label-width="60px">
+                        <el-form-item></el-form-item>
+                        <el-form-item label-width="80px" label="题目数:"><el-input type="text" v-model="t_num" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="每题分数:" style="margin-top: 8px"><el-input type="text" v-model="t_score" @change="change"></el-input></el-form-item>
+                         <el-form-item label-width="80px" label="付费:" style="margin-top: 8px">
+                             <el-radio v-model="t_radio" label="0">免费</el-radio>
+                             <el-radio v-model="t_radio" label="1">收费</el-radio>
+                         </el-form-item>
+                    </el-form-item>
+                    <el-form-item label="试题标签:" required>
+                        <el-input type="text" @change="change"></el-input>
+                    </el-form-item>
+                    <el-form-item label="倒计时:" required>
+                        <el-input type="text" v-model="AddFormData.spending_duration"></el-input>
+                    </el-form-item>
+                    <el-form-item label="考试时间:" required>
+                        <el-input type="text" v-model="AddFormData.exam_time"></el-input>
+                    </el-form-item>
+                    <el-form-item label="试题来源:" required>
+                        <el-select
+                            v-model="from_value"
+                            @change="choseFrom"
+                            placeholder="来源">
+                            <el-option
+                            v-for="item in fromAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input type="text" v-modal="AddFormData.limit-from_type"></el-input> -->
+                    </el-form-item>
+                     
                 </el-form>
                 <div slot="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
                     <el-button @click="add_show = false">取消</el-button>
@@ -137,9 +235,21 @@
             <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
                 <el-form :model="EditFormData" label-width="140px" label-position="left">
                     <el-form-item label="计划组名称:"><el-input v-model="EditFormData.title"/></el-form-item>
-                    <el-form-item label="计划组唯一标识:"><el-input v-model="EditFormData.plan_group_uuid"/></el-form-item>
+                    <!-- <el-form-item label="计划组唯一标识:"><el-input v-model="EditFormData.plan_group_uuid"/></el-form-item> -->
                     <el-form-item label="开始时间:">
-                        <el-date-picker v-model="EditFormData.start_time"    type="datetime" placeholder="选择日期时间:"></el-date-picker>
+                        <el-date-picker 
+                        v-model="EditFormData.start_time"  
+                        type="date" 
+                        placeholder="选择日期">
+                        </el-date-picker>
+                        <!-- <el-date-picker v-model="EditFormData.start_time"    type="datetime" placeholder="选择日期时间:"></el-date-picker> -->
+                    </el-form-item>
+                    <el-form-item label="结束时间:">
+                        <el-date-picker 
+                        v-model="EditFormData.end_time"  
+                        type="date" 
+                        placeholder="选择日期">
+                        </el-date-picker>
                     </el-form-item>
                     <el-form-item label="学员组成类型:">
                         <el-radio v-model="EditFormData.study_user_type" label="1">员工</el-radio>
@@ -244,10 +354,40 @@
                 parent_uuid: '',
                 name:'',
                 img:'',
+                study_start_photo:'0',
+                study_end_photo: '0'
             },
             // 详细
             detail_show:false,
             DetailFormData:[],
+            plaing_value: '', 
+            plaingAry: [],
+            plain_uuid: '',
+
+            s_radio: '0',
+            m_radio: '0',
+            c_radio: '0',
+            t_radio: '0',
+            from_value: '',
+            fromAry: [
+                {value: '0', label:'运营'},
+                {value: '10', label:'运输企业客户'},
+                {value: '20', label:'监管部门'},
+                {value: '30', label:'代理商'},
+                {value: '40', label:'培训机构'},
+                {value: '50', label:'个体工商户'},
+                {value: '60', label:'会员'}
+            ],
+            m_num: 0,
+            m_score: 0,
+            s_num: 0,
+            s_score: 0,
+            c_num: 0,
+            c_score: 0,
+            t_num: 0,
+            t_score: 0,
+            resource_value: '',
+            resourceAry: []
         });
     }
 
@@ -269,8 +409,32 @@
         },
         created(){
             this.init();
+            lime.req('ShopPlanGroupList',{login_token: lime.cookie_get('login_token')}).then( res => {
+                this.plaingAry = res.data.rows.map(v => {
+                    return {value: v.uuid, label: v.name , ...v}
+                });
+            })
+            lime.req('ShopResourceList',{login_token: lime.cookie_get('login_token'),page_no: 1,page_len:20}).then( res => {
+                this.resourceAry = res.data.rows.map(v => {
+                    return {value: v.uuid, label: v.title , ...v}
+                });
+            })
         },
         methods:{
+            change(e) {
+                this.$forceUpdate()
+            },
+            chosePlaing(uuid) {
+                this.plain_uuid = uuid
+                console.log(uuid)
+            }, 
+            choseFrom(uuid) {
+                console.log(uuid)
+            },
+            choseResource(uuid) {
+                // this.plain_uuid = uuid
+                console.log(uuid)
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {util.submenu(menu,this,lime.cookie_get('login_token'), local);},
             // 数据初始化
@@ -346,24 +510,29 @@
                 this.add_show = true;
             },
             onAddSubmit() {
-                let pam = {
-                    login_token:lime.cookie_get('login_token'),
-                    title: 'test',
-                    plan_group_uuid: '111',
-                    start_time: '2020-09-21',
-                    end_time: '2020-10-21',
-                    question_rule: '[]',
-                    study_user_type: '1',
-                    duration: '45',
-                    pay_type: '1',
-                    study_start_photo: '0',
-                    study_process_photo: '1',
-                    study_end_photo: '0',
-                    exam_process_photo: '1',
-                    exam_end_photo: '0',
-                    exam_start_photo: '0'  
+                this.AddFormData.login_token = lime.cookie_get('login_token')
+                this.AddFormData.plan_group_uuid = this.plain_uuid
+                this.AddFormData.start_time = this.AddFormData.start_time.getFullYear() + '-' + (this.AddFormData.start_time.getMonth() + 1) + '-' + this.AddFormData.start_time.getDate()
+                this.AddFormData.end_time = this.AddFormData.end_time.getFullYear() + '-' + (this.AddFormData.end_time.getMonth() + 1) + '-' + this.AddFormData.end_time.getDate()
+                this.AddFormData.end_time = '2020-09-27'
+                let questionRule = {
+                    "select":[ 
+                        {"type":"s","num":this.s_num,"score":this.s_score,"is_pay":this.s_radio - 0},
+                        {"type":"m","num":this.m_num,"score":this.m_score,"is_pay":this.m_radio - 0},
+                        {"type":"c","num":this.c_num,"score":this.c_score,"is_pay":this.c_radio - 0},
+                        {"type":"t","num":this.t_num,"score":this.t_score,"is_pay":this.t_radio - 0}, 
+                    ], 
+                    "limit":{ 
+                        "tags":[], 
+                        "spending_duration":6000, 
+                        "exam_time":6000, 
+                        "from_type":[] 
+                    } 
                 }
-                ShopPlanAdd(pam, res => {
+                
+                
+                this.AddFormData.question_rule = JSON.stringify(questionRule)
+                ShopPlanAdd(this.AddFormData, res => {
                     this.init()
                     this.add_show = false
                 }).catch(err => {

@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:16:53
- * @LastEditTime: 2020-09-21 09:58:41
+ * @LastEditTime: 2020-09-27 14:11:51
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Bfinance/Statistic.vue
@@ -9,7 +9,8 @@
 <template>
     <!-- <h1>{{cpname}}</h1> -->
     <div>
-        <TableBase :loading="loading" :page_num="page_num" :total="total" :rows="rows" :columns="columns" @selRow="onSelectCurrRow" @onref="onRefresh" @pageChange="onPageChange"  />
+        <!-- <TableBase  :loading="loading" :page_num="page_num" :total="total" :rows="rows" :columns="columns" @selRow="onSelectCurrRow" @onref="onRefresh" @pageChange="onPageChange"  /> -->
+        <Finance  :dtlist="dtlist"/>
     </div>
 </template>
 <script>
@@ -17,8 +18,9 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-    import { ShopTradeAccountList } from "@/api/request"
-    import TableBase from "@/components/myTables/myTable.vue"
+    import { ShopAccountList } from "@/api/request"
+    // import TableBase from "@/components/myTables/myTable.vue"
+    import Finance from "@/components/myEcharts/finance.vue"
 
     if (!store.state.ShopTradeAccountData) {
         Vue.set(store.state, 'ShopTradeAccountData', {
@@ -55,32 +57,33 @@
                 {prop: 'add_time', label: '添加时间'}
             ],
             cpname: '财务统计',
+            dtlist: []
 
         });
     }
 
     export default {
         components: {
-            TableBase
+            // TableBase,
+            Finance
         },
         data() {
             return store.state.ShopTradeAccountData
         },
-        created() {
-            this.init()
-        },
-        methods: {
-            init() {
-               this.loading = true;
+        mounted() {
+            this.loading = true;
                 let pam = {
                     login_token:lime.cookie_get('login_token'),
-                    page_len: this.page_len + '',
-                    page_num: this.page_num + ''
                 }
-                ShopTradeAccountList(pam, res => {
+                ShopAccountList(pam, res => {
                     this.loading = false;
                     this.rows = res.data.rows;
                     this.total = res.data.total;
+                    this.dtlist = [
+                        res.data.enable_coins || 0,res.data.freeze_coins || 0,
+                        res.data.enable_money - 0,res.data.freeze_money - 0,
+                        res.data.enable_give_money || 0,res.data.integral || 0,
+                        res.data.empirical_val || 0 ]
                     // this.list = res.data;
                 }).catch(err => {
                     this.loading = false;
@@ -90,6 +93,10 @@
                 setTimeout(() => {
                     this.loading = false;
                 }, 10000);
+        },
+        methods: {
+            init() {
+               
             },
             // 刷新
             onRefresh() {

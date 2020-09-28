@@ -1,7 +1,7 @@
 <!--
  * @Author: zs
  * @Date: 2020-09-10 11:35:01
- * @LastEditTime: 2020-09-18 14:20:01
+ * @LastEditTime: 2020-09-27 14:02:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Admin/Information.vue
@@ -66,11 +66,22 @@
     </div>
 
     <!-- 编辑 -->
-    <el-dialog title="编辑" width="650px" :visible.sync="edit_show">
+    <el-dialog title="编辑" width="380px" :visible.sync="edit_show">
         <div>
-          <el-checkbox-group v-model="checkedAry">
+          <!-- <el-checkbox-group v-model="checkedAry">
             <el-checkbox v-for="item in all_uuid" :label="item" :key="item"></el-checkbox>
-          </el-checkbox-group>
+          </el-checkbox-group> -->
+          <el-form :model="EditFormData" label-width="80px" label-position="left">
+              <el-form-item label="角色:">
+                <el-cascader 
+                      clearable 
+                      :options="edit_rows"
+                      :props="{multiple: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                      placeholder="请选择"
+                      v-model="EditFormData.checked_uuid" style="width:240px">
+                </el-cascader>
+              </el-form-item>
+          </el-form>
         </div>
       <span slot="footer">
         <el-button @click="edit_show = false">取消</el-button>
@@ -105,7 +116,12 @@ if (!store.state.GetShopConfigData) {
     checkedAry: [],
     all_uuid: [],
     check_uuid: [],
-    allCheck: []
+    allCheck: [],
+
+    edit_rows: [],
+    EditFormData: {
+      
+    }
   })
 }
 
@@ -192,32 +208,31 @@ export default {
               this.allCheck = res.data
               this.checkedAry = []
               this.all_uuid = []
-              res.data.forEach((item, index) => { 
-                if(this.ready_uuid.includes(item.uuid, 0)) {
-                  this.checkedAry.push(item.name)
-                  this.all_uuid.push(item.name)
-                }else {
-                  this.all_uuid.push(item.name)
-                }
 
-              })
+
+              let _rows = [];
+              this.edit_rows = [];
+              res.data.forEach(item => {
+                    if (item.uuid != this.curr_row.uuid) {
+                        _rows.push({
+                            name:item.name,
+                            parent_uuid:item.parent_uuid,
+                            uuid:item.uuid,
+                        });
+                    }
+                });
+                this.edit_rows = util.toTree(_rows);
+              // res.data.forEach((item, index) => { 
+              //   if(this.ready_uuid.includes(item.uuid, 0)) {
+              //     this.checkedAry.push(item.name)
+              //     this.all_uuid.push(item.name)
+              //   }else {
+              //     this.all_uuid.push(item.name)
+              //   }
+
+              // })
               this.edit_show = true
       })
-      // ShopRoleList({login_token: lime.cookie_get('login_token')},res => {
-      //    this.allCheck = res.data
-      //    this.checkedAry = []
-      //    this.all_uuid = []
-      //    res.data.forEach((item, index) => { 
-      //     if(this.ready_uuid.includes(item.uuid, 0)) {
-      //       this.checkedAry.push(item.name)
-      //       this.all_uuid.push(item.name)
-      //     }else {
-      //       this.all_uuid.push(item.name)
-      //     }
-
-      //    })
-      //    this.edit_show = true
-      // })
     },
     // 保存编辑提交
     onEditSubmit () {
@@ -228,13 +243,21 @@ export default {
         }
       })
       let that = this
+      console.log(this.EditFormData.checked_uuid)
       lime.req('SetShopSave',{
               login_token:lime.cookie_get('login_token'),
-              [that.role_type]:this.check_uuid
+              [that.role_type]:this.EditFormData.checked_uuid
       }).then(res => {
               this.edit_show = false
               this.init()
       })
+      // lime.req('SetShopSave',{
+      //         login_token:lime.cookie_get('login_token'),
+      //         [that.role_type]:this.check_uuid
+      // }).then(res => {
+      //         this.edit_show = false
+      //         this.init()
+      // })
 
       // SetShopSave({
       //   login_token:lime.cookie_get('login_token'),

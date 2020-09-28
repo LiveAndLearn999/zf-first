@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:21:12
- * @LastEditTime: 2020-09-25 15:01:23
+ * @LastEditTime: 2020-09-27 17:00:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Ctrain/Plain.vue
@@ -63,14 +63,14 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <!-- <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
                 </el-pagination>
-            </div>
+            </div> -->
         </div>
         <!-- <div style="border-top: solid 1px #f2f1f4;">
             <el-table 
@@ -107,7 +107,7 @@
             :visible.sync="add_show"
             width="500px">
             <el-form :model="AddFormData" label-width="120px" label-position="left">
-                <el-form-item label="所属父类:">
+                <el-form-item label="所属分组:">
                     <el-cascader 
                         clearable 
                         :options="add_rows"
@@ -116,7 +116,7 @@
                         v-model="AddFormData.parent_uuid" style="width: 330px">
                     </el-cascader>
                 </el-form-item>
-                <el-form-item label="计划组名称:">
+                <el-form-item label="计划组名称:" :required="true">
                     <el-input v-model="AddFormData.name" style="width: 330px"/>
                 </el-form-item>
                 <el-form-item label="图片:">
@@ -354,6 +354,7 @@
                 }
                 this.AddFormData.login_token = lime.cookie_get('login_token');
                 this.AddFormData.img  = this.$refs.upload.img_url;
+                this.AddFormData.parent_uuid = this.AddFormData.parent_uuid ? this.AddFormData.parent_uuid : '0'
                 lime.req('ShopPlanGroupAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
@@ -384,6 +385,8 @@
                 this.edit_rows = util.toTree(_rows);
                 this.EditFormData.parent_uuid = this.curr_row.parent_uuid;
                 this.EditFormData.name = this.curr_row.name;
+                this.EditFormData.uuid = this.curr_row.uuid;
+                this.EditFormData.img = this.curr_row.img || ''
                 
                 this.edit_show = true;
 

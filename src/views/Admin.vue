@@ -55,7 +55,8 @@
             title="消息列表"
             size="40%"
             :visible.sync="msg_show"
-            :direction="direction">
+            :direction="direction"
+             :before-close="handleClose">
             <!-- border -->
             <!-- 数据表格 -->
             <div style="width: 100%;height: 30px;text-align: left;padding-left: 24px;box-sizing: border-box;font-size: 13px;color: #909399">
@@ -82,7 +83,7 @@
                     fixed="right"
                     label="操作">
                         <template slot-scope="scope">
-                            <el-button @click="handleClick(scope.row)" type="text" size="small">详细</el-button>
+                            <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">详细</el-button> -->
                             <el-button @click="handleDel(scope.row)" type="text" size="small">删除</el-button>
                         </template>
                     </el-table-column>
@@ -243,15 +244,33 @@
             },
             handleMsg() {
                 this.msg_show = true;
+                if(this.$refs.configurationTable) {
+                    this.$refs.configurationTable.doLayout()
+                }
                 this.initTable()
             },
+            handleClose(done) {
+                if(this.$refs.configurationTable) {
+                    this.$refs.configurationTable.doLayout()
+                }
+                 done();
+            },
+
             initTable() {
                     if(this.total - 0  > 0) {
                         this.showCircle = true
                     }else {
                         this.showCircle = false
                     }
-                    this.$refs.configurationTable.doLayout()
+                    setTimeout(() => {
+                        this.$nextTick(() => {
+                            this.$refs.configurationTable.doLayout()
+                        })
+                    }, 50)
+                    // if(this.$refs.configurationTable) {
+                    //     this.$refs.configurationTable.doLayout()
+                    // }
+                    // this.$refs.configurationTable.doLayout()
                 // let pam = {
                 //     login_token:lime.cookie_get('login_token'),
                 // }
@@ -478,6 +497,10 @@
         0% {opacity: 1;}
         50% {opacity: 0.5;}
         100% {opacity: 0;}
+    }
+
+    .el-table--border th.gutter:last-of-type {
+        display: table-cell !important;
     }
 
     /* .el-table th.gutter{
