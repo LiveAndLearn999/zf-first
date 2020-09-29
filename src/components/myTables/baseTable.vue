@@ -38,12 +38,26 @@
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
+                 <el-pagination
+                @current-change="onPageChange"
+                :current-page.sync="page_num"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                 <!-- <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination> -->
+                <!-- <el-pagination
                     :current-page.sync="page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div> 
      

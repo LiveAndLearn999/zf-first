@@ -55,23 +55,35 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="题目" align="center"></el-table-column>
-                <el-table-column prop="content" label="选项" align="center">
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="title" show-overflow-tooltip label="题目" align="left"></el-table-column>
+                <!-- <el-table-column prop="content" label="选项" align="center">
                     <template slot-scope="scope">
                        <p v-for="(item,index) in scope.row.content" :key="index">{{item.opt}}:{{item.content}}</p>
                     </template>
+                </el-table-column> -->
+                <el-table-column prop="is_pay" label="是否付费" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.is_pay == 1 ? '是' : '否' }}
+                    </template>
                 </el-table-column>
-                <el-table-column prop="is_pay" label="是否付费" align="center"></el-table-column>
                 <el-table-column prop="is_show" label="是否展示" align="center">
                     <template slot-scope="scope">
                         {{formatDate(scope.row.is_show * 1000)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="tag" label="题目" align="center"></el-table-column>
-                <el-table-column prop="ques_type" label="题型" align="center"></el-table-column>
+                <!-- <el-table-column prop="tag" label="题目" align="center"></el-table-column> -->
+                <el-table-column prop="ques_type" label="题型" align="center">
+                    <template slot-scope="scope">
+                       {{scope.row.ques_type == 1 ? '单选' : scope.row.ques_type == 2 ? '多选' : '判断'}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="answer" label="答案" align="center"></el-table-column>
-                <el-table-column prop="check_state" label="审核状态" align="center"></el-table-column>
+                <el-table-column prop="check_state" label="审核状态" align="center">
+                    <template slot-scope="scope">
+                       {{scope.row.check_state == 1 ? '通过' : '未通过'}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="add_time" label="添加时间" align="center"></el-table-column>
                 <el-table-column prop="last_time" label="最后修改时间" align="center">
                     <template slot-scope="scope">
@@ -81,11 +93,19 @@
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
+                </el-pagination> -->
+                 <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
                 </el-pagination>
             </div>
         </div>
@@ -95,7 +115,7 @@
             title="搜索"
             :visible.sync="search_show"
             width="30%">
-            <el-form :model="SearchFormData" label-width="120px">
+            <el-form :model="SearchFormData" label-width="120px" label-position="left">
                 <el-form-item label="题目:">
                     <el-input v-model="SearchFormData.title" />
                 </el-form-item>
@@ -112,18 +132,34 @@
             title="添加"
             :visible.sync="add_show"
             width="500px">
-            <el-form :model="AddFormData" label-width="85px">
-                <el-form-item label="标签:" :required='true'>
-                    <el-input v-model="AddFormData.title" />
+            <el-form :model="AddFormData" label-width="120px" label-position="left">
+                <el-form-item label="题目内容:" :required='true'>
+                    <el-input type="textarea" v-model="AddFormData.title" />
                 </el-form-item>
-                <el-form-item label="是否需支付" label-width="110px" :required='true'>
-                    <el-input v-model="AddFormData.is_pay" />
+                <el-form-item label="是否需支付:"  :required='true'>
+                     <el-radio-group v-model="AddFormData.is_pay">
+                        <el-radio :label="1">是</el-radio>
+                        <el-radio :label="0">否</el-radio>
+                    </el-radio-group>
+                    <!-- <el-input v-model="AddFormData.is_pay" /> -->
                 </el-form-item>
                 <el-form-item label="是否展示:" :required='true'>
-                    <el-input v-model="AddFormData.is_show" />
-                </el-form-item>
-                <el-form-item label="分析:">
-                    <el-input v-model="AddFormData.analysis" />
+                    <el-switch
+                    v-model="AddFormData.is_show">
+                    </el-switch>
+
+                    <!-- <el-radio-group v-model="AddFormData.is_show">
+                        <el-radio :label="1">是</el-radio>
+                        <el-radio :label="0">否</el-radio>
+                    </el-radio-group> -->
+                     <el-date-picker
+                            style="margin-left: 10px"
+                            v-if="AddFormData.is_show == 1"
+                            v-model="show_date"
+                            type="date"
+                            placeholder="选择日期">
+                        </el-date-picker>
+                    <!-- <el-input v-model="AddFormData.is_show" /> -->
                 </el-form-item>
                 <el-form-item label="标签:">
                     <!-- <el-button @click="tags_show = true">添加标签</el-button> -->
@@ -132,7 +168,20 @@
                     <!-- <el-input v-model="AddFormData.tag_uuids" /> -->
                 </el-form-item>
                 <el-form-item label="题型:" :required='true'>
-                    <el-input v-model="AddFormData.ques_type" />
+                     <el-radio-group v-model="AddFormData.ques_type">
+                        <el-radio :label="1">判断</el-radio>
+                        <el-radio :label="2">单选</el-radio>
+                         <el-radio :label="3">多选</el-radio>
+                        <el-radio :label="4">简答</el-radio>
+                    </el-radio-group>
+                    <!-- <el-input v-model="AddFormData.ques_type" /> -->
+                </el-form-item>
+                <el-form-item label="分析:" v-if="AddFormData.ques_type == 4">
+                    <el-input type="textarea" v-model="AddFormData.analysis" />
+                </el-form-item>
+                <el-form-item label="图片:">
+                    <file ref="pciurls" />
+                    <!-- <el-input v-model="AddFormData.pic_urls" /> -->
                 </el-form-item>
                 <!-- <el-form-item label="图片地址:">
                     <el-input v-model="AddFormData.pic_urls" />
@@ -140,8 +189,8 @@
                 <el-form-item label="答案:" :required='true'>
                     <el-input v-model="AddFormData.answer" />
                 </el-form-item>
-                <el-form-item label="最小金额:">
-                    <el-input v-model="AddFormData.min_num" />
+                <el-form-item label="最小金额:" v-if="AddFormData.is_pay == 1">
+                    <el-input type="number" maxLength="4" v-model="AddFormData.min_num" />
                 </el-form-item>
             </el-form>
 
@@ -238,6 +287,7 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+    import file from "@/components/imgUpload/upload.vue"
 
     if (!store.state.ShopQuesQuestionData) {
         Vue.set(store.state, 'ShopQuesQuestionData', {
@@ -263,20 +313,21 @@
                 // order_field:'add_time',
                 // order_sort:'desc'
             },
-
             // 添加
             add_show:false,
+            show_date: '',
             AddFormData:{
                 login_token:'',
                 title: '',
-                is_pay:0,
+                is_pay:1,
                 is_show:1,
                 analysis: '',	
                 // tag_uuids:[],	
-                ques_type:2,
+                ques_type:1,
                 // pic_urls:[],	
                 answer:'',
                 min_num:0,
+                pic_urls: []
             },
 
             // 标签列表
@@ -326,6 +377,9 @@
     }
 
     export default {
+         components: {
+            file
+        },
         data() {
             return store.state.ShopQuesQuestionData;
         },
@@ -430,6 +484,9 @@
                 this.SearchFormData.page_num = page;
                 this.init();
             },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             // 排序处理
             onSortChange(sort) {
                 console.log(sort);
@@ -450,7 +507,12 @@
             },
             // 添加向后台提交
             onAddSubmit() {
+                console.log(this.$refs.pciurls.img_url)
                 this.AddFormData.login_token = lime.cookie_get('login_token');
+                // this.AddFormData.is_show = this.AddFormData.is_show ? 1 : 0
+                // this.AddFormDate.pic_urls  = [this.$refs.pciurls.img_url]
+                this.AddFormData.is_show = !this.AddFormData.is_show ? 0 : this.show_date.getFullYear() + '-' + (this.show_date.getMonth() + 1) + '-' + this.show_date.getDate()
+                // .substr(0, 10)
                 lime.req('ShopQuesQuestionAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
@@ -459,10 +521,8 @@
                     this.title= '';
                     this.is_pay=0;
                     this.is_show=1;
-                    this.analysis= '';	
-                    // this.tag_uuids=[];	
-                    this.ques_type=2;
-                    // this.pic_urls=[];	
+                    this.analysis= '';		
+                    this.ques_type=2;	
                     this.answer ='';
                     this.min_num =0;
                 }).catch(err => {

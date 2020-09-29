@@ -55,18 +55,26 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标签" align="center"></el-table-column>
+                <el-table-column type="index" label="#" width="80px"></el-table-column>
+                <el-table-column prop="title" label="标签" align="left"></el-table-column>
                 <el-table-column prop="remark" label="备注" align="center"></el-table-column>
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
@@ -281,6 +289,9 @@
             onPageChange(page){
                 this.SearchFormData.page_num = page;
                 this.init();
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
             },
             // 排序处理
             onSortChange(sort) {

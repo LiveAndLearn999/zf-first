@@ -8,7 +8,7 @@
 -->
 <!-- 试题分组 -->
 <template>
-    <div v-wechat-title="$route.meta.title">
+    <div  v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
         <div style="height: 46px; line-height: 46px; overflow: hidden;">
             <el-row>
@@ -53,19 +53,27 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标签组名" align="center"></el-table-column>
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="title" label="标签组名" align="left"></el-table-column>
                 <!-- <el-table-column prop="uuid" label="UUID" align="center"></el-table-column> -->
                 <el-table-column prop="remark" label="备注" align="center"></el-table-column>
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
+                 <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
@@ -121,7 +129,7 @@
                     <el-input v-model="EditFormData.title" :required='true'/>
                 </el-form-item>
 
-                <el-form-item label="备注:">
+                <el-form-item label="备注:" show-overflow-tooltip>
                     <el-input v-model="EditFormData.remark" />
                 </el-form-item>
 
@@ -149,15 +157,12 @@
             rows:[],
             total:0,
             loading:false,
-
             curr_row:null,
-
             // 搜索
             search_show:false,
             SearchFormData:{
                 title:''
             },
-
             // 添加
             add_show:false,
             AddFormData:{
@@ -166,7 +171,6 @@
                 title:'',
                 remark:'',
             },
-
             // 编辑
             edit_show:false,
             EditFormData:{
@@ -226,7 +230,6 @@
             // 数据初始化
             init() {
                 this.loading = true;
-
                 lime.req('ShopQuesGroupList', {
                     login_token:lime.cookie_get('login_token'),
                     title:this.SearchFormData.title,
@@ -278,6 +281,9 @@
             onPageChange(page){
                 this.SearchFormData.page_num = page;
                 this.init();
+            },
+             handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
             },
             // 排序处理
             onSortChange(sort) {
@@ -356,6 +362,7 @@
     }
 </script>
 
+
 <style scoped>
     .menu{
         display: inline-block;
@@ -372,4 +379,6 @@
         right:0;
         overflow: hidden;
     }
+
+
 </style>

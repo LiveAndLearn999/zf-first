@@ -38,7 +38,45 @@
             </el-row>
         </div>
 
-        <TableBase :loading="loading" :rows="rows" :columns="columns" @selRow="onSelectCurrRow"/>
+        <div style="border-top: solid 1px #f2f1f4;">
+            <el-table 
+                :data="rows"
+                :height="height - 60 - 46 - 48"
+                v-loading="loading"
+                element-loading-text="拼命加载中"
+                element-loading-spinner="el-icon-loading"
+                element-loading-background="rgba(0, 0, 0, 0.8)"
+                @sort-change="onSortChange"
+                :highlight-current-row="true"
+                @current-change="onSelectRow"
+                style="width: 100%" 
+                size="mini" >
+                    <el-table-column width="80px" type="index" label="#"></el-table-column>
+                    <el-table-column prop="code" align="left" label="运单单号"></el-table-column>
+                    <el-table-column prop="plate_number" label="车牌号"></el-table-column>
+                    <el-table-column prop="dispatch_time" label="调度日期"></el-table-column>
+                    <el-table-column prop="s_address" label="起送地"></el-table-column>
+                    <el-table-column prop="e_address" label="目的地"></el-table-column>
+                    <el-table-column prop="status" label="运单状态 "></el-table-column>
+                    <el-table-column prop="type" label="来源">
+                        <template slot-scope="scope">
+                            {{scope.row.type == 1 ? '企业派送 ' : '员工提交'}}
+                        </template>
+                    </el-table-column>
+            </el-table>
+
+            <div class="page" :style="{width:width - 250 + 'px'}">
+                 <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    layout="prev, pager, next, jumper"
+                    :total="total">
+                </el-pagination>
+            </div>
+        </div> 
+        <!-- <TableBase :loading="loading" :rows="rows" :columns="columns" @selRow="onSelectCurrRow"/> -->
 
         <!-- 添加 -->
         <el-drawer
@@ -121,6 +159,38 @@
                             <ChooseVeh ref="ofVeh"/>
                             <!-- <el-input v-model="AddFormData.shop_vehicle_uuid"></el-input> -->
                         </el-form-item>
+                        <el-form-item label="货品信息:">
+                            <el-form-item label="货物类型:" style="margin-top: 10px">
+                                <el-select
+                                    style="width: 100%"
+                                    v-model="good_value"
+                                     @change="choseGood"
+                                     placeholder="请选择货品">
+                                    <el-option
+                                        v-for="item in goodAry"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="标码:" style="margin-top: 10px">
+                                <el-input type="text" v-model="un_number"></el-input>
+                            </el-form-item>
+                            <el-form-item label="货物总重量:" style="margin-top: 10px">
+                                <el-input type="number" v-model="cargo_total"></el-input>
+                            </el-form-item>
+
+                            <el-form-item label="包装规格:" style="margin-top: 10px">
+                                <el-input type="text" v-model="packing_spec"></el-input>
+                            </el-form-item>
+                            <el-form-item label="数量:" style="margin-top: 10px">
+                                <el-input type="number" v-model="number_of_cargos"></el-input>
+                            </el-form-item>
+                            <el-form-item label="单位:" style="margin-top: 10px">
+                                <el-input type="text" v-model="unit"></el-input>
+                            </el-form-item>
+                        </el-form-item>
                     
                     </el-form>
                 </div>
@@ -129,10 +199,6 @@
                 <el-button @click="add_show = false">取消</el-button>
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
             </div>
-            <!-- <span slot="footer">
-                <el-button @click="add_show = false">取消</el-button>
-                <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span> -->
         </el-drawer>
         
         <!-- <el-dialog  
@@ -233,6 +299,119 @@
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
             </span>
         </el-dialog> -->
+
+        <!-- 编辑 -->
+        <el-drawer
+            :visible.sync="edit_show"
+            :direction="direction" size="45%">
+             <div slot="title">编辑</div>
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+                    <el-form :model="EditFormData" label-width="160px" label-position="left">
+                        <el-form-item label="托运人名称:" required>
+                            <el-input v-model="EditFormData.consignor" />
+                        </el-form-item>
+                        <el-form-item label="托运人联系电话:" required>
+                            <el-input v-model="EditFormData.consignor_phone" />
+                        </el-form-item>
+                        <el-form-item label="装货人名称:" required>
+                            <el-input v-model="EditFormData.loader" />
+                        </el-form-item>
+                        <el-form-item label="装货人联系:" required>
+                            <el-input v-model="EditFormData.loader_phone"></el-input>
+                        </el-form-item>
+                        <el-form-item label="收货人名称:" required>
+                            <el-input v-model="EditFormData.consignee"></el-input>
+                        </el-form-item>
+                        <el-form-item label="收货人联系电话:" required>
+                            <el-input v-model="EditFormData.consignee_phone"></el-input>
+                        </el-form-item>
+                        <el-form-item label="起运日期:" required>
+                            <el-date-picker
+                                v-model="EditFormData.s_time"
+                                type="date"
+                                placeholder="选择日期时间">
+                            </el-date-picker>
+                        </el-form-item>
+                        <el-form-item label="地址:" required>
+                            <ChooseAre ref="starAdress"/> 
+                        </el-form-item>
+                        <el-form-item label="具体地址:" required>
+                            <el-input v-model="EditFormData.s_address"></el-input>
+                        </el-form-item>
+                        <el-form-item label="目地地:" required>
+                            <ChooseAre ref="goAdress"/>
+                        </el-form-item>
+                        <el-form-item label="目的地具体地址:" required>
+                            <el-input v-model="EditFormData.e_address"></el-input>
+                        </el-form-item>
+                        <el-form-item label="调度人:">
+                            <el-input v-model="EditFormData.dispatcher"></el-input>
+                        </el-form-item>
+                        <el-form-item label="备注:">
+                            <el-input type="textarea" v-model="EditFormData.remark"></el-input>
+                        </el-form-item>
+                        <el-form-item label="调度时间:">
+                            <el-date-picker
+                                v-model="EditFormData.dispatch_time"
+                                type="date"
+                                placeholder="选择日期时间">
+                            </el-date-picker>
+                        </el-form-item>
+                        <el-form-item label="承运人:" required>
+                            <ChoosePeo ref="getPeople"/>
+                        </el-form-item>
+                        <el-form-item label="参与人(参与派送):" required>
+                            <ChoosePeock ref="doPeople"/>
+                        </el-form-item>
+                        <el-form-item label="主要参与人:" required>
+                            <ChoosePeock ref="mdoPeople"/>
+                        </el-form-item>
+                        <el-form-item label="企业归属车辆:">
+                            <ChooseVeh ref="ofVeh"/>
+                        </el-form-item>
+                        <el-form-item label="货品信息:">
+                            <el-form-item label="货物类型:" style="margin-top: 10px">
+                                <el-select
+                                    style="width: 100%"
+                                    v-model="good_value"
+                                     @change="choseGood"
+                                     placeholder="请选择货品">
+                                    <el-option
+                                        v-for="item in goodAry"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="标码:" style="margin-top: 10px">
+                                <el-input type="text" v-model="un_number"></el-input>
+                            </el-form-item>
+                            <el-form-item label="货物总重量:" style="margin-top: 10px">
+                                <el-input type="number" v-model="cargo_total"></el-input>
+                            </el-form-item>
+
+                            <el-form-item label="包装规格:" style="margin-top: 10px">
+                                <el-input type="text" v-model="packing_spec"></el-input>
+                            </el-form-item>
+                            <el-form-item label="数量:" style="margin-top: 10px">
+                                <el-input type="number" v-model="number_of_cargos"></el-input>
+                            </el-form-item>
+                            <el-form-item label="单位:" style="margin-top: 10px">
+                                <el-input type="text" v-model="unit"></el-input>
+                            </el-form-item>
+                        </el-form-item>
+                    
+                    </el-form>
+                </div>
+
+            <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                <el-button @click="edit_show = false">取消</el-button>
+                <el-button @click="onEditSubmit" type="primary">确定</el-button>
+            </div>
+        </el-drawer>
+
+
 
         <!-- 详细 -->
         <el-drawer
@@ -394,7 +573,7 @@ import Vue from "vue";
     import lime from "@/lime.js";
     import util from "@/util.js";
     import {EbShopConfirm, EbShopStaffReceiveBillAudit, EbShopAudit, EbShopCancel, EbShopList, EbShopAdd , EbDetail, GetCityUuid, EbGoodsTypeList, EbStaffList, EbCarrierList, EbPackTypeList, EbGoodList, EbShopVehicleList, EbShopListCertificate} from "@/api/request"
-    import TableBase from "@/components/myTables/baseTable.vue"
+    // import TableBase from "@/components/myTables/baseTable.vue"
     import ChooseAre from "@/components/chooseAre/chooseAre.vue"
     import ChoosePeo from "@/components/choosePeople/choosePeo.vue"
     import ChoosePeock from "@/components/choosePeople/choosePeock.vue"
@@ -409,6 +588,10 @@ import Vue from "vue";
             total:0,
             loading:false,
             curr_row:null,
+             SearchFormData:{
+                page_num:1,
+                page_len:10,
+            },
              // 添加
             add_show:false,
             AddFormData:{},
@@ -422,16 +605,6 @@ import Vue from "vue";
             EditFormData:{},
             //表格数据
             rows: [],
-            //表头设置
-            columns: [
-                {prop: 'add_time', label: '运单单号'},
-                // {prop: 'consignee', label: '收货人名称'},
-                {prop: 'consignee_phone', label: '收货人联系电话'},
-                {prop: 'consignor', label: '托运人名称'},
-                {prop: 'consignor_phone', label: '托运人联系电话'} ,
-                {prop: 'creator_staff', label: '承运人'},
-                {prop: 'dispatcher', label: '调度人'}
-            ],
             cpname: '电子运单--api 平台未找到相关接口',
             direction: 'rtl',
             check_show: false,
@@ -440,14 +613,22 @@ import Vue from "vue";
             receive_show: false,
             ReceiveFormData: {},
             // dtlist: [10, 52, 200, 334, 390, 330],
-            dtlist: []
+            dtlist: [],
+            good_value: '',
+            goodAry: [],
+            good_uuid: '',
+            un_number: '',
+            cargo_total: '',
+            packing_spec: '',
+            number_of_cargos:'',
+            unit: ''
 
         });
     }
 
     export default {
         components: {
-            TableBase,
+            // TableBase,
             ChooseAre,
             ChoosePeo,
             ChoosePeock,
@@ -472,8 +653,17 @@ import Vue from "vue";
                    this.dtlist = [res.data.transit_num, res.data.transport_num, res.data.check_pass_num, res.data.reject_num, res.data.distribute_num, res.data.complete_num]
                 console.log(res)
                })
+                lime.req('EbGoodList',{login_token : lime.cookie_get('login_token')}).then(res => {
+            this.goodAry = res.data.rows.map(v => {
+                return {value: v.uuid, label: v.name, ...v}
+            });
+        })
         },
         methods: {
+            choseGood(uuid) {
+                this.good_uuid = uuid
+                console.log(uuid)
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
@@ -481,7 +671,9 @@ import Vue from "vue";
             init() {
                 this.loading = true;
                 let pam = {
-                    login_token:lime.cookie_get('login_token')
+                    login_token:lime.cookie_get('login_token'),
+                    page_num:this.SearchFormData.page_num,
+                    page_len:this.SearchFormData.page_len
                 }
                 EbShopList(pam, res => {
                     this.loading = false;
@@ -500,16 +692,34 @@ import Vue from "vue";
             // 刷新
             onRefresh() {this.init();},
             // 点击单选
-            onSelectCurrRow(row) {
+            onSelectRow(row) {
                 this.curr_row = row;
+            },
+            onPageChange(page){
+                this.SearchFormData.page_num = page;
+                this.init();
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            // 排序处理
+            onSortChange(sort) {
+                console.log(sort);
+                this.SearchFormData.order_field = sort.prop;
+                if (sort.order == 'ascending') {
+                    this.SearchFormData.order_sort  = 'asc';
+                } else {
+                    this.SearchFormData.order_sort  = 'desc';
+                }
+                
+                this.init();
             },
             //添加
             
             handleAdd() {
               this.add_show = true  
             },
-            onAddSubmit() {
-                
+            onAddSubmit() {               
                 this.AddFormData.s_time = this.AddFormData.s_time.getFullYear() + '-' + (this.AddFormData.s_time.getMonth() + 1) + '-' + this.AddFormData.s_time.getDate()
                 this.AddFormData.dispatch_time = this.AddFormData.dispatch_time.getFullYear() + '-' + (this.AddFormData.dispatch_time.getMonth() + 1) + '-' + this.AddFormData.dispatch_time.getDate()
                 this.AddFormData.s_area_uuid =  this.$refs.starAdress.area_uuid
@@ -519,6 +729,16 @@ import Vue from "vue";
                 this.AddFormData.main_staff_uuid =  this.$refs.mdoPeople.people_uuid[0]
                 this.AddFormData.shop_vehicle_uuid =  this.$refs.ofVeh.veh_uuid
                 this.AddFormData.login_token  =  lime.cookie_get('login_token')
+                this.AddFormData.goods_json = [
+                    {
+                        "good_uuid": this.good_uuid,
+                        "un_number": this.un_number,
+                        "cargo_total": this.cargo_total,
+                        "packing_spec": this.packing_spec,
+                        "number_of_cargos": this.number_of_cargos,
+                        "unit": this.unit
+                    }
+                ]
                 EbShopAdd(this.AddFormData, res => {
                     console.log(res)
                 })
@@ -542,6 +762,15 @@ import Vue from "vue";
                     })
                 })
             },
+            //编辑
+            handleEdit(){
+                this.EditFormData = this.curr_row
+                this.edit_show = true
+            },
+            onEditSubmit() {
+                this.edit_show = false
+            },
+
             //详细
             handleDetail() {
                 if (util.empty(this.curr_row)) {

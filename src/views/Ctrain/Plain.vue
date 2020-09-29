@@ -54,9 +54,9 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="计划名称" align="center"></el-table-column>
-                <el-table-column prop="img" label="图片" align="center">
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="name" label="计划名称" align="left"></el-table-column>
+                <el-table-column prop="img" label="图片" align="right">
                     <template slot-scope="scope">
                         <img class="imgclass" v-if="scope.row.img" :src="scope.row.img" @click="showImg(scope.row.img)" alt="未上传" style="width: 40px;">
                         <span v-else style="color: red">未上传</span>

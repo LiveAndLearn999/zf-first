@@ -44,8 +44,8 @@
                 element-loading-background="rgba(0, 0, 0, 0.8)" 
                 @sort-change="onSortChange" :highlight-current-row="true" 
                 @current-change="onSelectRow" style="width: 100%" size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标题" align="center"></el-table-column>
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="title" label="标题" align="left"></el-table-column>
                 <el-table-column prop="cont_type" label="文件类型" align="center" >
                      <template slot-scope="scope">
                         {{scope.row.cont_type == 1 ? '视频' : '图文'}}

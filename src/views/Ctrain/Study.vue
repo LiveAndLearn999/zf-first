@@ -53,9 +53,9 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="plan_name" label="计划名称" align="center"></el-table-column>
-                <el-table-column prop="state" label="状态" align="center">
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="plan_name" show-overflow-tooltip label="计划名称" align="left"></el-table-column>
+                <el-table-column prop="state"  label="状态" align="center">
                     <template slot-scope="scope">
                         {{stateFormat(scope.row.state)}}
                     </template>
@@ -77,11 +77,19 @@
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
+                </el-pagination> -->
+                <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
                 </el-pagination>
             </div>
         </div>
@@ -90,13 +98,23 @@
         <el-dialog
             title="搜索"
             :visible.sync="search_show"
-            width="30%">
+            width="400px">
             <el-form :model="SearchFormData" label-width="120px">
                 <el-form-item label="开始时间:">
-                    <el-input v-model="SearchFormData.start_date" />
+                    <el-date-picker 
+                        v-model="SearchFormData.start_date"  
+                        type="date" 
+                        placeholder="开始日期">
+                    </el-date-picker>
+                    <!-- <el-input v-model="SearchFormData.start_date" /> -->
                 </el-form-item>
                 <el-form-item label="结束时间:">
-                    <el-input v-model="SearchFormData.end_date" />
+                    <el-date-picker 
+                        v-model="SearchFormData.end_date"  
+                        type="date" 
+                        placeholder="结束日期">
+                    </el-date-picker>
+                    <!-- <el-input v-model="SearchFormData.end_date" /> -->
                 </el-form-item>
             </el-form>
 
@@ -132,16 +150,20 @@
         </el-dialog>
 
         <!-- 详细 -->
-        <el-dialog title="详细" :visible.sync="detail_show" width="40%">
-            <el-form :model="DetailFormData" label-width="120px">
+        <el-dialog title="详细" :visible.sync="detail_show" width="450px">
+            <el-form :model="DetailFormData" label-width="120px" label-position="left">
                 <!-- <el-form-item label="UUID:">{{DetailFormData.uuid}}</el-form-item> -->
-                <el-form-item label="状态:">{{stateFormat(DetailFormData.state)}}</el-form-item>
-                <el-form-item label="开始时间:">{{DetailFormData.start_time}}</el-form-item>
+                <el-form-item label="状态:">{{DetailFormData.state == 1 ?  '完成' : '未完成'}}</el-form-item>
+                <el-form-item label="开始时间:">{{DetailFormData.start_time || '---'}}</el-form-item>
                 <el-form-item label="结束时间:">{{DetailFormData.end_time== '' ? '未结束' : DetailFormData.end_time}}</el-form-item>
                 <el-form-item label="类型:">{{  DetailFormData.is_online == 1 ? '现场' : '线上'}}</el-form-item>
-                <el-form-item label="首次拍照:">{{DetailFormData.in_face}}</el-form-item>
-                <el-form-item label="最后拍照:">{{DetailFormData.out_face}}</el-form-item>
-                <el-form-item label="证书:">{{DetailFormData.certificate_img}}</el-form-item>
+                <el-form-item label="首次拍照:">{{DetailFormData.in_face || '---'}}</el-form-item>
+                <el-form-item label="最后拍照:">{{DetailFormData.out_face || '---'}}</el-form-item>
+                <el-form-item label="证书:">
+                    <img v-if="DetailFormData.certificate_img" :src="DetailFormData.certificate_img" alt="">
+                    <span v-else>未上传</span>
+                    <!-- {{DetailFormData.certificate_img}} -->
+                </el-form-item>
             </el-form>
             <span slot="footer">
                 <el-button type="primary" @click="detail_show = false">确 定</el-button>
@@ -313,6 +335,9 @@
             onPageChange(page){
                 this.SearchFormData.page_num = page;
                 this.init();
+            },
+             handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
             },
             // 排序处理
             onSortChange(sort) {

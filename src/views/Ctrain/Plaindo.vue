@@ -52,8 +52,8 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="计划名称" align="center"></el-table-column>
+                <el-table-column type="index" label="#" width="80px"></el-table-column>
+                <el-table-column prop="title" label="计划名称" align="left"></el-table-column>
                 <el-table-column prop="start_time" label="开始时间" align="center" :sortable=true></el-table-column>
                 <el-table-column prop="end_time" label="结束时间" align="center" :sortable=true></el-table-column>
             </el-table>
@@ -121,7 +121,7 @@
                         <el-select
                             v-model="resource_value"
                             @change="choseResource"
-                            placeholder="计划组">
+                            placeholder="资源">
                             <el-option
                             v-for="item in resourceAry"
                             :key="item.value"
@@ -235,7 +235,20 @@
             <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
                 <el-form :model="EditFormData" label-width="140px" label-position="left">
                     <el-form-item label="计划组名称:"><el-input v-model="EditFormData.title"/></el-form-item>
-                    <!-- <el-form-item label="计划组唯一标识:"><el-input v-model="EditFormData.plan_group_uuid"/></el-form-item> -->
+                    <el-form-item label="计划组:">
+                        <el-select
+                            v-model="plaing_value"
+                            @change="chosePlaing"
+                            placeholder="计划组">
+                            <el-option
+                            v-for="item in plaingAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input v-model="EditFormData.plan_group_uuid"/> -->
+                    </el-form-item>
                     <el-form-item label="开始时间:">
                         <el-date-picker 
                         v-model="EditFormData.start_time"  
@@ -250,6 +263,20 @@
                         type="date" 
                         placeholder="选择日期">
                         </el-date-picker>
+                    </el-form-item>
+                     <el-form-item label="资源:" required>
+                        <el-select
+                            v-model="resource_value"
+                            @change="choseResource"
+                            placeholder="资源">
+                            <el-option
+                            v-for="item in resourceAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input v-model="AddFormData.plan_group_uuid"/> -->
                     </el-form-item>
                     <el-form-item label="学员组成类型:">
                         <el-radio v-model="EditFormData.study_user_type" label="1">员工</el-radio>
