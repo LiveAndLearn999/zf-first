@@ -40,8 +40,8 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column align="center" prop="name" label="姓名"></el-table-column>
+                <el-table-column width="80px" type="index" label="#"></el-table-column>
+                <el-table-column align="left" prop="name" label="姓名"></el-table-column>
                 <el-table-column align="center" prop="mobile" label="登录手机"></el-table-column>
                 <el-table-column align="center" prop="role_name" label="角色" >
                     <template slot-scope="scope">
@@ -90,7 +90,7 @@
         <el-dialog
             title="搜索"
             :visible.sync="search_show"
-            width="35%">
+            width="450px">
             <el-form :model="SearchFormData" label-width="120px" label-position="left">
                 <el-form-item label="员工姓名:"><el-input v-model="SearchFormData.real_name" /></el-form-item>
             </el-form>
@@ -114,50 +114,26 @@
                     <el-form-item label="添加时间:">{{DetailFormData.add_time }}</el-form-item>
                     <el-form-item label="最近修改时间:">{{DetailFormData.last_time}}</el-form-item>
                     <el-form-item label="最近修改ip:">{{DetailFormData.last_ip}}</el-form-item>
-                    <el-form-item label="紧急联系人:">{{DetailFormData.emergency_contact || '---' }}</el-form-item>
-                    
-                    <el-form-item label="紧急联系电话:">
-                        {{DetailFormData.emergency_conttel}}
-                    </el-form-item>
-                    <el-form-item label="与紧急联系人关系:">
-                        {{DetailFormData.emergency_about}}
-                    </el-form-item>
-                    <el-form-item label="银行卡号:">
-                        {{DetailFormData.bank_code }}
-                    </el-form-item>
-                    <el-form-item label="银行名称:">
-                        {{DetailFormData.bank_name}}
-                    </el-form-item>
-                    <el-form-item label="银行卡姓名:">
-                        {{DetailFormData.bank_staff_name}}
-                    </el-form-item>
-                    <el-form-item label="入职时间:">
-                        {{DetailFormData.start_time}}
-                    </el-form-item>
-                    <el-form-item label="试用期时间:">
-                        {{DetailFormData.try_time}}
-                    </el-form-item>
-                    <el-form-item label="离职时间:">
-                        {{DetailFormData.out_time}}
-                    </el-form-item>
-                    <el-form-item label="身份证:">
-                        {{DetailFormData.person_code}}
-                    </el-form-item>
-                    <el-form-item label="性别:">
-                        {{DetailFormData.sex == 1 ? '男' : '女'}}
-                    </el-form-item>
-                    <el-form-item label="当前居住地:">
-                        {{DetailFormData.now_addr}}
-                    </el-form-item>
-                    <el-form-item label="籍贯所在地:">
-                        {{DetailFormData.home_addr}}
-                    </el-form-item>
-                    <el-form-item label="身份证正面:">
-                        <!-- {{DetailFormData.person_code_img0}} -->
-                        <img src="../../assets/imgs/car.png" alt="">
+                    <el-form-item label="紧急联系人:">{{DetailFormData.emergency_contact || '---' }}</el-form-item>                    
+                    <el-form-item label="紧急联系电话:">{{DetailFormData.emergency_conttel}}</el-form-item>
+                    <el-form-item label="与紧急联系人关系:">{{DetailFormData.emergency_about}}</el-form-item>
+                    <el-form-item label="银行卡号:">{{DetailFormData.bank_code }}</el-form-item>
+                    <el-form-item label="银行名称:">{{DetailFormData.bank_name}}</el-form-item>
+                    <el-form-item label="银行卡姓名:">{{DetailFormData.bank_staff_name}}</el-form-item>
+                    <el-form-item label="入职时间:">{{DetailFormData.start_time}}</el-form-item>
+                    <el-form-item label="试用期时间:">{{DetailFormData.try_time}}</el-form-item>
+                    <el-form-item label="离职时间:">{{DetailFormData.out_time}}</el-form-item>
+                    <el-form-item label="身份证:">{{DetailFormData.person_code}}</el-form-item>
+                    <el-form-item label="性别:">{{DetailFormData.sex == 1 ? '男' : '女'}}</el-form-item>
+                    <el-form-item label="当前居住地:">{{DetailFormData.now_addr}}</el-form-item>
+                    <el-form-item label="籍贯所在地:">{{DetailFormData.home_addr}}</el-form-item>
+                    <el-form-item label="身份证正面:"><!-- {{DetailFormData.person_code_img0}} -->
+                        <img v-if="DetailFormData.person_code_img0" :src="DetailFormData.person_code_img0" alt="" style="width: 50px;height: 50px">
+                        <span v-else>未上传</span>
                     </el-form-item>
                     <el-form-item label="身份证反面:">
-                        <img src="../../assets/imgs/car.png" alt="">
+                        <img v-if="DetailFormData.person_code_img1" :src="DetailFormData.person_code_img1" alt="" style="width: 50px;height: 50px">
+                        <span v-else>未上传</span>
                         <!-- {{DetailFormData.person_code_img1}} -->
                     </el-form-item>
                     <el-form-item label="学历类型:">
@@ -167,28 +143,19 @@
                         <span v-else-if="DetailFormData.edu_type == 3">大专及以上</span>
                         <span v-else-if="DetailFormData.edu_type == 4">本科及以上</span>
                         <span v-else>研究生及以上</span>
-                        <!-- {{DetailFormData.edu_type}} -->
                     </el-form-item>
                     <el-form-item label="婚姻状况:">
                         <span v-if="DetailFormData.is_marry == 0 ">未婚</span>
                         <span v-else-if="DetailFormData.is_marry == 1 ">已婚</span>
                         <span v-else-if="DetailFormData.is_marry == 2 ">离异</span>
-                        <span v-else> 丧偶</span>
-                        <!-- {{DetailFormData.is_marry}} -->
+                        <span v-else>丧偶</span>
                     </el-form-item>
-                    <el-form-item label="民族:">
-                        {{DetailFormData.nation}}
-                    </el-form-item>
-                    <el-form-item label="微信号:">
-                        {{DetailFormData.weixin_code}}
-                    </el-form-item>
-                   <el-form-item label="薪资:">
-                       {{((DetailFormData.salary - 0) / 100) + '元'}}
-                    </el-form-item> 
+                    <el-form-item label="民族:">{{DetailFormData.nation}}</el-form-item>
+                    <el-form-item label="微信号:">{{DetailFormData.weixin_code}}</el-form-item>
+                    <el-form-item label="薪资:">{{((DetailFormData.salary - 0) / 100) + '元'}}</el-form-item> 
                     <el-form-item label="是否已交社保:">
                         <span v-if="DetailFormData.is_social == 0 ">未交</span>
                         <span v-else>已交</span>
-                        <!-- {{DetailFormData.is_social}} -->
                     </el-form-item> 
                 </el-form>
                 <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
@@ -208,8 +175,10 @@
                     <el-form-item label="登录手机号:" required><el-input v-model="AddFormData.mobile" /></el-form-item>
                     <el-form-item label="密码:" required><el-input v-model="AddFormData.pwd" /></el-form-item>
                     <el-form-item label="状态:" required>
-                        <el-radio v-model="AddFormData.state" label="0">冻结</el-radio>
-                        <el-radio v-model="AddFormData.state" label="1">启用</el-radio>
+                        <el-radio-group v-model="add_state">
+                            <el-radio :label="0">冻结</el-radio>
+                            <el-radio :label="1">启用</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="添加时间:">
                          <el-date-picker
@@ -268,12 +237,15 @@
                         </el-date-picker>
                         <!-- <el-input v-model="AddFormData.out_time" /> -->
                     </el-form-item>
-                    <el-form-item label="身份证:">
+                    <el-form-item label="身份证号:">
                         <el-input v-model="AddFormData.person_code" />
                     </el-form-item>
                     <el-form-item label="性别:">
-                        <el-radio v-model="AddFormData.sex" label="0">女</el-radio>
-                        <el-radio v-model="AddFormData.sex" label="1">男</el-radio>
+                        <el-radio-group v-model="add_sex">
+                            <el-radio :label="0">女</el-radio>
+                            <el-radio :label="1">男</el-radio>
+                        </el-radio-group>
+                        <!-- AddFormData.sex -->
                     </el-form-item>
                     <el-form-item label="当前居住地:">
                         <el-input v-model="AddFormData.now_addr" />
@@ -282,24 +254,32 @@
                         <el-input v-model="AddFormData.home_addr" />
                     </el-form-item>
                     <el-form-item label="身份证正面:">
-                        <el-input v-model="AddFormData.person_code_img0" />
+                        <file ref="img_code"/>
+                        <!-- <el-input v-model="AddFormData.person_code_img0" /> -->
                     </el-form-item>
                     <el-form-item label="身份证反面:">
-                        <el-input v-model="AddFormData.person_code_img1" />
+                        <file ref="imgs_code"/>
+                        <!-- <el-input v-model="AddFormData.person_code_img1" /> -->
                     </el-form-item>
                     <el-form-item label="受教育类型:">
-                        <el-radio v-model="AddFormData.edu_type" label="0">保密</el-radio>
-                        <el-radio v-model="AddFormData.edu_type" label="1">初中及以上</el-radio>
-                        <el-radio v-model="AddFormData.edu_type" label="2">高中及以上</el-radio>
-                        <el-radio v-model="AddFormData.edu_type" label="3">大专及以上</el-radio>
-                        <el-radio v-model="AddFormData.edu_type" label="4"> 本科及以上</el-radio>
-                        <el-radio v-model="AddFormData.edu_type" label="5"> 研究生及以上</el-radio>
+                         <el-radio-group v-model="add_edu_type">
+                            <el-radio :label="0">保密</el-radio>
+                            <el-radio :label="1">初中及以上</el-radio>
+                            <el-radio :label="2">高中及以上</el-radio>
+                            <el-radio :label="3">大专及以上</el-radio>
+                            <el-radio :label="4"> 本科及以上</el-radio>
+                            <el-radio :label="5"> 研究生及以上</el-radio>
+                         </el-radio-group>
+                         <!-- AddFormData.edu_type -->
                     </el-form-item>
                     <el-form-item label="婚姻状况:">
-                        <el-radio v-model="AddFormData.is_marry" label="0">未婚</el-radio>
-                        <el-radio v-model="AddFormData.is_marry" label="1">已婚</el-radio>
-                        <el-radio v-model="AddFormData.is_marry" label="2">离异</el-radio>
-                        <el-radio v-model="AddFormData.is_marry" label="3">丧偶</el-radio>
+                        <el-radio-group v-model="add_is_marry">
+                            <el-radio :label="0">未婚</el-radio>
+                            <el-radio :label="1">已婚</el-radio>
+                            <el-radio :label="2">离异</el-radio>
+                            <el-radio :label="3">丧偶</el-radio>`
+                        </el-radio-group>
+                        <!-- AddFormData.is_marry -->
                     </el-form-item>
                     <el-form-item label="民族:">
                         <el-input v-model="AddFormData.nation" />
@@ -308,11 +288,14 @@
                         <el-input v-model="AddFormData.weixin_code" />
                     </el-form-item>
                    <el-form-item label="薪资:">
-                       <el-input v-model="AddFormData.salary" />
+                       <el-input type="number" v-model="AddFormData.salary" />
                     </el-form-item> 
                     <el-form-item label="是否已交社保:">
-                        <el-radio v-model="AddFormData.is_social" label="0">未缴</el-radio>
-                        <el-radio v-model="AddFormData.is_social" label="1">已缴</el-radio>
+                        <el-radio-group v-model="add_is_social">
+                            <el-radio :label="0">未缴</el-radio>
+                            <el-radio :label="1">已缴</el-radio>
+                        </el-radio-group>
+                        <!-- AddFormData.is_social -->
                     </el-form-item> 
                 </el-form>
                 <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
@@ -332,8 +315,10 @@
                     <el-form-item label="员工名称:"><el-input v-model="EditFormData.name" /></el-form-item>
                     <el-form-item label="登录手机号:"><el-input v-model="EditFormData.mobile" /></el-form-item>
                     <el-form-item label="状态:">
-                        <el-radio v-model="EditFormDataState" label="0">冻结</el-radio>
-                        <el-radio v-model="EditFormDataState" label="1">启用</el-radio>
+                        <el-radio-group v-model="edit_state">
+                            <el-radio :label="0">冻结</el-radio>
+                            <el-radio :label="1">启用</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="添加时间:">
                         <el-date-picker
@@ -387,12 +372,14 @@
                             placeholder="选择日期时间">
                         </el-date-picker>
                     </el-form-item>
-                    <el-form-item label="身份证:">
+                    <el-form-item label="身份证号:">
                         <el-input v-model="EditFormData.person_code" />
                     </el-form-item>
                     <el-form-item label="性别:">
-                        <el-radio v-model="EditFormDataSex" label="0">女</el-radio>
-                        <el-radio v-model="EditFormDataSex" label="1">男</el-radio>
+                        <el-radio-group v-model="edit_sex">
+                            <el-radio :label="0">女</el-radio>
+                            <el-radio :label="1">男</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="当前居住地:">
                         <el-input v-model="EditFormData.now_addr" />
@@ -401,24 +388,32 @@
                         <el-input v-model="EditFormData.home_addr" />
                     </el-form-item>
                     <el-form-item label="身份证正面:">
-                        <el-input v-model="EditFormData.person_code_img0" />
+                        <img v-if="EditFormData.person_code_img0" :src="EditFormData.person_code_img0" alt="" style="width: 50px">
+                        <file v-else ref="edit_img"/>
+                        <!-- <el-input v-model="EditFormData.person_code_img0" /> -->
                     </el-form-item>
                     <el-form-item label="身份证反面:">
-                        <el-input v-model="EditFormData.person_code_img1" />
+                         <img v-if="EditFormData.person_code_img1" :src="EditFormData.person_code_img1" alt="" style="width: 50px">
+                         <file v-else ref="edit_imgs"/>
+                        <!-- <el-input v-model="EditFormData.person_code_img1" /> -->
                     </el-form-item>
                     <el-form-item label="受教育类型:">
-                        <el-radio v-model="EditFormDataEdutype" label="0">保密</el-radio>
-                        <el-radio v-model="EditFormDataEdutype" label="1">初中及以上</el-radio>
-                        <el-radio v-model="EditFormDataEdutype" label="2">高中及以上</el-radio>
-                        <el-radio v-model="EditFormDataEdutype" label="3">大专及以上</el-radio>
-                        <el-radio v-model="EditFormDataEdutype" label="4"> 本科及以上</el-radio>
-                        <el-radio v-model="EditFormDataEdutype" label="5"> 研究生及以上</el-radio>
+                        <el-radio-group v-model="edit_edu_type">
+                            <el-radio :label="0">保密</el-radio>
+                            <el-radio :label="1">初中及以上</el-radio>
+                            <el-radio :label="2">高中及以上</el-radio>
+                            <el-radio :label="3">大专及以上</el-radio>
+                            <el-radio :label="4"> 本科及以上</el-radio>
+                            <el-radio :label="5"> 研究生及以上</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="婚姻状况:">
-                        <el-radio v-model="EditFormDataIsmarry" label="0">未婚</el-radio>
-                        <el-radio v-model="EditFormDataIsmarry" label="1">已婚</el-radio>
-                        <el-radio v-model="EditFormDataIsmarry" label="2">离异</el-radio>
-                        <el-radio v-model="EditFormDataIsmarry" label="3">丧偶</el-radio>
+                        <el-radio-group v-model="edit_is_marry">
+                            <el-radio :label="0">未婚</el-radio>
+                            <el-radio :label="1">已婚</el-radio>
+                            <el-radio :label="2">离异</el-radio>
+                            <el-radio :label="3">丧偶</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="民族:">
                         <el-input v-model="EditFormData.nation" />
@@ -427,11 +422,13 @@
                         <el-input v-model="EditFormData.weixin_code" />
                     </el-form-item>
                    <el-form-item label="薪资:">
-                       <el-input v-model="EditFormData.salary" />
+                       <el-input v-model="EditFormData.salary" type="number"/>
                     </el-form-item> 
                     <el-form-item label="是否已交社保:">
-                        <el-radio v-model="Issocial" label="0">未缴</el-radio>
-                        <el-radio v-model="Issocial" label="1">已缴</el-radio>
+                        <el-radio-group v-model="edit_is_social">
+                            <el-radio :label="0">未缴</el-radio>
+                            <el-radio :label="1">已缴</el-radio>
+                        </el-radio-group>
                     </el-form-item> 
                 </el-form>
                 <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
@@ -489,59 +486,73 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-
-    if (!store.state.ManageData) {
-        Vue.set(store.state, 'ManageData', {
-            rows:[],
-            total:0,
-            loading:false,
-            curr_row:null,
-            SearchFormData:{
-                real_name:'',
-                page_num:1,
-                page_len:10,
-                order_field:'add_time',
-                order_sort:'desc'
-            },
-            search_show:false,
-            //详细
-            detail_show: false,
-            DetailFormData:{},
-            // 添加
-            add_show:false,
-            AddFormData:{
-                real_name:'',
-                mobile:'',
-                pwd:'',
-            },
-            //编辑
-            edit_show:false,
-            EditFormData:{
-                real_name:''
-            },
-            //设置角色
-            role_show:false,
-            role_rows:[],
-            RoleFormData:{
-                manage_uuid:'',
-                role_uuid:'',
-            },
-            setpwd_show: false,
-            PwdFormDate: {},
-            havaSeatch: false,
-            roleColor: '',
-            direction: 'rtl',
-            EditFormDataState: '0',
-            EditFormDataSex: '0',
-            EditFormDataEdutype: '0',
-            Issocial: '0',
-            EditFormDataIsmarry: '0',
-            oldEditpwd: ''
-        });
-    }
+    import file from "@/components/imgUpload/upload.vue"
 
     export default {
-        data() {return store.state.ManageData;},
+        components:{
+            file
+        },
+        data() {
+            return {
+                rows:[],
+                total:0,
+                loading:false,
+                curr_row:null,
+                SearchFormData:{
+                    real_name:'',
+                    page_num:1,
+                    page_len:10,
+                    order_field:'add_time',
+                    order_sort:'desc'
+                },
+                search_show:false,
+                //详细
+                detail_show: false,
+                DetailFormData:{},
+                // 添加
+                add_show:false,
+                AddFormData:{
+                    real_name:'',
+                    mobile:'',
+                    pwd:'',
+                },
+                add_is_social: 0,
+                add_sex: 0,
+                add_state: 0,
+                add_is_marry: 0,
+                add_edu_type: 0,
+        
+                //编辑
+                edit_show:false,
+                EditFormData:{
+                    real_name:''
+                },
+                edit_is_social: 0,
+                edit_sex: 0,
+                edit_state: 0,
+                edit_is_marry: 0,
+                edit_edu_type: 0,
+
+                //设置角色
+                role_show:false,
+                role_rows:[],
+                RoleFormData:{
+                    manage_uuid:'',
+                    role_uuid:'',
+                },
+                setpwd_show: false,
+                PwdFormDate: {},
+                havaSeatch: false,
+                roleColor: '',
+                direction: 'rtl',
+                EditFormDataState: '0',
+                EditFormDataSex: '0',
+                EditFormDataEdutype: '0',
+                Issocial: '0',
+                EditFormDataIsmarry: '0',
+                oldEditpwd: ''
+            }
+        },
         computed:{
             width:() => {
                 return store.state.AppData.width;
@@ -559,9 +570,7 @@
         created(){this.init();},
         methods:{
             // 按钮点击 menu:参数数据 local是否本地程序
-            onSubMenu(menu, local = false) {
-                util.submenu(menu,this,lime.cookie_get('login_token'), local);
-            },
+            onSubMenu(menu, local = false) {util.submenu(menu,this,lime.cookie_get('login_token'), local);},
             // 数据初始化
             init() {
                 this.loading = true;
@@ -593,43 +602,34 @@
                 }
             },
             // 表格数据刷新
-            onRefresh() {
-                this.init();
-            },
+            onRefresh() {this.init();},
             // 搜索页面打开
             onSearch() {
                 this.search_show = true;
                 this.havaSeatch = true
-                },
+            },
             // 搜索提交
             onSearchSubmit(){
-                
                 this.SearchFormData.page_num = 1;
                 this.init();
                 this.search_show = false
             },
             // 选择单行
-            onSelectRow(row){
-                this.curr_row = row;
-            },
+            onSelectRow(row){this.curr_row = row;},
             // 分页处理
             onPageChange(page){
                 this.SearchFormData.page_num = page;
                 this.init();
             },
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
-            },
+            handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 排序处理
             onSortChange(sort) {
-                console.log(sort);
                 this.SearchFormData.order_field = sort.prop;
                 if (sort.order == 'ascending') {
                     this.SearchFormData.order_sort  = 'asc';
                 } else {
                     this.SearchFormData.order_sort  = 'desc';
-                }
-                
+                }               
                 this.init();
             },
 
@@ -639,19 +639,8 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-                lime.req('ShopStaffDetail', {
-                    login_token:lime.cookie_get('login_token'),
-                    uuid: this.curr_row.uuid
-                }).then(res => {
-                    this.detail_show = true;
-                    this.DetailFormData= res.data
-                    // this.rows = res.data.rows;
-                    // this.total = res.data.total;
-                });
-            //    this.DetailFormData.name = this.curr_row.name
-            //    this.DetailFormData.mobile = this.curr_row.mobile
-            //    this.DetailFormData.state = this.curr_row.state
-            //    this.detail_show = true; 
+                this.DetailFormData = this.curr_row
+                this.detail_show = true;
             },
             // 添加展示
             handleAdd() {
@@ -661,11 +650,14 @@
             // 添加向后台提交
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                this.AddFormData.edu_type =  this.AddFormData.edu_type - 0
-                this.AddFormData.is_marry =  this.AddFormData.is_marry - 0
-                // this.AddFormData.is_social =  this.AddFormData.is_social - 0
-                this.AddFormData.sex =  this.AddFormData.sex - 0
-                this.AddFormData.state =  this.AddFormData.state - 0
+                this.AddFormData.edu_type =  this.add_edu_type
+                this.AddFormData.is_marry =  this.add_is_marry
+                this.AddFormData.is_social =  this.add_is_social + ''
+                this.AddFormData.sex =  this.add_sex
+                this.AddFormData.state =  this.add_state//img_code person_code_img0 person_code_img1
+                this.AddFormData.person_code_img0 = this.$refs.img_code.img_url
+                this.AddFormData.person_code_img1 = this.$refs.imgs_code.img_url
+                this.AddFormData.start_time = util.eleDate(this.AddFormData.start_time)
                 lime.req('ShopStaffAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
@@ -683,21 +675,27 @@
                 }
                 console.log(this.curr_row)
                 this.EditFormData = this.curr_row
-                this.EditFormDataState = this.curr_row.state + ''
-                this.Issocial =  this.curr_row.is_social == 0 ? this.curr_row.is_social + '' : '1'
-                this.EditFormDataSex = this.curr_row.sex + ''
-                this.EditFormDataEdutype = this.curr_row.edu_type + ''
-                this.EditFormDataIsmarry = this.curr_row.is_marry + ''
+                this.edit_is_social = this.EditFormData.is_social == 0 ? 0 : 1,
+                this.edit_sex =  this.EditFormData.sex
+                this.edit_state = this.EditFormData.state
+                this.edit_is_marry = this.EditFormData.is_marry
+                this.edit_edu_type = this.EditFormData.edu_type
                 this.edit_show =true;
             },
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
                 this.EditFormData.uuid        = this.curr_row.uuid;
-                this.EditFormData.state = this.EditFormDataState;
-                this.EditFormData.sex  = this.EditFormDataSex;
-                this.EditFormData.edu_type  = this.EditFormDataEdutype;
-                this.EditFormData.is_social  = this.Issocial;
-                this.EditFormData.is_marry  = this.EditFormDataIsmarry;
+                this.EditFormData.state = this.edit_state;
+                this.EditFormData.sex  = this.edit_sex;
+                this.EditFormData.edu_type  = this.edit_edu_type;
+                this.EditFormData.is_social  = this.edit_is_social + '';
+                this.EditFormData.is_marry  = this.edit_is_marry;
+                if(this.$refs.edit_img.img_url) {
+                    this.EditFormData.person_code_img0 = this.$refs.edit_img.img_url
+                }
+                if(this.$refs.edit_imgs.img_url) {
+                    this.EditFormData.s = this.$refs.edit_imgs.img_url
+                }
                 lime.req('ShopStaffEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
