@@ -48,13 +48,9 @@
                 @current-change="onSelectRow"
                 style="width: 100%;margin-top: 20px" 
                 size="mini">
-<<<<<<< HEAD
                 <!-- element-loading-spinner="el-icon-loading"
                 element-loading-background="rgba(0, 0, 0, 0.8)" -->
                 <el-table-column width="80px" type="index" label="序号"></el-table-column>
-=======
-                <el-table-column width="80px" type="index" label="#"></el-table-column>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 <el-table-column align="left" prop="name" label="姓名"></el-table-column>
                 <el-table-column align="center" prop="mobile" label="登录手机"></el-table-column>
                 <el-table-column align="center" prop="role_name" label="角色" >
@@ -74,7 +70,7 @@
                         {{scope.row.last_time == 0 ? '还未登陆' : scope.row.last_time}}
                     </template>
                 </el-table-column>
-               <el-table-column label="操作" width="230px" align="center">
+              <!--  <el-table-column label="操作" width="230px" align="center">
                     <template slot-scope="scope">
                     <el-dropdown trigger="hover">
                         <span class="el-dropdown-link">
@@ -108,7 +104,7 @@
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
-                </el-table-column>
+                </el-table-column> -->
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
@@ -156,12 +152,6 @@
                     <el-form-item label="登录手机号:">{{DetailFormData.mobile }}</el-form-item>
                     <el-form-item label="角色名称:">{{DetailFormData.role_name }}</el-form-item>
                     <el-form-item label="状态:">{{DetailFormData.state == 1 ? '启用' : '冻结'}}</el-form-item>
-<<<<<<< HEAD
-=======
-                    <el-form-item label="添加时间:">{{DetailFormData.add_time }}</el-form-item>
-                    <el-form-item label="最近修改时间:">{{DetailFormData.last_time}}</el-form-item>
-                    <el-form-item label="最近修改ip:">{{DetailFormData.last_ip}}</el-form-item>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-form-item label="紧急联系人:">{{DetailFormData.emergency_contact || '---' }}</el-form-item>                    
                     <el-form-item label="紧急联系电话:">{{DetailFormData.emergency_conttel}}</el-form-item>
                     <el-form-item label="与紧急联系人关系:">{{DetailFormData.emergency_about}}</el-form-item>
@@ -170,16 +160,11 @@
                     <el-form-item label="银行卡姓名:">{{DetailFormData.bank_staff_name}}</el-form-item>
                     <el-form-item label="入职时间:">{{DetailFormData.start_time}}</el-form-item>
                     <el-form-item label="试用期时间:">{{DetailFormData.try_time}}</el-form-item>
-<<<<<<< HEAD
-=======
-                    <el-form-item label="离职时间:">{{DetailFormData.out_time}}</el-form-item>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-form-item label="身份证:">{{DetailFormData.person_code}}</el-form-item>
                     <el-form-item label="性别:">{{DetailFormData.sex == 1 ? '男' : '女'}}</el-form-item>
                     <el-form-item label="当前居住地:">{{DetailFormData.now_addr}}</el-form-item>
                     <el-form-item label="籍贯所在地:">{{DetailFormData.home_addr}}</el-form-item>
                     <el-form-item label="身份证正面:"><!-- {{DetailFormData.person_code_img0}} -->
-<<<<<<< HEAD
                         <!-- <img v-if="DetailFormData.person_code_img0" :src="DetailFormData.person_code_img0" alt="" style="width: 50px;height: 50px"> -->
                         <el-image 
                             v-if="DetailFormData.person_code_img0"
@@ -197,13 +182,6 @@
                             :src="DetailFormData.person_code_img1" 
                             :preview-src-list="[DetailFormData.person_code_img1]">
                         </el-image>
-=======
-                        <img v-if="DetailFormData.person_code_img0" :src="DetailFormData.person_code_img0" alt="" style="width: 50px;height: 50px">
-                        <span v-else>未上传</span>
-                    </el-form-item>
-                    <el-form-item label="身份证反面:">
-                        <img v-if="DetailFormData.person_code_img1" :src="DetailFormData.person_code_img1" alt="" style="width: 50px;height: 50px">
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                         <span v-else>未上传</span>
                         <!-- {{DetailFormData.person_code_img1}} -->
                     </el-form-item>
@@ -222,10 +200,6 @@
                         <span v-else>丧偶</span>
                     </el-form-item>
                     <el-form-item label="民族:">{{DetailFormData.nation}}</el-form-item>
-<<<<<<< HEAD
-=======
-                    <el-form-item label="微信号:">{{DetailFormData.weixin_code}}</el-form-item>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-form-item label="薪资:">{{((DetailFormData.salary - 0) / 100) + '元'}}</el-form-item> 
                     <el-form-item label="是否已交社保:">
                         <span v-if="DetailFormData.is_social == 0 ">未交</span>
@@ -242,164 +216,240 @@
         <el-drawer
             title="添加"
             :visible.sync="add_show"
-            :direction="direction" size="50%" >
-            <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
-                <el-form style="margin-top: 10px" :model="AddFormData" label-width="140px" label-position="left" :rules="rules">
-                    <el-form-item prop="name" label="员工名称:"><el-input @input="setNames" maxlength="12"  style="width: 360px" v-model="AddFormData.name" /></el-form-item>
-                    <el-form-item prop="mobile" label="登录手机号:" required><el-input style="width: 360px" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="11" v-model="AddFormData.mobile" /></el-form-item>
-                    <el-form-item prop="pwd" label="密码:"><el-input v-model="AddFormData.pwd" style="width: 360px" maxlength="16"/></el-form-item>
-                    <el-form-item label="状态:" required>
-                        <el-radio-group v-model="add_state">
-                            <el-radio :label="0">冻结</el-radio>
-                            <el-radio :label="1">启用</el-radio>
-                        </el-radio-group>
-<<<<<<< HEAD
-                    </el-form-item>       
-                    <el-form-item label="紧急联系人:"><el-input maxlength="10" style="width: 360px" v-model="AddFormData.emergency_contact" /></el-form-item>
-=======
+            :direction="direction" :size="drawerWidth" style="min-width: 600px">
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form ref="addForm" :model="AddFormData" label-width="140px" label-position="right" :rules="rules">
+                    <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">基本信息</div>
+                    </div>
+                    <el-row style="margin-top: 30px;min-width: 500px">
+                            <el-col :span="12">
+                                 <el-form-item prop="name" label="员工名称:"><el-input @input="setNames" class="width_240" maxlength="12"  v-model="AddFormData.name" /></el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item prop="mobile" label="登录手机号:"><el-input maxlength="11" class="width_240" v-model="AddFormData.mobile" /></el-form-item>
+                            </el-col>
+                    </el-row>
+                    <el-row>
+                            <el-col :span="12">
+                                  <el-form-item prop="pwd" label="密码:"><el-input class="width_240" v-model="AddFormData.pwd" minlength="6" maxlength="20"/></el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="状态:" required>
+                                    <el-select v-model="add_state" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in state_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                            </el-form-item> 
+                            </el-col>
+                    </el-row> 
+                     <el-row>
+                            <el-col :span="12">
+                                  <el-form-item label="性别:">
+                                      <el-select v-model="add_sex" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in sex_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                    <!-- AddFormData.sex -->
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="受教育类型:">
+                                    <el-select v-model="add_edu_type" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in edu_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                    <!-- <el-radio-group v-model="add_edu_type">
+                                        <el-radio :label="0">保密</el-radio>
+                                        <el-radio :label="1">初中及以上</el-radio>
+                                        <el-radio :label="2">高中及以上</el-radio>
+                                        <el-radio :label="3">大专及以上</el-radio>
+                                        <el-radio :label="4"> 本科及以上</el-radio>
+                                        <el-radio :label="5"> 研究生及以上</el-radio>
+                                    </el-radio-group> -->
+                                    <!-- AddFormData.edu_type -->
+                                </el-form-item>
+                            </el-col>
+                    </el-row>           
+                     <el-row>
+                            <el-col :span="12">
+                                 <el-form-item label="婚姻状况:">
+                                    <el-select v-model="add_is_marry" placeholder="请选择" >
+                                        <el-option
+                                        class="width_240"
+                                        v-for="item in marry_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                    <!-- <el-radio-group v-model="add_is_marry">
+                                        <el-radio :label="0">未婚</el-radio>
+                                        <el-radio :label="1">已婚</el-radio>
+                                        <el-radio :label="2">离异</el-radio>
+                                        <el-radio :label="3">丧偶</el-radio>`
+                                    </el-radio-group> -->
+                                    <!-- AddFormData.is_marry -->
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="民族:">
+                                    <el-select v-model="add_is_marry" placeholder="请选择">
+                                        <el-option
+                                        class="width_240"
+                                        v-for="item in marry_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                    </el-row> 
+                     <el-form-item label="身份证号:">
+                        <el-input v-model="AddFormData.person_code" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="18"
+></el-input>
+                     </el-form-item>
+                    <el-form-item label="当前居住地:">
+                        <el-input style="min-width: 240px" v-model="AddFormData.now_addr" />
                     </el-form-item>
-                    <el-form-item label="添加时间:">
-                         <el-date-picker
-                            v-model="AddFormData.add_time"
-                            type="datetime"
-                            placeholder="选择日期时间">
-                        </el-date-picker>
-                        <!-- <el-input v-model="AddFormData.add_time" /> -->
+                    <el-form-item label="籍贯所在地:">
+                        <el-input style="min-width: 240px" v-model="AddFormData.home_addr" />
                     </el-form-item>
-                    <el-form-item label="最近修改时间:">
-                        <el-date-picker
-                            v-model="AddFormData.last_time"
-                            type="datetime"
-                            placeholder="选择日期时间">
-                        </el-date-picker>
-                        <!-- <el-input v-model="AddFormData.last_time" /> -->
+                     <el-form-item label="身份证正面:">
+                                <file ref="img_code" :iconUrl="iconUrl" class="width_240"/>
+                                <!-- <el-input v-model="AddFormData.person_code_img0" /> -->
+                            </el-form-item>
+                    <el-form-item label="身份证反面:">
+                                <file ref="imgs_code" :iconUrl="iconUrls" class="width_240"/>
+                                <!-- <el-input v-model="AddFormData.person_code_img1" /> -->
+                            </el-form-item>
+                    <!-- <el-row >
+                        <el-col :span="12">
+                            <el-form-item label="身份证正面:">
+                                <file ref="img_code" :iconUrl="iconUrl" class="width_240"/>
+                                <el-input v-model="AddFormData.person_code_img0" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="身份证反面:">
+                                <file ref="imgs_code" :iconUrl="iconUrls" class="width_240"/>
+                                <el-input v-model="AddFormData.person_code_img1" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row> -->
+
+                    <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">财务信息</div>
+                    </div>
+                    <el-form-item label="银行卡号:" style="margin-top: 30px">
+                         <el-input onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="19" style="min-width: 240px" v-model="AddFormData.bank_code" />
                     </el-form-item>
-                    <el-form-item label="最近修改ip:"><el-input v-model="AddFormData.last_ip" /></el-form-item>
-                    <el-form-item label="紧急联系人:"><el-input v-model="AddFormData.emergency_contact" /></el-form-item>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
-                    <el-form-item label="紧急联系电话:">
-                        <el-input onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="11" style="width: 360px" v-model="AddFormData.emergency_conttel" />
-                    </el-form-item>
-                    <el-form-item label="与紧急联系人关系:">
-                        <el-input style="width: 360px" v-model="AddFormData.emergency_about" />
-                    </el-form-item>
-                    <el-form-item label="银行卡号:">
-                         <el-input onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="19" style="width: 360px" v-model="AddFormData.bank_code" />
-                    </el-form-item>
-                    <el-form-item label="银行名称:">
-                        <el-input style="width: 360px" v-model="AddFormData.bank_name" />
+                    <el-form-item label="银行名称:" @input="bankInput">
+                        <el-input maxlength="20" style="min-width: 240px" v-model="AddFormData.bank_name" />
                     </el-form-item>
                     <el-form-item label="银行卡姓名:">
                         <!-- <el-input style="width: 260px" v-model="AddFormData.bank_staff_name" /> -->
-                        <el-input style="width: 360px" v-model="add_name" />
+                        <el-input @input="nameInput" style="min-width: 240px" v-model="add_name" />
                     </el-form-item>
-                    <el-form-item label="入职时间:">
-                        <el-date-picker
-                        style="width: 360px"
-                            v-model="AddFormData.start_time"
-                            type="date"
-                            placeholder="选择日期时间">
-                        </el-date-picker>
-                        <!-- <el-input v-model="AddFormData.start_time" /> -->
-                    </el-form-item>
-                    <el-form-item label="试用期时间:">
-                        <el-date-picker
-                            style="width: 360px"
-                            v-model="AddFormData.try_time"
-                            type="date"
-                            placeholder="选择日期时间">
-                        </el-date-picker>
-                        <!-- <el-input v-model="AddFormData.try_time" /> -->
-                    </el-form-item>
-<<<<<<< HEAD
-                    <el-form-item label="身份证号:">
-                        <el-input style="width: 360px" v-model="AddFormData.person_code" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="18"
-></el-input>
-                       <!--  <el-input style="width: 360px" v-model="personCode"></el-input> -->
-=======
-                    <el-form-item label="离职时间:">
-                        <el-date-picker
-                            v-model="AddFormData.out_time"
-                            type="datetime"
-                            placeholder="选择日期时间">
-                        </el-date-picker>
-                        <!-- <el-input v-model="AddFormData.out_time" /> -->
-                    </el-form-item>
-                    <el-form-item label="身份证号:">
-                        <el-input v-model="AddFormData.person_code" />
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
-                    </el-form-item>
-                    <el-form-item label="性别:">
-                        <el-radio-group v-model="add_sex">
-                            <el-radio :label="0">女</el-radio>
-                            <el-radio :label="1">男</el-radio>
-                        </el-radio-group>
-                        <!-- AddFormData.sex -->
-                    </el-form-item>
-                    <el-form-item label="当前居住地:">
-                        <el-input style="width: 360px" v-model="AddFormData.now_addr" />
-                    </el-form-item>
-                    <el-form-item label="籍贯所在地:">
-                        <el-input style="width: 360px" v-model="AddFormData.home_addr" />
-                    </el-form-item>
-                    <el-form-item label="身份证正面:">
-                        <file ref="img_code"/>
-                        <!-- <el-input v-model="AddFormData.person_code_img0" /> -->
-                    </el-form-item>
-                    <el-form-item label="身份证反面:">
-                        <file ref="imgs_code"/>
-                        <!-- <el-input v-model="AddFormData.person_code_img1" /> -->
-                    </el-form-item>
-                    <el-form-item label="受教育类型:">
-                         <el-radio-group v-model="add_edu_type">
-                            <el-radio :label="0">保密</el-radio>
-                            <el-radio :label="1">初中及以上</el-radio>
-                            <el-radio :label="2">高中及以上</el-radio>
-                            <el-radio :label="3">大专及以上</el-radio>
-                            <el-radio :label="4"> 本科及以上</el-radio>
-                            <el-radio :label="5"> 研究生及以上</el-radio>
-                         </el-radio-group>
-                         <!-- AddFormData.edu_type -->
-                    </el-form-item>
-                    <el-form-item label="婚姻状况:">
-                        <el-radio-group v-model="add_is_marry">
-                            <el-radio :label="0">未婚</el-radio>
-                            <el-radio :label="1">已婚</el-radio>
-                            <el-radio :label="2">离异</el-radio>
-                            <el-radio :label="3">丧偶</el-radio>`
-                        </el-radio-group>
-                        <!-- AddFormData.is_marry -->
-                    </el-form-item>
-                    <el-form-item label="民族:">
-                        <el-input style="width: 360px" v-model="AddFormData.nation" />
-                    </el-form-item>
-                   <el-form-item label="薪资:">
-<<<<<<< HEAD
-                       <el-input-number v-model="AddFormData.salary" :min="1" :max="100000" ></el-input-number>
-                    <!-- <el-input-number style="width: 360px" v-model="AddFormData.salary" :precision="2" :step="0.1" :max="100000"></el-input-number> -->
-                       <!-- <el-input type="number" v-model="AddFormData.salary" /> -->
-=======
-                       <el-input type="number" v-model="AddFormData.salary" />
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
+                     <el-form-item label="薪资:">
+                       <el-input-number  controls-position="right" v-model="AddFormData.salary" :min="1" :max="100000" ></el-input-number>
                     </el-form-item> 
                     <el-form-item label="是否已交社保:">
-                        <el-radio-group v-model="add_is_social">
+                        <el-select v-model="add_is_social" placeholder="请选择">
+                            <el-option
+                            v-for="item in social_options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-radio-group v-model="add_is_social">
                             <el-radio :label="0">未缴</el-radio>
                             <el-radio :label="1">已缴</el-radio>
-                        </el-radio-group>
-                        <!-- AddFormData.is_social -->
+                        </el-radio-group> -->
                     </el-form-item> 
+
+                    <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">财务信息</div>
+                    </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="12">
+                            <el-form-item label="入职时间:">
+                                <el-date-picker
+                                    class="width_240"
+                                    v-model="AddFormData.start_time"
+                                    type="date"
+                                    placeholder="选择日期时间">
+                                </el-date-picker>
+                                <!-- <el-input v-model="AddFormData.start_time" /> -->
+                            </el-form-item>
+                        </el-col>
+                        <!-- <el-col :span="2" class="bktrsp">11</el-col> -->
+                        <el-col :span="12" >
+                            <el-form-item label="试用期时间:">
+                                <el-date-picker
+                                class="width_240"
+                                    v-model="AddFormData.try_time"
+                                    type="date"
+                                    placeholder="选择日期时间">
+                                </el-date-picker>
+                                <!-- <el-input v-model="AddFormData.try_time" /> -->
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                     <el-row>
+                        <el-col :span="12">
+                             <el-form-item label="紧急联系人:">
+                                <el-input class="width_240" maxlength="20"  v-model="AddFormData.emergency_contact" />
+                            </el-form-item>
+                        </el-col>
+                       <!-- <el-col :span="2" class="bktrsp">11</el-col> -->
+                        <el-col :span="12" >
+                            <el-form-item  label="紧急联系电话:" prop="mobiles">
+                                <!-- onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" -->
+                           <el-input maxlength="11" class="width_240" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')" v-model="AddFormData.emergency_conttel" />
+                           
+                            </el-form-item>
+                           <!-- <div class="form-item">
+                                <label class="form-item-label">与紧急联系人关系:</label><el-input style="width: 128px"  maxlength="10"  v-model="AddFormData.emergency_about" />
+                           </div> -->
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="与紧急联系人关系:">
+                                <el-input   maxlength="10"  v-model="AddFormData.emergency_about" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    
+                    <!-- <el-form-item label="民族:">
+                        <el-input style="min-width: 240px" v-model="AddFormData.nation" />
+                    </el-form-item> -->
                 </el-form>
             </div>
             <div  class="drawer-footer">
                 <span slot="footer">
                     <el-button @click="add_show = false">取消</el-button>
-                <el-button @click="onAddSubmit" type="primary">确定</el-button>
+                    <el-button @click="onAddSubmit" type="primary">确定</el-button>
                 </span>
-                 <!-- <div slot="footer" style="width: 360px;text-align: right">
-                    <el-button @click="add_show = false">取 消</el-button>
-                    <el-button type="primary" @click="onAddSubmit">确 定</el-button>
-                </div> -->
             </div>
         </el-drawer>
 
@@ -448,20 +498,8 @@
                             placeholder="选择日期时间">
                         </el-date-picker>
                     </el-form-item>
-<<<<<<< HEAD
                     <el-form-item label="身份证号:">
                         <el-input style="width: 360px" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="18" v-model="EditFormData.person_code" />
-=======
-                    <el-form-item label="离职时间:">
-                        <el-date-picker
-                            v-model="EditFormData.out_time"
-                            type="datetime"
-                            placeholder="选择日期时间">
-                        </el-date-picker>
-                    </el-form-item>
-                    <el-form-item label="身份证号:">
-                        <el-input v-model="EditFormData.person_code" />
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item>
                     <el-form-item label="性别:">
                         <el-radio-group v-model="edit_sex">
@@ -476,21 +514,10 @@
                         <el-input style="width: 360px" v-model="EditFormData.home_addr" />
                     </el-form-item>
                     <el-form-item label="身份证正面:">
-<<<<<<< HEAD
                         <file ref="edtimg_code" :imgUrl="EditFormData.person_code_img0"/>
                     </el-form-item>
                     <el-form-item label="身份证反面:">
                          <file :imgUrl="EditFormData.person_code_img1" ref="edtimg_codes"/>
-=======
-                        <img v-if="EditFormData.person_code_img0" :src="EditFormData.person_code_img0" alt="" style="width: 50px">
-                        <file v-else ref="edit_img"/>
-                        <!-- <el-input v-model="EditFormData.person_code_img0" /> -->
-                    </el-form-item>
-                    <el-form-item label="身份证反面:">
-                         <img v-if="EditFormData.person_code_img1" :src="EditFormData.person_code_img1" alt="" style="width: 50px">
-                         <file v-else ref="edit_imgs"/>
-                        <!-- <el-input v-model="EditFormData.person_code_img1" /> -->
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item>
                     <el-form-item label="受教育类型:">
                         <el-radio-group v-model="edit_edu_type">
@@ -514,13 +541,9 @@
                         <el-input style="width: 360px" v-model="EditFormData.nation" />
                     </el-form-item>
                    <el-form-item label="薪资:">
-<<<<<<< HEAD
                         <el-input-number v-model="EditFormData.salary" :min="1" :max="100000" ></el-input-number>
                     <!-- <el-input-number style="width: 260px" v-model="EditFormData.salary" :precision="2" :step="0.1" :max="100000"></el-input-number> -->
                        <!-- <el-input v-model="EditFormData.salary" type="number"/> -->
-=======
-                       <el-input v-model="EditFormData.salary" type="number"/>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item> 
                     <el-form-item label="是否已交社保:">
                         <el-radio-group v-model="edit_is_social">
@@ -546,7 +569,8 @@
                     <el-cascader 
                         clearable 
                         :options="role_rows"
-                        :props="{checkStrictly: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        expand-trigger="hover" 
+                        :props="{checkStrictly: true,cexpandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
                         v-model="RoleFormData.role_uuid">
                     </el-cascader>
@@ -587,9 +611,8 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-<<<<<<< HEAD
     // import file from "@/components/imgUpload/upload.vue"
-    import file from "@/components/imgUpload/drapload.vue"
+    import file from "@/components/imgUpload/draploads.vue"
     // import drawer from "@/components/drawer/drawer.vue"
     export default {
         components:{
@@ -597,62 +620,10 @@
             // drawer,
         },
         data() {
-            return {
-                // 添加form字段
-                manage_add_from_des: [
-                    {
-                        field: 'name', type: 'text', label: '员工名称', value: '',
-                        rules: [{required: true, message: '员工名称名称不可为空', trigger: 'blur'},]
-                    },
-
-                    {
-                        field: 'mobile', type: 'text', label: '登录手机', value: '',
-                        rules: [{required: true, message: '登录手机不可为空', trigger: 'blur'},]
-                    },
-                    {
-                        field: 'pwd', type: 'password', label: '登录密码', value: '',
-                        rules: [{required: true, message: '登录密码不可为空', trigger: 'blur'},]
-                    },
-                    {
-                        field: 'state', type: 'radio',label: '状态', options: [
-                            {value: '0',name: '冻结'},
-                            {value: '1',name: '启用'}
-                        ],
-                        showstar: true
-                    },
-                    {
-                        field: 'emergency_contact', type: 'text',label: '紧急联系人'
-                    },
-                    {
-                        field: 'emergency_conttel', type: 'text',label: '紧急联系电话'
-                    },
-                    {
-                        field: 'bank_code', type: 'text',label: '银行卡号'
-                    },
-                    {
-                        field: 'bank_name', type: 'text',label: '银行名称'
-                    },
-                    {
-                        field: 'bank_staff_name', type: 'text',label: '银行账号姓名'
-                    },
-                    {
-                        field: 'start_time', type: 'text',label: '入职时间'
-                    },
-                    {
-                        field: 'try_time', type: 'text',label: '试用期时间'
-                    },
-                    {
-                        field: 'person_code', type: 'text',label: '身份证号'
-                    },
-                    {
-                        field: 'sex', type: 'radio',label: '性别', options: [
-                            {value: '0',name: '女'},
-                            {value: '1',name: '男'}
-                        ],
-                        showstar: true
-                    },
-    
-                ],
+            return {  
+                iconUrls: false,
+                iconUrl: true, 
+                drawerWidth: '50%',           
                 rows:[],
                 total:0,
                 loading:false,
@@ -684,68 +655,81 @@
                 rules: {
                       name: [
                         { required: true, message: '员工姓必填', trigger: 'blur' },
-                        { min: 2, max: 20, message: '长度在2到20个字符', trigger: 'blur' }
+                        { 
+                             pattern: /^[\u4E00-\u9FA5]{2,20}$/,
+                            message: '员工名称须为汉字，且位数为2-20位',
+                            trigger: 'blur'
+                            // min: 2, max: 20, message: '长度在2到20个字符', trigger: 'blur' 
+                        }
                       ],
-                      // mobile: [
-                      //   {max: 11,required: true, message: '请输入手机号', trigger: 'blur' },
-                      //   {
-                      //       pattern: /^1[3|4|5|7|8][0-9]\d{8}$/,
-                      //       message: '手机号格式不对',
-                      //       trigger: 'blur'
-                      //     }
-
-                      // ],
-                      pwd: [
+                      mobile: [
+                        {max: 11,required: true, message: '登录手机号必填', trigger: 'blur' },
+                        {
+                            pattern: /^1[3|4|5|7|8][0-9]\d{8}$/,
+                            message: '手机号格式不对',
+                            trigger: 'blur'
+                          }
+                    ],
+                    // mobiles: [{
+                    //     type: 'number',
+                    //     trigger: 'blur',
+                    //     required: false,
+                    //     message: '平均用例运行时长必须为数字值',
+                    //     // pattern: /^1[3|4|5|7|8][0-9]\d{8}$/,
+                    //     transform (value) {
+                    //     return _.toNumber(value)
+                    //     }
+                    // }],
+                    mobiles: [
+                        {max: 11,required: false, message: '请输入手机号', trigger: 'blur' },
+                        {
+                            pattern: /^1[3|4|5|7|8][0-9]\d{8}$/,
+                            message: '手机号格式不对',
+                            trigger: 'blur'
+                          }
+                    ],
+                    pwd: [
                         {  required: true,message: '密码必填', trigger: 'blur' },
                         {
-                            pattern: /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,18}$/,
-                            message: '密码须包含数字、字母两种元素，且密码位数为6-16位',
+                            pattern: /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,20}$/,
+                            message: '密码须包含数字,字母,特殊字符中两种元素，且密码位数为6-20位',
                             trigger: 'blur'
                           }
                       ]
 
                   },
-=======
-    import file from "@/components/imgUpload/upload.vue"
-
-    export default {
-        components:{
-            file
-        },
-        data() {
-            return {
-                rows:[],
-                total:0,
-                loading:false,
-                curr_row:null,
-                SearchFormData:{
-                    real_name:'',
-                    page_num:1,
-                    page_len:10,
-                    order_field:'add_time',
-                    order_sort:'desc'
-                },
-                search_show:false,
-                //详细
-                detail_show: false,
-                DetailFormData:{},
-                // 添加
-                add_show:false,
-                AddFormData:{
-                    real_name:'',
-                    mobile:'',
-                    pwd:'',
-                },
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 add_is_social: 0,
                 add_sex: 0,
                 add_state: 0,
                 add_is_marry: 0,
                 add_edu_type: 0,
-<<<<<<< HEAD
                 add_name: '',
-=======
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
+                edu_options: [
+                     {value: 0,label: '保密'},
+                     {value: 1,label: '初中及以上'},
+                     {value: 2,label: '高中及以上'},
+                     {value: 3,label: '大专及以上'},
+                     {value: 4,label: '本科及以上'},
+                     {value: 5,label: '研究生及以上'}
+                ],
+                marry_options: [
+                    {value: 0,label: '未婚'},
+                    {value: 1,label: '已婚'},
+                    {value: 2,label: '离异'},
+                    {value: 3,label: '丧偶'}
+                ],
+                state_options: [
+                    {value: 0,label: '冻结'},
+                    {value: 1,label: '启用'},
+                ],
+                sex_options: [
+                    {value: 0,label: '男'},
+                    {value: 1,label: '女'},
+                ],
+                social_options: [
+                    {value: 0,label: '未缴'},
+                    {value: 1,label: '已缴'},
+                ],
         
                 //编辑
                 edit_show:false,
@@ -796,8 +780,66 @@
         updated() {
             // this.add_show = false
         },
+        mounted() {
+            // let self = this;
+            // this.screenWidth = document.body.clientWidth; //767
+            // this.screenHeight = document.body.clientHeight;//350
+            // window.onresize = () => {
+            //     console.log(99999)
+            //     if(860/document.body.clientWidth < 1) {
+            //         this.drawerWidth = 860/document.body.clientWidth*100 + '%'
+            //     }else {
+            //         this.drawerWidth = '100%'
+            //     }
+            // };
+        },
         methods:{
-<<<<<<< HEAD
+            nameInput(val) {
+                console.log(val)
+                let reg = /^[\u4E00-\u9FA5]$/
+                if(reg.test(val)){
+                    this.add_name = val
+                }else {
+                    var regEx = /[^\u4e00-\u9fa5\uf900-\ufa2d]/g; 
+                    this.add_name = val.replace(regEx, ''); 
+                }
+            },
+            bankInput(val) {
+                let reg = /^[\u4E00-\u9FA5]$/
+                if(reg.test(val)){
+                    this.AddFormData.bank_name = val
+                    val = val
+                }else {
+                    var regEx = /[^\u4e00-\u9fa5\uf900-\ufa2d]/g; 
+                    // this.AddFormData.bank_name = val.replace(regEx, ''); 
+                    val = val.replace(regEx, '');
+                }
+            },
+            // nameBlur(val) {
+            //     console.log(this.add_name)
+            //     const h = this.$createElement;
+            //     this.$notify({
+            //         title: '提示',
+            //         message: h('i', { style: 'color: teal'}, '请完善银行卡/银行名称')
+            //     });
+            // },
+            // bankInput(val) {
+            //     let reg = /^[\u4E00-\u9FA5]$/
+            //     if(reg.test(val)){
+            //         this.AddFormData.bank_name = val
+            //     }else {
+            //         var regEx = /[^\u4e00-\u9fa5\uf900-\ufa2d]/g; 
+            //         this.AddFormData.bank_name = val.replace(regEx, ''); 
+            //     }
+            // },
+            // bankBlur(val) {
+            //     console.log(this.add_name)
+            //     const h = this.$createElement;
+            //     this.$notify({
+            //         title: '提示',
+            //         message: h('i', { style: 'color: teal'}, '请完善银行卡/银行卡姓名')
+            //     });
+            // },
             changeCard() {
                 this.$nextTick(() => {
                     if(this.AddFormData.person_code !== null){
@@ -811,9 +853,6 @@
                 this.add_name = val
             },
            // 按钮点击 menu:参数数据 local是否本地程序
-=======
-            // 按钮点击 menu:参数数据 local是否本地程序
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
             onSubMenu(menu, local = false) {util.submenu(menu,this,lime.cookie_get('login_token'), local);},
             // 数据初始化
             init() {
@@ -893,27 +932,39 @@
             },
             // 添加向后台提交
             onAddSubmit() {
-                this.AddFormData.login_token = lime.cookie_get('login_token');
-                this.AddFormData.edu_type =  this.add_edu_type
-                this.AddFormData.is_marry =  this.add_is_marry
-                this.AddFormData.is_social =  this.add_is_social + ''
-                this.AddFormData.sex =  this.add_sex
-                this.AddFormData.state =  this.add_state//img_code person_code_img0 person_code_img1
-                this.AddFormData.person_code_img0 = this.$refs.img_code.img_url
-                this.AddFormData.person_code_img1 = this.$refs.imgs_code.img_url
-                this.AddFormData.start_time = util.eleDate(this.AddFormData.start_time)
-<<<<<<< HEAD
-                this.AddFormData.try_time = util.eleDate(this.AddFormData.try_time)
-                this.AddFormData.bank_staff_name = this.add_name
-=======
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
-                lime.req('ShopStaffAdd', this.AddFormData).then(res => {
-                    this.SearchFormData.page_num = 1;
-                    this.init();
-                    this.add_show = false;
-                }).catch(err => {
-                    this.$message.error(err.msg);
+                this.$refs['addForm'].validateField('mobiles', phoneError => { //验证手机号码是否正确
+                    if (!phoneError) {
+                        return false
+                    } else {
+                        return false;
+                    }
                 })
+                this.$refs['addForm'].validate((valid) => {
+                    if (valid) {
+                        alert('submit!');
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+                // this.AddFormData.login_token = lime.cookie_get('login_token');
+                // this.AddFormData.edu_type =  this.add_edu_type
+                // this.AddFormData.is_marry =  this.add_is_marry
+                // this.AddFormData.is_social =  this.add_is_social + ''
+                // this.AddFormData.sex =  this.add_sex
+                // this.AddFormData.state =  this.add_state
+                // this.AddFormData.person_code_img0 = this.$refs.img_code.img_url
+                // this.AddFormData.person_code_img1 = this.$refs.imgs_code.img_url
+                // this.AddFormData.start_time = util.eleDate(this.AddFormData.start_time)
+                // this.AddFormData.try_time = util.eleDate(this.AddFormData.try_time)
+                // this.AddFormData.bank_staff_name = this.add_name
+                // lime.req('ShopStaffAdd', this.AddFormData).then(res => {
+                //     this.SearchFormData.page_num = 1;
+                //     this.init();
+                //     this.add_show = false;
+                // }).catch(err => {
+                //     this.$message.error(err.msg);
+                // })
             },
 
             // 编辑展示
@@ -939,19 +990,11 @@
                 this.EditFormData.edu_type  = this.edit_edu_type;
                 this.EditFormData.is_social  = this.edit_is_social + '';
                 this.EditFormData.is_marry  = this.edit_is_marry;
-<<<<<<< HEAD
                 if(this.$refs.edtimg_code.img_url) {
                     this.EditFormData.person_code_img0 = this.$refs.edtimg_code.img_url
                 }
                 if(this.$refs.edtimg_codes.img_url) {
                     this.EditFormData.s = this.$refs.edtimg_codes.img_url
-=======
-                if(this.$refs.edit_img.img_url) {
-                    this.EditFormData.person_code_img0 = this.$refs.edit_img.img_url
-                }
-                if(this.$refs.edit_imgs.img_url) {
-                    this.EditFormData.s = this.$refs.edit_imgs.img_url
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 }
                 lime.req('ShopStaffEdit', this.EditFormData).then(res => {
                     this.init();
@@ -1065,6 +1108,37 @@
     }
 </script>
 <style>
+    .form-item {
+       text-align: right;
+       width: 100%;
+       text-align: right;
+       /* margin-top: 20px; */
+    }
+    .form-item-label {
+        color: #606266;
+        font-size: 14px;
+        margin-right: 10px;
+        /* display: inline-block; */
+        /* width: 120px */
+    }
+    .bktrsp {
+        color: transparent;
+    }
+    .row-flex {
+        display: flex;
+        flex-direction: row;
+        border: 1px solid red;
+        height: 36px;
+        margin-top: 10px
+    }
+    .row-flexlf {
+        height: 100%;
+        border: 1px solid green;
+    }
+    .row-flexrg {
+        height: 100%;
+        border: 1px solid black;
+    }
     :focus{
         outline:0;
     }
@@ -1084,9 +1158,21 @@
         margin-bottom: 20px !important;
     }
 
+    .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
     .draw-content:after {
          content: "";
-        height: 20px;
+        height: 30px;
         display: block;
 
     }
@@ -1105,6 +1191,24 @@
     .el-image-viewer__mask {
         opacity: 1!important;
     }
+
+    .el-cascader-panel .el-radio{ 
+    width: 100%;
+    height: 100%;
+    z-index: 10; 
+    position: absolute; 
+    top: 10px;
+    right: 10px; 
+  } 
+  .el-cascader-panel .el-radio__input{ 
+     visibility: hidden; 
+   } 
+   .el-cascader-panel .el-cascader-node__postfix{ 
+     top: 10px;
+   } 
+   .el-col {
+       /* text-align: right; */
+   }
 
 
     /* .el-table td, .el-table th {
@@ -1149,6 +1253,38 @@
         border-top: 1px solid #F2F2F2;
         line-height: 50px;
         z-index: 999;
+    }
+
+    .line {
+        width: 100%;
+        height: 30px;
+        display: flex;
+        flex-direction: row;
+        border-bottom: 1px solid #F2F2F2;
+    }
+
+    .linelf {
+        width: 2%;
+        height: 100%;
+    }
+
+    .linerg {
+        width: 98%;
+        height: 100%;
+        line-height: 30px;
+        font-size: 14px;
+        color: #2a2f3b;
+    }
+
+    .line-line {
+        width: 2px;
+        height: 16px;
+        margin-top: 7px;
+        background: #0F7BF6;
+    }
+
+    .width_240 {
+        /* width: 212px; */
     }
 
     

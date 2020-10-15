@@ -88,10 +88,7 @@
                     :total="total">
                 </el-pagination> -->
                 <el-pagination
-<<<<<<< HEAD
                 background
-=======
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 @size-change="handleSizeChange"
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_num"

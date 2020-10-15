@@ -15,8 +15,6 @@
                 </el-col>
                 <el-col :span="16" style="text-align: right">
                     <div style="padding-right: 20px;">
-                        <i v-if="autoPlay" class="el-icon-bell" @click="autoPlay = !autoPlay" style="font-size: 20px;margin-right: 6px;color: #409EFF"></i>
-                        <i v-else class="el-icon-close-notification" @click="autoPlay = !autoPlay" style="font-size: 20px;margin-right: 6px;"></i>
                         <span class="msg_icon" v-if="showCircle"></span>
                         <i v-if="autoPlay" class="el-icon-bell" @click="autoPlay = !autoPlay" style="cursor: pointer;font-size: 22px;margin-right: 36px;color: #B3B3B3"></i>
                         <i v-else class="el-icon-close-notification" @click="autoPlay = !autoPlay" style="cursor: pointer;font-size: 22px;margin-right: 36px;color: #B3B3B3"></i>
@@ -42,27 +40,17 @@
                         </span>
                         <!-- <span class="msg_icon" v-if="showCircle"></span>
                         <el-button type="text" @click="handleMsg">消息</el-button>
-                        <!-- <i class="el-icon-arrow-down" style="font-size: 20px;margin-right: 6px;position: relative; top: 6px;"></i> -->
                         <el-button type="text" @click="my_show = true">我的</el-button>
-<<<<<<< HEAD
                         <el-button type="danger" @click="onLogout" plain size="mini">退出</el-button> -->
 
                         <!-- <i class="el-icon-arrow-down" style="font-size: 20px;margin-right: 6px;position: relative; top: 6px;"></i> -->
                         <!-- <i class="el-icon-switch-button" style="font-size: 20px;margin-left: 6px;" @click="onLogout"></i> -->
                         <!-- <el-button type="text" @click="close">关闭ws</el-button> -->
-=======
-                        <i class="el-icon-switch-button" style="font-size: 20px;margin-left: 6px;" @click="onLogout"></i>
-                        <!-- <el-button type="danger" @click="onLogout" plain size="mini">退出</el-button> -->
-                        <el-button type="text" @click="close">关闭ws</el-button>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </div>
                 </el-col>
             </el-row>
         </div>
-<<<<<<< HEAD
 
-=======
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
         <!-- el-icon-close-notification -->
         <audio controls="controls" hidden  src="../assets/msg.mp3" ref="audio"></audio>
 
@@ -100,11 +88,7 @@
         <!-- 消息 -->
         <el-drawer align="left"
             title="消息"
-<<<<<<< HEAD
             size="50%"
-=======
-            size="40%"
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
             :visible.sync="msg_show"
             :direction="direction"
              :before-close="handleClose">
@@ -113,21 +97,12 @@
             <!-- <div style="width: 100%;height: 30px;text-align: left;padding-left: 24px;box-sizing: border-box;font-size: 13px;color: #909399">
                     声音:  <el-switch  v-model="autoPlay"></el-switch>
                 </div> -->
-<<<<<<< HEAD
             <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
             <el-table 
                             :data="rows"
                             stripe
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
-=======
-            <el-tabs type="border-card" v-model="activeName" style="width: 100%" @tab-click="handleClicks">
-                <el-tab-pane label="接收" name="first" :height="height - 140" >
-                    <div>
-                        <!-- style="border-top: solid 1px #f2f1f4;"  :highlight-current-row="true" -->
-                        <el-table 
-                            :data="rows"
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                             width="40%"
                             :height="height - 140"
                             v-loading="loading"
@@ -138,119 +113,20 @@
                             @current-change="onSelectRow"
                             style="width: 100%" 
                             size="mini" ref="configurationTable">
-<<<<<<< HEAD
                             <el-table-column type="index" label="#" width="80px"></el-table-column>
-=======
-                            <el-table-column type="index" label="#"></el-table-column>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                             <el-table-column prop="content_type" label="内容类型"></el-table-column>
                             <el-table-column prop="content" label="消息内容"></el-table-column>
                             <el-table-column prop="send_time" label="发送时间" :sortable=true></el-table-column>
                             <el-table-column
-<<<<<<< HEAD
                             label="操作" width="230px" align="center">
                                 <template slot-scope="scope">
                                     <!-- <div  @click="handleDel(scope.row)" type="text" size="small">删除</div> -->
-=======
-                            fixed="right"
-                            label="操作">
-                                <template slot-scope="scope">
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                                     <el-button @click="handleDel(scope.row)" type="text" size="small">删除</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
-<<<<<<< HEAD
             </div>
            
-=======
-                    </div>
-                </el-tab-pane>
-                <el-tab-pane label="发送" name="second" :style="{height:height - 140 + 'px'}">
-                    <div>
-                         <!-- :highlight-current-row="true" -->
-                        <el-table 
-                            :data="rows"
-                            :height="height - 540"
-                            v-loading="loading"
-                            element-loading-text="拼命加载中"
-                            element-loading-spinner="el-icon-loading"
-                            element-loading-background="rgba(0, 0, 0, 0.8)"
-                            @sort-change="onSortChange"
-                            @current-change="onSelectRow"
-                            style="width: 100%" 
-                            size="mini" ref="configurationTables">
-                            <el-table-column type="index" label="#"></el-table-column>
-                            <el-table-column prop="content_type" label="内容类型"></el-table-column>
-                            <el-table-column prop="content" label="消息内容"></el-table-column>
-                            <el-table-column prop="send_time" label="发送时间" :sortable=true></el-table-column>
-                            <el-table-column
-                            fixed="right"
-                            label="操作">
-                                <template slot-scope="scope">
-                                    <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">详细</el-button> -->
-                                    <el-button @click="handleDel(scope.row)" type="text" size="small">删除</el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <!-- <div class="page" style="width: 100%;text-align: right">
-                            <el-pagination
-                                :current-page.sync="SearchFormData.page_num"
-                                @current-change="onPageChange"
-                                layout="prev, pager, next"
-                                :total="total">
-                            </el-pagination>
-                        </div> -->
-                    </div>
-                    <div style="width: 100%;margin-top: 20px;">
-                         <el-form :model="SendFormData" label-width="140px" label-position="left">
-                             <el-form-item label="消息类型:">
-                                <el-radio-group v-model="msg_type">
-                                    <el-radio :label="0">系统消息</el-radio>
-                                    <el-radio :label="100">交易消息</el-radio>
-                                    <el-radio :label="200">服务消息</el-radio>
-                                    <el-radio :label="300">活动消息</el-radio>
-                                    <el-radio :label="1000">功能消息</el-radio>
-                                </el-radio-group>
-                             </el-form-item>
-                             <el-form-item label="接收类型:">
-                                <el-radio-group v-model="get_type">
-                                    <el-radio :label="10">运营接收</el-radio>
-                                    <el-radio :label="20">商户接收</el-radio>
-                                    <el-radio :label="30">会员接收</el-radio>
-                                </el-radio-group>
-                             </el-form-item>
-                             <el-form-item label="内容类型:">
-                                <el-radio-group v-model="content_type">
-                                    <el-radio :label="0">文字</el-radio>
-                                    <el-radio :label="10">图片</el-radio>
-                                    <el-radio :label="20">音频</el-radio>
-                                    <el-radio :label="30">视频</el-radio>
-                                    <el-radio :label="40">url地址</el-radio>
-                                    <el-radio :label="100">html混合</el-radio>
-                                </el-radio-group>
-                             </el-form-item>
-                             <el-form-item label="系统发送:">
-                                <el-radio-group v-model="is_system">
-                                    <el-radio :label="0">否</el-radio>
-                                    <el-radio :label="1">是</el-radio>
-                                </el-radio-group>
-                             </el-form-item>
-                             <el-form-item label="内容:">
-                                <el-input v-model="SendFormData.content" type="textarea"></el-input>
-                             </el-form-item>
-                            <!-- <el-form-item label="员工名称:"><el-input v-model="EditFormData.name" /></el-form-item>
-                            <el-form-item label="登录手机号:"><el-input v-model="EditFormData.mobile" /></el-form-item> -->
-
-                         </el-form>
-                         <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
-                            <!-- <el-button @click="edit_show = false">取消</el-button> -->
-                            <el-button @click="onSendSubmit" type="primary">发送</el-button>
-                        </div>
-                    </div>
-                </el-tab-pane>
-            </el-tabs>
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
         </el-drawer>
 
         <!-- 我的 -->
@@ -317,7 +193,7 @@
                 order_field:'add_time',
                 order_sort:'desc'
             },
-            autoPlay: false,
+            autoPlay: true,
             showCircle: false,
             my_show: false,
             myFormDate: {
@@ -333,24 +209,15 @@
             path:"ws://47.110.162.90:8383",
             socket:"",
             get_message: true,
-<<<<<<< HEAD
             activeName: 'first',
-=======
-            activeName: 'second',
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
 
             SendFormData: {},
             msg_type: 0,  
             get_type: 10,
             content_type: 0,
-<<<<<<< HEAD
             is_system: 0,
             activeNames: ['1'],
             show_card: false
-=======
-            is_system: 0
-
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
 
         })
     }
@@ -383,7 +250,6 @@
 
         },
         methods:{
-<<<<<<< HEAD
             changeName() {
                 if(this.activeName == 'first') {
                      lime.req('ShopStaffLoginEdit',{
@@ -426,8 +292,6 @@
             showCard() {
                 this.show_card = !this.show_card
             },
-=======
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
             handleClicks(tab, event) {
                  setTimeout(() => {
                     this.$nextTick(() => {
@@ -500,7 +364,6 @@
                 }else {
                     this.showCircle = false
                 }
-<<<<<<< HEAD
             },
             send: function () {
                 this.socket.send(params)
@@ -509,16 +372,6 @@
                 this.socket.close()
                 console.log("socket已经关闭")
             },
-=======
-            },
-            send: function () {
-                this.socket.send(params)
-            },
-            close: function () {
-                this.socket.close()
-                console.log("socket已经关闭")
-            },
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
 
 
             playAudio() {
@@ -536,10 +389,7 @@
             },
             handleMsg() {
                 this.msg_show = true;
-<<<<<<< HEAD
                 this.show_card = false;
-=======
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 setTimeout(() => {
                     this.$nextTick(() => {
                         if(this.$refs.configurationTable) {
@@ -792,7 +642,6 @@
         box-sizing: border-box;
     }
 
-<<<<<<< HEAD
     .text {
         font-size: 14px;
         text-align: left;
@@ -837,8 +686,6 @@
 
 
 
-=======
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
     /* .el-table th.gutter{
         display: table-cell!important;
     } */

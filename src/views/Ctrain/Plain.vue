@@ -56,15 +56,9 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-<<<<<<< HEAD
                 <el-table-column type="index" width="80px" label="序号"></el-table-column>
                 <el-table-column prop="name" label="计划名称" align="left"></el-table-column>
                 <el-table-column prop="img" label="图片" align="center">
-=======
-                <el-table-column type="index" width="80px" label="#"></el-table-column>
-                <el-table-column prop="name" label="计划名称" align="left"></el-table-column>
-                <el-table-column prop="img" label="图片" align="right">
->>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <template slot-scope="scope">
                         <el-image 
                             v-if="scope.row.img"
