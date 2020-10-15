@@ -42,31 +42,44 @@
 
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
+              <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 :data="rows"
+                stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
                 :height="height - 60 - 46 - 48"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+              
+                element-loading-background="rgba(0, 0, 0, 0.1)"
 
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标签" align="center"></el-table-column>
+                <el-table-column type="index" label="序号" width="80px"></el-table-column>
+                <el-table-column prop="title" label="标签" align="left"></el-table-column>
                 <el-table-column prop="remark" label="备注" align="center"></el-table-column>
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
+                background
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
@@ -282,6 +295,9 @@
                 this.SearchFormData.page_num = page;
                 this.init();
             },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             // 排序处理
             onSortChange(sort) {
                 console.log(sort);
@@ -374,8 +390,8 @@
         line-height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right:0;
+        bottom: 40px;
+        right:40px;
         overflow: hidden;
     }
 

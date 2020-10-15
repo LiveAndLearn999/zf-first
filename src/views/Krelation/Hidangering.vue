@@ -15,12 +15,12 @@
                         <el-col :span="6">
                         <div style="padding-left:16px;">
                             <i class="el-icon-s-unfold"></i>
-                            <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+                            <span style="padding-left:9px;font-size: 16px">{{$store.state.AdminData.active_title}}</span>
                         </div>
                         </el-col>
 
                         <el-col :span="18">
-                        <div style="text-align: right;">
+                        <div style="text-align: right;font-size: 14px">
                             <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
 
                             <el-link
@@ -38,6 +38,9 @@
             <div style="border-top: solid 1px #f2f1f4;">
                 <el-table
                     :data="rows"
+                    stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px'}"
                     :height="height - 60 - 46 - 48"
                     v-loading="loading"
                     element-loading-text="加载中..."
@@ -63,11 +66,21 @@
 
                 <div class="page" :style="{width:width - 250 + 'px'}">
                     <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    layout="prev, pager, next, jumper"
+                    :total="total">
+                    </el-pagination>
+                    <!-- <el-pagination
+                    background
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total"
-                    ></el-pagination>
+                    ></el-pagination> -->
                 </div>
             </div>
 
@@ -112,8 +125,11 @@
                 <div>
                         <el-form :model="DetailFormData" label-width="120px" label-position="left">
                             <el-form-item label="企业名称:">{{DetailFormData.shop_name}}</el-form-item>
-                            <el-form-item label="是否被选中:">{{DetailFormData.is_select}}</el-form-item>
-                            <el-form-item label="排查项检查项集合:">{{DetailFormData.check_list}}</el-form-item>
+                            <el-form-item label="是否被选中:">{{DetailFormData.is_select == 1? '是' : '否'}}</el-form-item>
+                           <!--  <el-form-item label="排查项检查项集合:">
+                                {{DetailFormData.check_list}}
+                                <div v-for="item in DetailFormData.check_list" :key="item.uuid">{{item.add_time}}</div>
+                            </el-form-item> -->
                             <el-form-item label="状态:">{{DetailFormData.status}}</el-form-item>
                             <el-form-item label="名称:">{{DetailFormData.name}}</el-form-item>
                         </el-form>
@@ -171,6 +187,7 @@
             this.init()
         },
         methods: {
+            handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 按钮点击 menu: 参数数据 local是否本地程序
             onSubMenu (menu, local = false) {
                 util.submenu(menu, this, lime.cookie_get('login_token'), local)
@@ -290,8 +307,8 @@
         line-height: 40px;
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right: 0;
+        bottom: 40px;
+        right: 40px;
         overflow: hidden;
     }
 

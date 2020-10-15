@@ -15,14 +15,14 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right; font-size: 14px">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
 
@@ -41,6 +41,9 @@
        <div style="border-top: solid 1px #f2f1f4;">
             <el-table 
                 :data="rows"
+                stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px'}"
                 :height="height - 60 - 46 - 48"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
@@ -52,40 +55,30 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                    <el-table-column type="index" label="#"></el-table-column>
-                    <el-table-column prop="name" label="承运方名称"></el-table-column>
+                    <el-table-column type="index" width="80px" label="序号"></el-table-column>
+                    <el-table-column prop="name" align="left" label="承运方名称"></el-table-column>
                     <el-table-column prop="phone_number" label="联系手机号"></el-table-column>
                     <el-table-column prop="license" label="承运人许可证"></el-table-column>
                     <el-table-column prop="add_time" label="添加时间"></el-table-column>
                     <el-table-column prop="last_time" label="修改时间"></el-table-column>
-                    <!-- <template v-for="(column, index) in columns">
-                         <el-table-column align="center" :key="index" :prop="column.prop" :label="column.label">
-                             <span v-if="column.showSt">
-                                  columns: [
-                {prop: 'name', label: '承运方名称'},
-                {prop: 'phone_number', label: '联系手机号'},
-                {prop: 'license', label: '承运人许可证'},
-                {prop: 'add_time', label: '添加时间'},
-                {prop: 'last_time', label: '修改时间'} 
-            ],
-                                 slot-scope="scope"
-                                 stateFormat(scope.row.state)
-                                 <template>
-                                    {{column.status}}
-                                    {{scope.row.status + '111111'}}
-                                </template>
-                             </span>
-                         </el-table-column>
-                    </template> -->
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    layout="prev, pager, next, jumper"
+                    :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
        </div>
 
@@ -237,7 +230,9 @@ export default {
         init() {
             this.loading = true;
             let pam = {
-                login_token:lime.cookie_get('login_token')
+                login_token:lime.cookie_get('login_token'),
+                page_num:this.SearchFormData.page_num,
+                page_len:this.SearchFormData.page_len
             }
             EbCarrierList(pam, res => {
                 this.loading = false;

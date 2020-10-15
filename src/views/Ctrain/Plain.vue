@@ -39,85 +39,55 @@
 
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
+             <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 ref="role"
                 :data="rows"
+                stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
                 row-key="uuid"
                 :height="height - 60 - 95"
                 v-loading="loading"
                 :default-expand-all="true"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-
+                element-loading-background="rgba(0, 0, 0, 0.1)"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="计划名称" align="center"></el-table-column>
+                <el-table-column type="index" width="80px" label="序号"></el-table-column>
+                <el-table-column prop="name" label="计划名称" align="left"></el-table-column>
                 <el-table-column prop="img" label="图片" align="center">
                     <template slot-scope="scope">
-                        <img class="imgclass" v-if="scope.row.img" :src="scope.row.img" @click="showImg(scope.row.img)" alt="未上传" style="width: 40px;">
+                        <el-image 
+                            v-if="scope.row.img"
+                            style="width: 30px; height: 30px"
+                            :src="scope.row.img" 
+                            :preview-src-list="[scope.row.img]">
+                        </el-image>
                         <span v-else style="color: red">未上传</span>
                     </template>
                 </el-table-column>
             </el-table>
-            <!-- <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
-                    :current-page.sync="SearchFormData.page_num"
-                    @current-change="onPageChange"
-                    layout="prev, pager, next"
-                    :total="total">
-                </el-pagination>
-            </div> -->
         </div>
-        <!-- <div style="border-top: solid 1px #f2f1f4;">
-            <el-table 
-                :data="rows"
-                :height="height - 60 - 46 - 48"
-                v-loading="loading"
-                element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-
-                @sort-change="onSortChange"
-                :highlight-current-row="true"
-                @current-change="onSelectRow"
-                style="width: 100%" 
-                size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="计划名称"></el-table-column>
-               
-            </el-table>
-
-            <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
-                    :current-page.sync="SearchFormData.page_num"
-                    @current-change="onPageChange"
-                    layout="prev, pager, next"
-                    :total="total">
-                </el-pagination>
-            </div>
-        </div> -->
-
         <!-- 添加模板 -->
         <el-dialog  
             title="添加"
             :visible.sync="add_show"
-            width="500px">
+            width="560px">
             <el-form :model="AddFormData" label-width="120px" label-position="left">
+                <el-form-item label="计划组名称:" required>
+                    <el-input v-model="AddFormData.name" style="width: 360px"/>
+                </el-form-item>
                 <el-form-item label="所属分组:">
                     <el-cascader 
                         clearable 
                         :options="add_rows"
                         :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
-                        v-model="AddFormData.parent_uuid" style="width: 330px">
+                        v-model="AddFormData.parent_uuid" style="width: 360px">
                     </el-cascader>
-                </el-form-item>
-                <el-form-item label="计划组名称:" :required="true">
-                    <el-input v-model="AddFormData.name" style="width: 330px"/>
                 </el-form-item>
                 <el-form-item label="图片:">
                     <file v-if="add_show" ref="upload"/>
@@ -172,7 +142,7 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-    import file from "@/components/imgUpload/upload.vue"
+    import file from "@/components/imgUpload/drapload.vue"
 
     if (!store.state.ShopPlanGroupData) {
         Vue.set(store.state, 'ShopPlanGroupData', {
@@ -242,6 +212,9 @@
             this.init();
         },
         methods:{
+             handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             // 时间格式化
             formatDate: function (value) {
                 let date = new Date(value);
@@ -422,6 +395,7 @@
                     lime.req('ShopPlanGroupDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
+                        // uuid: '6170f7e3ece37f0c4c1f9471c9c8327b'
                     }).then(res => {
                         this.init();
                         this.$message.success('操作成功');
@@ -453,8 +427,8 @@
         line-height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right:0;
+        bottom: 40px;
+        right:40px;
         overflow: hidden;
     }
 

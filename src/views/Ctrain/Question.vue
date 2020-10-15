@@ -15,14 +15,14 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right;font-size: 16px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
 
@@ -42,50 +42,81 @@
 
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
+             <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
+                stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
                 :data="rows"
                 :height="height - 60 - 46 - 48"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+               
+                element-loading-background="rgba(0, 0, 0, 0.1)"
 
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="题目" align="center"></el-table-column>
-                <el-table-column prop="content" label="选项" align="center">
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="title" show-overflow-tooltip label="题目" align="left"></el-table-column>
+                <!-- <el-table-column prop="content" label="选项" align="center">
                     <template slot-scope="scope">
                        <p v-for="(item,index) in scope.row.content" :key="index">{{item.opt}}:{{item.content}}</p>
                     </template>
+                </el-table-column> -->
+                <el-table-column prop="is_pay" label="是否付费" align="center">
+                    <template slot-scope="scope">
+                        {{scope.row.is_pay == 1 ? '是' : '否' }}
+                    </template>
                 </el-table-column>
-                <el-table-column prop="is_pay" label="是否付费" align="center"></el-table-column>
-                <el-table-column prop="is_show" label="是否展示" align="center">
+                <!-- <el-table-column prop="is_show" label="是否展示" align="center">
                     <template slot-scope="scope">
                         {{formatDate(scope.row.is_show * 1000)}}
                     </template>
+                </el-table-column> -->
+                <!-- <el-table-column prop="tag" label="题目" align="center"></el-table-column> -->
+                <el-table-column prop="ques_type" label="题型" align="center">
+                    <template slot-scope="scope">
+                       {{scope.row.ques_type == 1 ? '单选' : scope.row.ques_type == 2 ? '多选' : '判断'}}
+                    </template>
                 </el-table-column>
-                <el-table-column prop="tag" label="题目" align="center"></el-table-column>
-                <el-table-column prop="ques_type" label="题型" align="center"></el-table-column>
                 <el-table-column prop="answer" label="答案" align="center"></el-table-column>
-                <el-table-column prop="check_state" label="审核状态" align="center"></el-table-column>
-                <el-table-column prop="add_time" label="添加时间" align="center"></el-table-column>
+                <!-- <el-table-column prop="optionArr" label="选项" align="center">
+                    <template slot-scope="scope">
+                        <el-button>{{scope.row.check_state}}</el-button>
+                       {{scope.row.check_state == 1 ? '通过' : '未通过'}}
+                    </template>
+                </el-table-column> -->
+                <el-table-column prop="check_state" label="审核状态" align="center">
+                    <template slot-scope="scope">
+                       {{scope.row.check_state == 1 ? '通过' : '未通过'}}
+                    </template>
+                </el-table-column>
+                <!-- <el-table-column prop="add_time" label="添加时间" align="center"></el-table-column>
                 <el-table-column prop="last_time" label="最后修改时间" align="center">
                     <template slot-scope="scope">
                         {{scope.row.last_time == '' ? '还未登陆' : scope.row.last_time}}
                     </template>
-                </el-table-column>
+                </el-table-column> -->
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
+                </el-pagination> -->
+                 <el-pagination
+                 background
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
                 </el-pagination>
             </div>
         </div>
@@ -95,7 +126,7 @@
             title="搜索"
             :visible.sync="search_show"
             width="30%">
-            <el-form :model="SearchFormData" label-width="120px">
+            <el-form :model="SearchFormData" label-width="120px" label-position="left">
                 <el-form-item label="题目:">
                     <el-input v-model="SearchFormData.title" />
                 </el-form-item>
@@ -108,31 +139,84 @@
         </el-dialog>
 
         <!-- 添加模板 -->
-        <el-dialog  
+        <el-drawer
             title="添加"
             :visible.sync="add_show"
-            width="500px">
-            <el-form :model="AddFormData" label-width="85px">
-                <el-form-item label="标签:" :required='true'>
-                    <el-input v-model="AddFormData.title" />
+            direction="rtl" size="500px">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+            <el-form :model="AddFormData" label-width="120px" label-position="left">
+                <el-form-item label="题目内容:" :required='true'>
+                    <el-input type="textarea" v-model="AddFormData.title" />
                 </el-form-item>
-                <el-form-item label="是否需支付" label-width="110px" :required='true'>
-                    <el-input v-model="AddFormData.is_pay" />
+                <el-form-item label="是否需支付:"  :required='true'>
+                     <el-radio-group v-model="AddFormData.is_pay">
+                        <el-radio :label="1">是</el-radio>
+                        <el-radio :label="0">否</el-radio>
+                    </el-radio-group>
+                    <!-- <el-input v-model="AddFormData.is_pay" /> -->
                 </el-form-item>
                 <el-form-item label="是否展示:" :required='true'>
-                    <el-input v-model="AddFormData.is_show" />
-                </el-form-item>
-                <el-form-item label="分析:">
-                    <el-input v-model="AddFormData.analysis" />
+                    <el-switch
+                    v-model="AddFormData.is_show">
+                    </el-switch>
+
+                    <!-- <el-radio-group v-model="AddFormData.is_show">
+                        <el-radio :label="1">是</el-radio>
+                        <el-radio :label="0">否</el-radio>
+                    </el-radio-group> -->
+                     <el-date-picker
+                            style="margin-left: 10px"
+                            v-if="AddFormData.is_show == 1"
+                            v-model="show_date"
+                            type="date"
+                            placeholder="选择日期">
+                        </el-date-picker>
+                    <!-- <el-input v-model="AddFormData.is_show" /> -->
                 </el-form-item>
                 <el-form-item label="标签:">
-                    <!-- <el-button @click="tags_show = true">添加标签</el-button> -->
-                    <el-button @click="handleTag" type="primary" style="margin-right: 20px;">添加标签</el-button>
-                    <span v-for="(item,index) in AddFormData.tag_list" :key="index">{{item.title}}  </span>
+                    <el-tag
+                    :key="tag"
+                    v-for="tag in dynamicTags"
+                    closable
+                    :disable-transitions="false"
+                    @close="handleClose(tag)">
+                    {{tag}}
+                    </el-tag>
+                    <el-input
+                    class="input-new-tag"
+                    v-if="inputVisible"
+                    v-model="inputValue"
+                    ref="saveTagInput"
+                    size="small"
+                    @keyup.enter.native="handleInputConfirm"
+                    @blur="handleInputConfirm"
+                    >
+                    </el-input>
+                    <el-button v-else class="button-new-tag" size="small" @click="showInput">
+                        <i class="el-icon-plus"></i>
+                    </el-button>
+
+
+
+                    <!-- <el-button @click="handleTag" type="primary" style="margin-right: 20px;">添加标签</el-button> -->
+                    <!-- <span v-for="(item,index) in AddFormData.tag_list" :key="index">{{item.title}}  </span> -->
                     <!-- <el-input v-model="AddFormData.tag_uuids" /> -->
                 </el-form-item>
                 <el-form-item label="题型:" :required='true'>
-                    <el-input v-model="AddFormData.ques_type" />
+                     <el-radio-group v-model="AddFormData.ques_type">
+                        <el-radio :label="1">判断</el-radio>
+                        <el-radio :label="2">单选</el-radio>
+                         <el-radio :label="3">多选</el-radio>
+                        <el-radio :label="4">简答</el-radio>
+                    </el-radio-group>
+                    <!-- <el-input v-model="AddFormData.ques_type" /> -->
+                </el-form-item>
+                <el-form-item label="分析:" v-if="AddFormData.ques_type == 4">
+                    <el-input type="textarea" v-model="AddFormData.analysis" />
+                </el-form-item>
+                <el-form-item label="图片:">
+                    <file ref="pciurls" />
+                    <!-- <el-input v-model="AddFormData.pic_urls" /> -->
                 </el-form-item>
                 <!-- <el-form-item label="图片地址:">
                     <el-input v-model="AddFormData.pic_urls" />
@@ -140,28 +224,37 @@
                 <el-form-item label="答案:" :required='true'>
                     <el-input v-model="AddFormData.answer" />
                 </el-form-item>
-                <el-form-item label="最小金额:">
-                    <el-input v-model="AddFormData.min_num" />
+                <el-form-item label="最小金额:" v-if="AddFormData.is_pay == 1">
+                    <el-input-number v-model="AddFormData.min_num" @change="handleChange" :min="1" :max="10000" label="描述文字"></el-input-number>
+                    <!-- <el-input type="number" maxLength="4" v-model="AddFormData.min_num" /> -->
                 </el-form-item>
             </el-form>
-
-            <span slot="footer">
+            </div>
+            <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                 <el-button @click="add_show = false">取消</el-button>
+                <el-button @click="onAddSubmit" type="primary">确定</el-button>
+            </div>
+            <!-- <span slot="footer">
                 <el-button @click="add_show = false">取消</el-button>
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+            </span> -->
+        <!-- </el-dialog> -->
+        </el-drawer>
 
         <el-dialog
             title="标签列表"
             :visible.sync="tags_show"
             width="30%">
             <el-form :model="TagsFormData" label-width="60px">
-                <el-form-item label="标签:">
+                <!-- <el-form-item label="标签:">
                     <el-input v-model="TagsFormData.title" class="tagsinput"/>
                     <el-button type="primary" @click="handleTag">搜索</el-button>
-                </el-form-item>
+                </el-form-item> -->
                 <el-checkbox-group v-model="TagsFormData.tag_uuids">
-                    <el-checkbox v-for="(item,index) in TagsFormData.tag_list" :key="index" :label="item">{{item.title}}</el-checkbox>
+                    <span style="width: 30%;display: inline-block" v-for="(item,index) in TagsFormData.tag_list" :key="index">
+                         <el-checkbox :label="item">{{item.title}}</el-checkbox>
+                    </span>
+                    <!-- <el-checkbox v-for="(item,index) in TagsFormData.tag_list" :key="index" :label="item">{{item.title}}</el-checkbox> -->
                 </el-checkbox-group>
             </el-form>
 
@@ -172,11 +265,12 @@
         </el-dialog>
 
         <!-- 编辑模板 -->
-        <el-dialog  
+       <el-drawer
             title="编辑"
             :visible.sync="edit_show"
-            width="500px">
-            <el-form :model="EditFormData" label-width="80px">
+            direction="rtl" size="500px">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+            <el-form :model="EditFormData" label-width="80px" label-position="left">
                  <el-form-item label="题目:" :required='true'>
                     <el-input v-model="EditFormData.title" />
                 </el-form-item>
@@ -205,32 +299,57 @@
                     <el-input v-model="EditFormData.min_num" />
                 </el-form-item>
             </el-form>
-
-            <span slot="footer">
+            </div>
+            <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
                 <el-button @click="edit_show = false">取消</el-button>
                 <el-button @click="onEditSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+            </div>
+            <!-- <span slot="footer">
+                <el-button @click="edit_show = false">取消</el-button>
+                <el-button @click="onEditSubmit" type="primary">确定</el-button>
+            </span> -->
+       </el-drawer>
+        <!-- </el-dialog> -->
 
         <!-- 详细 -->
-        <el-dialog title="详细" :visible.sync="detail_show" width="40%">
-            <el-form :model="DetailFormData" label-width="80px">
+        <!-- <el-dialog title="详细" :visible.sync="detail_show" width="40%"> -->
+        <el-drawer
+            title="详细"
+            :visible.sync="detail_show"
+            direction="rtl" size="500px">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+            <el-form :model="DetailFormData" label-width="80px" label-position="left">
                 <el-form-item class="mbstyle" label="题目:">{{DetailFormData.data.title}}</el-form-item>
-                <el-form-item class="mbstyle" label="是否需支付:" label-width="90px">{{DetailFormData.data.is_pay}}</el-form-item>
+                <el-form-item class="mbstyle" label="是否需支付:" label-width="90px">{{DetailFormData.data.is_pay ? '是' : '否'}}</el-form-item>
                 <el-form-item class="mbstyle" label="是否展示:">{{DetailFormData.data.is_show}}</el-form-item>
                 <el-form-item class="mbstyle" label="答案:">{{DetailFormData.data.answer}}</el-form-item>
                 <el-form-item class="mbstyle" label="分析:">{{DetailFormData.data.analysis}}</el-form-item>
                 <el-form-item class="mbstyle" label="标签:">{{DetailFormData.data.tag}}</el-form-item>
-                <el-form-item class="mbstyle" label="题型:">{{DetailFormData.data.ques_type}}</el-form-item>
-                <el-form-item class="mbstyle" label="选项:">{{DetailFormData.data.content}}</el-form-item>
-                <el-form-item class="mbstyle" label="图片地址:">{{DetailFormData.data.pic_urls}}</el-form-item>
-                <el-form-item class="mbstyle" label="审核状态:">{{DetailFormData.data.check_state}}</el-form-item>
+                <el-form-item class="mbstyle" label="题型:">{{DetailFormData.data.ques_type == 1 ? '判断题' : DetailFormData.data.ques_type == 2 ? '单选题' : DetailFormData.data.ques_type == 3 ? '多选题' : '简答' }}</el-form-item>
+                <el-form-item class="mbstyle" label="选项:">
+                    <el-form-item style="margin-top: 8px" v-for="value in DetailFormData.data.content" :key="value.uuid">
+                        <p>选项：{{value.opt}}   题目内容: {{value.content}}</p>
+                    </el-form-item>
+                    <div></div>
+                    <!-- {{DetailFormData.data.content}} -->
+                </el-form-item>
+                <el-form-item class="mbstyle" label="图片地址:">
+                    <img v-if="DetailFormData.data.pic_urls" :src="DetailFormData.data.pic_urls" alt="" style="width:50px;height: 50px">
+                    <span v-else>未上传</span>
+                    <!-- {{DetailFormData.data.pic_urls || '未上传'}} -->
+                </el-form-item>
+                <el-form-item class="mbstyle" label="审核状态:">{{stateFormat(DetailFormData.data.check_state)}}</el-form-item>
                 <el-form-item class="mbstyle" label="添加时间:">{{DetailFormData.data.add_time}}</el-form-item>
             </el-form>
+            </div>
+            <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                     <el-button type="primary" @click="detail_show = false">确 定</el-button>
+                </div>
             <span slot="footer">
                 <el-button type="primary" @click="detail_show = false">确 定</el-button>
             </span>
-        </el-dialog>
+        </el-drawer>
+        <!-- </el-dialog> -->
     </div>
 </template>
 <script>
@@ -238,6 +357,7 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+    import file from "@/components/imgUpload/upload.vue"
 
     if (!store.state.ShopQuesQuestionData) {
         Vue.set(store.state, 'ShopQuesQuestionData', {
@@ -263,20 +383,21 @@
                 // order_field:'add_time',
                 // order_sort:'desc'
             },
-
             // 添加
             add_show:false,
+            show_date: '',
             AddFormData:{
                 login_token:'',
                 title: '',
-                is_pay:0,
+                is_pay:1,
                 is_show:1,
                 analysis: '',	
                 // tag_uuids:[],	
-                ques_type:2,
+                ques_type:1,
                 // pic_urls:[],	
                 answer:'',
                 min_num:0,
+                pic_urls: []
             },
 
             // 标签列表
@@ -322,10 +443,17 @@
                 content:'',
                 is_answer:0,//1代表正确答案；0代表错误
             },
+            dynamicTags: [],
+            inputVisible: false,
+            inputValue: ''
+
         });
     }
 
     export default {
+         components: {
+            file
+        },
         data() {
             return store.state.ShopQuesQuestionData;
         },
@@ -347,6 +475,29 @@
             this.init();
         },
         methods:{
+             handleClose(tag) {
+                this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+            },
+
+            showInput() {
+                this.inputVisible = true;
+                this.$nextTick(_ => {
+                this.$refs.saveTagInput.$refs.input.focus();
+                });
+            },
+
+            handleInputConfirm() {
+                let inputValue = this.inputValue;
+                if (inputValue) {
+                this.dynamicTags.push(inputValue);
+                }
+                this.inputVisible = false;
+                this.inputValue = '';
+            },
+
+            handleChange(value) {
+                console.log(value)
+            },
             // 时间格式化
             formatDate: function (value) {
                 let date = new Date(value);
@@ -430,6 +581,9 @@
                 this.SearchFormData.page_num = page;
                 this.init();
             },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             // 排序处理
             onSortChange(sort) {
                 console.log(sort);
@@ -450,7 +604,12 @@
             },
             // 添加向后台提交
             onAddSubmit() {
+                console.log(this.$refs.pciurls.img_url)
                 this.AddFormData.login_token = lime.cookie_get('login_token');
+                // this.AddFormData.is_show = this.AddFormData.is_show ? 1 : 0
+                // this.AddFormDate.pic_urls  = [this.$refs.pciurls.img_url]
+                this.AddFormData.is_show = !this.AddFormData.is_show ? 0 : this.show_date.getFullYear() + '-' + (this.show_date.getMonth() + 1) + '-' + this.show_date.getDate()
+                // .substr(0, 10)
                 lime.req('ShopQuesQuestionAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
@@ -459,10 +618,8 @@
                     this.title= '';
                     this.is_pay=0;
                     this.is_show=1;
-                    this.analysis= '';	
-                    // this.tag_uuids=[];	
-                    this.ques_type=2;
-                    // this.pic_urls=[];	
+                    this.analysis= '';		
+                    this.ques_type=2;	
                     this.answer ='';
                     this.min_num =0;
                 }).catch(err => {
@@ -583,14 +740,14 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
+                this.detail_show = true;
                 lime.req('ShopQuesQuestionDetail', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid
                 }).then(res => {
                     // console.log(res.data)
                     this.DetailFormData.data = res.data
-                    this.detail_show = true;
+                    // this.detail_show = true;
                 }).catch(err => {
                     this.$message.error(err.msg);
                 })
@@ -627,8 +784,8 @@
         line-height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right:0;
+        bottom: 40px;
+        right:40px;
         overflow: hidden;
     }
 
@@ -640,4 +797,29 @@
         width: 200px;
         margin-right: 20px;
     }
+
+    .footer {
+        position: absolute;
+        bottom: 10px;
+        width: 96%;
+        padding-right: 50px!important;
+        box-sizing: border-box;
+    }
+
+     .el-tag + .el-tag {
+        margin-left: 10px;
+    }
+    .button-new-tag {
+        margin-left: 10px;
+        height: 32px;
+        line-height: 30px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .input-new-tag {
+        width: 90px;
+        margin-left: 10px;
+        vertical-align: bottom;
+    }
+
 </style>

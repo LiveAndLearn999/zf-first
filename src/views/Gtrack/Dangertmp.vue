@@ -38,6 +38,9 @@
             <div style="border-top: solid 1px #f2f1f4;">
                 <el-table
                     :data="rows"
+                    stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px'}"
                     :height="height - 60 - 46 - 48"
                     v-loading="loading"
                     element-loading-text="加载中..."
@@ -59,16 +62,25 @@
                     <el-table-column prop="reject_remark" label="驳回原因"  />
                     <el-table-column prop="add_time" label="添加时间"  />
                     <el-table-column prop="last_time" label="更新时间"  />
-                    <el-table-column prop="check_list" label="排查检查项信息信息"  />
+                    <!-- <el-table-column prop="check_list" label="排查检查项信息信息"  /> -->
                 </el-table>
 
                 <div class="page" :style="{width:width - 250 + 'px'}">
                     <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    layout="prev, pager, next, jumper"
+                    :total="total">
+                    </el-pagination>
+                    <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total"
-                    ></el-pagination>
+                    ></el-pagination> -->
                 </div>
             </div>
 
@@ -230,6 +242,7 @@
                  return {uuid: v.value, title: v.label , ...v}
                });
             },
+             handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 按钮点击 menu: 参数数据 local是否本地程序
             onSubMenu (menu, local = false) {
                 util.submenu(menu, this, lime.cookie_get('login_token'), local)
@@ -238,7 +251,9 @@
             init () {
                 this.loading = true
                 lime.req('VcShopTemplateActionList', {
-                    login_token: lime.cookie_get('login_token')
+                    login_token: lime.cookie_get('login_token'),
+                     page_num:this.SearchFormData.page_num,
+                    page_len:this.SearchFormData.page_len,
                 }).then(res => {
                     console.log(res.data)
                     this.loading = false
@@ -369,8 +384,8 @@
         line-height: 40px;
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right: 0;
+        bottom: 40px;
+        right: 40px;
         overflow: hidden;
     }
 

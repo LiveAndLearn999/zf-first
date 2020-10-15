@@ -135,6 +135,7 @@
                 this.loading = true;
                 lime.req('ShopStaffLogin', this.LoginFormData).then(res => {
                     lime.cookie_set('login_token', res.data.login_token, 7200);
+                    lime.cookie_set('uname', this.LoginFormData.mobile, 7200);
                     this.$router.push('/admin');
                     setTimeout(() => {
                         this.loading = false;

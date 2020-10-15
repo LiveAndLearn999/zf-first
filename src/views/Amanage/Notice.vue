@@ -13,11 +13,11 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+                        <span style="padding-left:9px;font-size: 16px">{{$store.state.AdminData.active_title}}</span>
                     </div>
                 </el-col>
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right; font-size: 14px">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <el-link
                             class="menu" 
@@ -33,36 +33,63 @@
 
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
+             <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 @current-change="onSelectCurrRow"
                 :data="rows" 
-                :height="height - 60 - 50"
+                stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
+                :height="height - 156"
                 v-loading="loading"
                 :default-expand-all="true"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+                element-loading-background="rgba(0, 0, 0, 0.1)"
                 :highlight-current-row="true" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column align="center" prop="title" label="标题"></el-table-column>
+                <el-table-column type="index" width="80px" label="序号"></el-table-column>
+                <el-table-column align="left" prop="title" label="标题"></el-table-column>
                 <el-table-column align="center" show-overflow-tooltip prop="content" label="内容"></el-table-column>
-                <el-table-column align="center" prop="imgs" label="附件">
-                    <template slot-scope="scope">
-                        <img v-if="scope.row.imgs[0]" :src="scope.row.imgs[0]" style="width: 30px" alt="">
-                        <span v-else>未上传</span>
-                    </template>
-                </el-table-column>
                 <el-table-column align="center" prop="state" label="状态">
                     <template slot-scope="scope">
                         {{stateFormat(scope.row.state)}}
                     </template>
                 </el-table-column>
                 <el-table-column align="center" prop="is_show" label="显示"></el-table-column>
+                <el-table-column label="操作" width="230px" align="center">
+                    <template slot-scope="scope">
+                    <el-dropdown trigger="hover">
+                        <span class="el-dropdown-link">
+                            更多<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click="handleEdit(scope.$index, scope.row)">
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleDetail(scope.$index, scope.row)">详情</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+                </el-table-column>
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
+                    background
                     @size-change="handleSizeChange"
                     @current-change="onPageChange"
                     :current-page.sync="SearchFormData.page_num"
@@ -83,52 +110,60 @@
         <el-drawer
             title="添加"
             :visible.sync="add_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
-                <el-form :model="AddFormData" label-width="80px" label-position="left">
-                    <el-form-item label="标题:" required>
-                        <el-input v-model="AddFormData.title" />
+            :direction="direction" size="50%">
+            <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
+                <el-form :model="AddFormData" label-width="80px" label-position="left" :rules="rules" style="margin-top: 10px">
+                    <el-form-item label="标题:" prop="title" required>
+                        <el-input v-model="AddFormData.title" style="width: 360px"/>
                     </el-form-item>
-                    <el-form-item label="内容:" required>
-                        <el-input type="textarea" v-model="AddFormData.content"></el-input>
+                    <el-form-item label="内容:" prop="content" required>
+                        <el-input type="textarea" :rows="8" style="width: 360px" v-model="AddFormData.content"></el-input>
                     </el-form-item>
                     <el-form-item label="状态:" required>
-                        <el-radio-group v-model="AddFormData.state">
+                        <el-radio-group v-model="add_state">
                             <el-radio :label="-1">作废</el-radio>
                             <el-radio :label="0">待审</el-radio>
                             <el-radio :label="1">已审</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="图片:">
-                        <file v-if="add_show" ref="upload"/>
+                        <file ref="upload" />
                     </el-form-item>
-                    <el-form-item label="显示:">
+                     <el-form-item label="显示" :required='true' class="paystyle">
+                        <el-switch v-model="add_isshow" style="float: left;margin-top: 10px;"></el-switch>
+                        <el-form-item v-if="add_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
+                            <el-col :span="11">
+                                <el-date-picker type="date" placeholder="选择日期" v-model="showTime" style="width: 265px;width: 165px;"></el-date-picker>
+                            </el-col>
+                        </el-form-item>
+                    </el-form-item>
+                    <!-- <el-form-item label="显示:">
                         <el-date-picker
                             v-model="AddFormData.is_show"
                             type="date"
                             placeholder="选择日期时间">
                         </el-date-picker>
-                    </el-form-item>
+                    </el-form-item> -->
                 </el-form>
-                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+            </div>
+            <div class="drawer-footer">
                     <el-button @click="add_show = false">取消</el-button>
                     <el-button @click="onAddSubmit" type="primary">确定</el-button>
                 </div>
-            </div>
         </el-drawer>
 
          <!-- 编辑 -->
          <el-drawer
             title="编辑"
             :visible.sync="edit_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+            :direction="direction" size="50%">
+          <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
                 <el-form :model="EditFormData" label-width="80px" label-position="left">
                     <el-form-item label="标题:">
-                        <el-input v-model="EditFormData.title" />
+                        <el-input v-model="EditFormData.title" style="width: 360px"/>
                     </el-form-item>
                     <el-form-item label="内容:">
-                        <el-input type="textarea" v-model="EditFormData.content"></el-input>
+                        <el-input type="textarea" style="width: 360px" :rows="8" v-model="EditFormData.content"></el-input>
                     </el-form-item>
                     <el-form-item label="状态:">
                         <el-radio-group v-model="EditFormData.state">
@@ -154,23 +189,28 @@
                         </el-date-picker>
                     </el-form-item> -->
                 </el-form>
-                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+            </div>
+            <div class="drawer-footer">
                     <el-button @click="edit_show = false">取消</el-button>
                     <el-button @click="onEditSubmit" type="primary">确定</el-button>
                 </div>
-            </div>
         </el-drawer>
 
         <!-- 详细 -->
         <el-drawer
             title="详细"
             :visible.sync="detail_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
-                <el-form :model="EditFormData" label-width="80px" label-position="left">
+            :direction="direction" size="50%">
+           <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
+                <el-form :model="EditFormData" label-width="80px" label-position="right">
                     <el-form-item label="标题:">{{DetailFormData.title}}</el-form-item>
                     <el-form-item v-if="DetailFormData.imgs[0]" label="图片:">
-                        <img :src="DetailFormData.imgs[0]" style="width: 50px" alt="">
+                        <el-image 
+                            style="width: 30px; height: 30px"
+                            :src="DetailFormData.imgs[0]" 
+                            :preview-src-list="DetailFormData.imgs">
+                        </el-image>
+                        <!-- <img :src="DetailFormData.imgs[0]" style="width: 50px" alt=""> -->
                     </el-form-item>
                     <el-form-item  label="状态:" prop="state">
                         <template slot-scope="scope">
@@ -184,10 +224,10 @@
                         </div>
                     </el-form-item>
                 </el-form>
-                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
-                    <el-button @click="detail_show = false" type="primary">确定</el-button>
-                </div>
             </div>
+             <div class="drawer-footer">
+                    <el-button @click="detail_show = false" type="primary">关闭</el-button>
+                </div>
         </el-drawer>
 
 
@@ -202,7 +242,8 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
     import { noticeList, noticeAdd , noticeDel, noticeEdit} from "@/api/request"
-    import file from "@/components/imgUpload/upload.vue"
+    // import file from "@/components/imgUpload/upload.vue"
+     import file from "@/components/imgUpload/drapload.vue"
 
     if (!store.state.NoticeData) {
         Vue.set(store.state, 'NoticeData', {
@@ -211,6 +252,14 @@
             total:0,
             loading:false,
             curr_row:null, // 当前选中行
+            rules: {
+                      title: [
+                        { required: true, message: '标题必填', trigger: 'blur' }
+                      ],
+                      content: [
+                        {type: 'number', required: true, message: '内容必填', trigger: 'blur' }
+                      ]
+                  },
             SearchFormData:{
                 name:'',
                 page_num:1,
@@ -221,7 +270,11 @@
             search_show:false,
             // 添加
             add_show:false,
-            AddFormData:{},
+            AddFormData:{
+                is_show: new Date()
+            },
+            showTime: new Date(),
+            add_state: -1,
             // 编辑
             edit_show:false,
             EditFormData:{
@@ -234,7 +287,8 @@
             DetailFormData: {
                 imgs: []
             },
-            direction: 'rtl'
+            direction: 'rtl',
+            add_isshow: false
             
         });
     }
@@ -318,6 +372,7 @@
             },
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
+                this.AddFormData.state = this.add_state
                 if(!this.$refs.upload.img_url){
                      this.$confirm('确定不上传图片?', '提示').then(() => {
                         noticeAdd(this.AddFormData,res => {
@@ -332,7 +387,8 @@
                     })
                 }
                 this.AddFormData.imgs  = [this.$refs.upload.img_url];
-                this.AddFormData.is_show = this.AddFormData.is_show.getFullYear() + '-' + (this.AddFormData.is_show.getMonth() + 1) + '-' + this.AddFormData.is_show.getDate()
+                 this.AddFormData.is_show = this.add_isshow ? util.eleDate(showTime) : 0
+                // this.AddFormData.is_show = this.AddFormData.is_show.getFullYear() + '-' + (this.AddFormData.is_show.getMonth() + 1) + '-' + this.AddFormData.is_show.getDate()
                 noticeAdd(this.AddFormData,res => {
                    this.init();
                    this.add_show = false;
@@ -422,4 +478,18 @@
 .img-load {
     cursor: pointer;
 }
+.drawer-footer {
+         position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999999;
+    }
 </style>

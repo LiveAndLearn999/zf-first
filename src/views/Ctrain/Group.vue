@@ -8,21 +8,21 @@
 -->
 <!-- 试题分组 -->
 <template>
-    <div v-wechat-title="$route.meta.title">
+    <div  v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
         <div style="height: 46px; line-height: 46px; overflow: hidden;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right;font-size: 14px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
 
@@ -40,32 +40,44 @@
 
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
+            <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 :data="rows"
-                :height="height - 60 - 46 - 48"
+                 stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
+                :height="height - 156"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+                element-loading-background="rgba(0, 0, 0, 0.1)"
 
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标签组名" align="center"></el-table-column>
+                <el-table-column type="index" width="80px" label="序号"></el-table-column>
+                <el-table-column prop="title" label="标签组名" align="left"></el-table-column>
                 <!-- <el-table-column prop="uuid" label="UUID" align="center"></el-table-column> -->
                 <el-table-column prop="remark" label="备注" align="center"></el-table-column>
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
+                 <el-pagination
+                 background
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
@@ -121,7 +133,7 @@
                     <el-input v-model="EditFormData.title" :required='true'/>
                 </el-form-item>
 
-                <el-form-item label="备注:">
+                <el-form-item label="备注:" show-overflow-tooltip>
                     <el-input v-model="EditFormData.remark" />
                 </el-form-item>
 
@@ -149,15 +161,12 @@
             rows:[],
             total:0,
             loading:false,
-
             curr_row:null,
-
             // 搜索
             search_show:false,
             SearchFormData:{
                 title:''
             },
-
             // 添加
             add_show:false,
             AddFormData:{
@@ -166,7 +175,6 @@
                 title:'',
                 remark:'',
             },
-
             // 编辑
             edit_show:false,
             EditFormData:{
@@ -226,7 +234,6 @@
             // 数据初始化
             init() {
                 this.loading = true;
-
                 lime.req('ShopQuesGroupList', {
                     login_token:lime.cookie_get('login_token'),
                     title:this.SearchFormData.title,
@@ -278,6 +285,9 @@
             onPageChange(page){
                 this.SearchFormData.page_num = page;
                 this.init();
+            },
+             handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
             },
             // 排序处理
             onSortChange(sort) {
@@ -356,6 +366,7 @@
     }
 </script>
 
+
 <style scoped>
     .menu{
         display: inline-block;
@@ -368,8 +379,10 @@
         line-height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right:0;
+        bottom: 40px;
+        right:40px;
         overflow: hidden;
     }
+
+
 </style>

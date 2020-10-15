@@ -15,14 +15,14 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right;font-size: 14px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
 
@@ -40,29 +40,36 @@
 
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
+             <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 :data="rows"
+                stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
                 :height="height - 60 - 46 - 48"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+               
+                element-loading-background="rgba(0, 0, 0, 0.1)"
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="计划名称" align="center"></el-table-column>
+                <el-table-column type="index" label="#" width="80px"></el-table-column>
+                <el-table-column prop="title" label="计划名称" align="left"></el-table-column>
                 <el-table-column prop="start_time" label="开始时间" align="center" :sortable=true></el-table-column>
                 <el-table-column prop="end_time" label="结束时间" align="center" :sortable=true></el-table-column>
             </el-table>
             <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
-                    :current-page.sync="SearchFormData.page_num"
-                    @current-change="onPageChange"
-                    layout="prev, pager, next"
-                    :total="total">
+                 <el-pagination
+                 background
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
                 </el-pagination>
             </div>
         </div>
@@ -81,12 +88,13 @@
             </span>
         </el-dialog>
 
+
         <!-- 添加模板 -->
         <el-drawer
             title="添加"
             :visible.sync="add_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+            :direction="direction" size="50%">
+             <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
                 <el-form :model="AddFormData" label-width="140px" label-position="left">
                     <el-form-item label="计划组名称:" required><el-input v-model="AddFormData.title"/></el-form-item>
                     <el-form-item label="计划组:" required>
@@ -103,32 +111,47 @@
                         </el-select>
                         <!-- <el-input v-model="AddFormData.plan_group_uuid"/> -->
                     </el-form-item>
-                    <el-form-item label="开始时间:" required>
+                    <!-- <el-form-item label="开始时间:" required>
                         <el-date-picker 
                         v-model="AddFormData.start_time"  
                         type="date" 
                         placeholder="选择日期:">
                         </el-date-picker>
+                    </el-form-item> -->
+                    <el-form-item label="学习时间范围:" required>
+                        <el-date-picker 
+                            size="small"
+                            style="width: 360px;margin-right: 20px;height: 36px"
+                            :clearable="true"
+                            unlink-panels
+                            align="center"
+                            v-model="AddFormData.start_end" 
+                            type="daterange" 
+                            value-format="yyyy-MM-dd" 
+                            range-separator="至" start-placeholder="开始日期" 
+                            end-placeholder="结束日期">
+                        </el-date-picker>
                     </el-form-item>
-                    <el-form-item label="结束时间:" required>
+                    <!-- <el-form-item label="结束时间:" required>
                         <el-date-picker 
                         v-model="AddFormData.end_time"  
                         type="date" 
                         placeholder="选择日期:">
                         </el-date-picker>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item label="资源:" required>
-                        <el-select
+                        <div @click="resuce_show = true" style="width: 80px;height: 36px;border: 1px solid #f2f2f2;border-radius: 4px;text-align: center; line-height: 36px; font-size: 20px"><i class="el-icon-plus"></i></div>
+                        <!-- <el-select
                             v-model="resource_value"
                             @change="choseResource"
-                            placeholder="计划组">
+                            placeholder="资源">
                             <el-option
                             v-for="item in resourceAry"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
                             </el-option>
-                        </el-select>
+                        </el-select> -->
                         <!-- <el-input v-model="AddFormData.plan_group_uuid"/> -->
                     </el-form-item>
                     <el-form-item label="学员组成类型:" required>
@@ -136,7 +159,10 @@
                         <el-radio v-model="AddFormData.study_user_type" label="2">学员</el-radio>
                         <el-radio v-model="AddFormData.study_user_type" label="3">混合</el-radio>
                     </el-form-item>
-                    <el-form-item label="时长:" required><el-input v-model="AddFormData.duration"/></el-form-item>
+                    <el-form-item label="时长:" required>
+                         <el-input-number v-model="AddFormData.duration"  :min="10" :max="200" label="描述文字"></el-input-number>
+                        <!-- <el-input v-model="AddFormData.duration"/> -->
+                    </el-form-item>
                     <el-form-item label="支付类型:" required>
                         <el-radio v-model="AddFormData.pay_type" label="1">企业付费</el-radio>
                         <el-radio v-model="AddFormData.pay_type" label="2">其它</el-radio>
@@ -145,12 +171,27 @@
                         <el-radio v-model="AddFormData.study_start_photo" label="0">不拍照</el-radio>
                         <el-radio v-model="AddFormData.study_start_photo" label="1">拍照 </el-radio>
                     </el-form-item>
-                    <el-form-item label="学习过程拍照:" required><el-input v-model="AddFormData.study_process_photo"/></el-form-item>
+                    <el-form-item label="过程拍照次数:" required>
+                        <el-input-number v-model="AddFormData.study_process_photo"  :min="1" :max="20" label="描述文字"></el-input-number>
+                        <!-- <el-input v-model="AddFormData.study_process_photo"/> -->
+                    </el-form-item>
                     <el-form-item label="学习结束是否拍照:" required>
                         <el-radio v-model="AddFormData.study_end_photo" label="0">不拍照</el-radio>
                         <el-radio v-model="AddFormData.study_end_photo" label="1">拍照 </el-radio>
                     </el-form-item>
-                    <el-form-item label="学习过程学习:" required><el-input v-model="AddFormData.exam_process_photo"/></el-form-item>
+                    <el-form-item label="是否考试:" required>
+                        <el-radio-group v-model="is_study">
+                            <el-radio :label="0">考试</el-radio>
+                            <el-radio :label="1">不考试</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item >
+                        <div style="width: 100%;height: 1px;background: #F2F2F2"></div>
+                    </el-form-item>
+                    <el-form-item label="学习过程学习:" required>
+                        <el-input-number v-model="AddFormData.exam_process_photo"  :min="1" :max="20" label="描述文字"></el-input-number>
+                        <!-- <el-input v-model="AddFormData.exam_process_photo"/></el-form-item> -->
+                    </el-form-item> 
                     <el-form-item label="考试结束是否拍照:" required>
                         <el-radio v-model="AddFormData.exam_end_photo" label="0">不拍照</el-radio>
                         <el-radio v-model="AddFormData.exam_end_photo" label="1">拍照 </el-radio>
@@ -220,11 +261,86 @@
                     </el-form-item>
                      
                 </el-form>
-                <div slot="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
-                    <el-button @click="add_show = false">取消</el-button>
-                    <el-button @click="onAddSubmit" type="primary">确定</el-button>
+            </div>
+            <div class="drawer-footer">
+                <el-button @click="add_show = false">取消</el-button>
+                <el-button @click="onAddSubmit" type="primary">确定</el-button>
+            </div>
+
+             <!-- 选择资源 -->
+        <el-drawer
+            title="资源选择"
+            :visible.sync="resuce_show"
+            :append-to-body="true"
+            :direction="direction" size="45%">
+             <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'hidden',margin:'0 auto',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
+
+                 <div class="resuce_flex">
+                     <div class="resuce_flexlf">
+                         <el-table 
+                            :data="rece_rows"
+                             ref="multipleTable"
+                             @selection-change="handleSelectionChange"
+                            stripe
+                            :row-style="{height:'40px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                            :header-cell-style="{height:'40px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '14px',fontWeight: '400'}"
+                            :height="height - 113"
+                            v-loading="loading"
+                            element-loading-text="拼命加载中"                       
+                            element-loading-background="rgba(0, 0, 0, 0.1)"
+                            :highlight-current-row="true"
+                            style="width: 100%" 
+                            size="mini">
+                            <el-table-column
+                            type="selection"
+                            width="55">
+                            </el-table-column>
+
+                
+                            <el-table-column show-overflow-tooltip prop="title" label="课件名称" align="left"></el-table-column>
+                            <el-table-column prop="min_num" label="金额" align="left"></el-table-column>
+                        </el-table>
+                     </div>
+                     <div class="resuce_flexmd">
+                         <div @click="addRece" :style="{width: '80%',marginLeft: '10%',marginTop:(height/3 - 30) +'px',height: 30 + 'px',border: '1px solid red', textAlign: 'center',lineHeight: '30px'}">+</div>
+                         <div  @click="unaddRece" :style="{width: '80%',marginLeft: '10%',marginTop:20 +'px',height: 30 + 'px',border: '1px solid red', textAlign: 'center',lineHeight: '30px'}">-</div>
+                     </div>
+                     <div class="resuce_flexrg">
+                          <el-table 
+                            :data="reces_rows"
+                             ref="multipleTables"
+                             @selection-change="handleSelectionChanges"
+                            stripe
+                            :row-style="{height:'40px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                            :header-cell-style="{height:'40px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '14px',fontWeight: '400'}"
+                            :height="height - 113"
+                            v-loading="loading"
+                            element-loading-text="拼命加载中"                       
+                            element-loading-background="rgba(0, 0, 0, 0.1)"
+                            :highlight-current-row="true"
+                            style="width: 100%" 
+                            size="mini">
+                            <el-table-column
+                            type="selection"
+                            width="55">
+                            </el-table-column>             
+                            <el-table-column show-overflow-tooltip prop="title" label="课件名称" align="left"></el-table-column>
+                            <el-table-column prop="min_num" label="金额" align="left"></el-table-column>
+                        </el-table>
+                     </div>
+                 </div>
+             </div>
+             <div class="drawer-footer" style="width: 45%;display: flex;flex-direction: row;">
+                <div style="width: 50%;height: 100%;font-size: 14px;color:#A6AAB8;text-align: left; padding-left: 20px;box-sizing: border-box">
+                    付费: <span style="color: #0F7BF6; font-size: 16px">{{all_money}}</span> 学币
+                </div>
+                <div style="width: 50%;height: 100%">
+                    <el-button @click="resuce_show = false">取消</el-button>
+                    <el-button @click="resuce_show = false" type="primary">确定</el-button>
                 </div>
             </div>
+        </el-drawer>
+
         </el-drawer>
 
         <!-- 编辑模板 -->
@@ -235,7 +351,20 @@
             <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
                 <el-form :model="EditFormData" label-width="140px" label-position="left">
                     <el-form-item label="计划组名称:"><el-input v-model="EditFormData.title"/></el-form-item>
-                    <!-- <el-form-item label="计划组唯一标识:"><el-input v-model="EditFormData.plan_group_uuid"/></el-form-item> -->
+                    <el-form-item label="计划组:">
+                        <el-select
+                            v-model="plaing_value"
+                            @change="chosePlaing"
+                            placeholder="计划组">
+                            <el-option
+                            v-for="item in plaingAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input v-model="EditFormData.plan_group_uuid"/> -->
+                    </el-form-item>
                     <el-form-item label="开始时间:">
                         <el-date-picker 
                         v-model="EditFormData.start_time"  
@@ -250,6 +379,20 @@
                         type="date" 
                         placeholder="选择日期">
                         </el-date-picker>
+                    </el-form-item>
+                     <el-form-item label="资源:" required>
+                        <el-select
+                            v-model="resource_value"
+                            @change="choseResource"
+                            placeholder="资源">
+                            <el-option
+                            v-for="item in resourceAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-input v-model="AddFormData.plan_group_uuid"/> -->
                     </el-form-item>
                     <el-form-item label="学员组成类型:">
                         <el-radio v-model="EditFormData.study_user_type" label="1">员工</el-radio>
@@ -347,6 +490,13 @@
                 name:'',
                 img:'',
             },
+            is_study: 0,
+            rece_rows: [],
+            reces_rows: [],
+            resuce_show: false,
+            all_money: 0,
+            multipleSelection: [],
+            multipleSelections: [],
             // 编辑
             edit_show:false,
             EditFormData:{
@@ -415,12 +565,61 @@
                 });
             })
             lime.req('ShopResourceList',{login_token: lime.cookie_get('login_token'),page_no: 1,page_len:20}).then( res => {
-                this.resourceAry = res.data.rows.map(v => {
-                    return {value: v.uuid, label: v.title , ...v}
-                });
+                console.log(res)
+                this.rece_rows = res.data.rows
+                // this.resourceAry = res.data.rows.map(v => {
+                //     return {value: v.uuid, label: v.title , ...v}
+                // });
             })
         },
         methods:{
+            toggleSelection(rows) {
+                if (rows) {
+                rows.forEach(row => {
+                    this.$refs.multipleTable.toggleRowSelection(row);
+                });
+                } else {
+                this.$refs.multipleTable.clearSelection();
+                }
+            },
+
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+                console.log(this.multipleSelection)
+            },
+
+            handleSelectionChanges(val) {
+                this.multipleSelections = val;
+                console.log(this.multipleSelections)
+            },
+
+            addRece() {
+                let count = 0
+                this.reces_rows =  this.multipleSelection
+                // this.multipleSelection = []
+                // this.$refs.multipleTable.clearSelection();
+                this.reces_rows.forEach((item,index) => {
+                    count =  count + item.min_num
+                })
+                console.log(count)
+                this.all_money = count
+            },
+            unaddRece() {
+            let add =this.reces_rows.filter(item=>!this.multipleSelections.some(ele=>ele.uuid===item.uuid)) 
+            this.reces_rows = add
+
+                let count = 0
+                this.reces_rows.forEach((item,index) => {
+                    count =  count + item.min_num
+                })
+                console.log(count)
+                this.all_money = count
+            },
+
+
+             handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             change(e) {
                 this.$forceUpdate()
             },
@@ -607,5 +806,44 @@
     @import '../../assets/styles/common.css';
     .mbstyle{
         margin-bottom: 0px;
+    }
+    .drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999999;
+    }
+
+    .resuce_flex {
+        width: 92%;
+        height: 100%;
+        margin-left: 4%;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .resuce_flexlf {
+        width: 45%;
+        height: 100%;
+    }
+
+    .resuce_flexmd {
+        width: 10%;
+        height: 100%;
+       
+    }
+
+    .resuce_flexrg {
+        width: 45%;
+        height: 100%;
     }
 </style>

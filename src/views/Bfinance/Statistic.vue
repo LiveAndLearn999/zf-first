@@ -8,9 +8,31 @@
 -->
 <template>
     <!-- <h1>{{cpname}}</h1> -->
-    <div>
+    <div v-wechat-title="$route.meta.title">
+        <div style="height: 46px; line-height: 46px;">
+            <el-row>
+                <el-col :span="6">
+                    <div style="padding-left:16px;">
+                        <i class="el-icon-s-unfold"></i>
+                        <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+                    </div>
+                </el-col>
+                <el-col :span="18">
+                    <div style="text-align: right; ">
+                        <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
+                        <el-link
+                            class="menu" 
+                            @click="onSubMenu(item)"
+                            v-for="(item,index) in $store.state.AdminData.right_menus" 
+                            :key="index">
+                            {{item.name}}
+                        </el-link>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
         <!-- <TableBase  :loading="loading" :page_num="page_num" :total="total" :rows="rows" :columns="columns" @selRow="onSelectCurrRow" @onref="onRefresh" @pageChange="onPageChange"  /> -->
-        <Finance  :dtlist="dtlist"/>
+        <Finance v-if="show_chart" :dtlist="dtlist" style="margin-top: 2px"/>
     </div>
 </template>
 <script>
@@ -57,7 +79,8 @@
                 {prop: 'add_time', label: '添加时间'}
             ],
             cpname: '财务统计',
-            dtlist: []
+            dtlist: [],
+            show_chart: false
 
         });
     }
@@ -84,6 +107,7 @@
                         res.data.enable_money - 0,res.data.freeze_money - 0,
                         res.data.enable_give_money || 0,res.data.integral || 0,
                         res.data.empirical_val || 0 ]
+                    this.show_chart = true
                     // this.list = res.data;
                 }).catch(err => {
                     this.loading = false;
@@ -95,8 +119,15 @@
                 }, 10000);
         },
         methods: {
+            // 按钮点击 menu:参数数据 local是否本地程序
+            onSubMenu(menu, local = false) {
+                util.submenu(menu,this,lime.cookie_get('login_token'), local);
+            },
             init() {
-               
+               this.loading = true;
+               setTimeout(() => {
+                    this.loading = false;
+                }, 2000);
             },
             // 刷新
             onRefresh() {

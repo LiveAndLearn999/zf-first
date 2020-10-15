@@ -38,6 +38,9 @@
             <div style="border-top: solid 1px #f2f1f4;">
                 <el-table
                     :data="rows"
+                    stripe
+                    :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white'}" 
+                    :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px'}"
                     :height="height - 60 - 46 - 48"
                     v-loading="loading"
                     element-loading-text="加载中..."
@@ -51,9 +54,9 @@
                 >
                     <el-table-column type="index" label="#"></el-table-column>
                     <el-table-column prop="title" label="排查项标题"  />
+                    <el-table-column prop="sort" label="排序" />
                     <el-table-column prop="add_time" label="添加时间"  />
                     <el-table-column prop="last_time" label="更改时间"  />
-                    <el-table-column prop="sort" label="排序"  />
                     <!-- <el-table-column label="角色">
                         <template slot-scope="scope">
                             <span v-for="(item, index) in rows[scope.$index].role_list" :key="index" style="display: inline-block;padding-right:30px">{{scope.row.role_list[index].name}}</span>
@@ -63,11 +66,20 @@
 
                 <div class="page" :style="{width:width - 250 + 'px'}">
                     <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    layout="prev, pager, next, jumper"
+                    :total="total">
+                    </el-pagination>
+                    <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total"
-                    ></el-pagination>
+                    ></el-pagination> -->
                 </div>
             </div>
 
@@ -115,6 +127,12 @@
                             <el-form-item label="排序:">{{DetailFormData.sort}}</el-form-item>
                             <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
                             <el-form-item label="更改时间:">{{DetailFormData.last_time}}</el-form-item>
+                            <el-form-item label="检查项:">
+                                <p v-for="value in DetailFormData.items" :key="value.uuid">
+                                    {{value.item_title}}
+                                </p>
+                                <!-- {{DetailFormData.items}} -->
+                            </el-form-item>
                         </el-form>
                         </div>
                     <span slot="footer">
@@ -174,11 +192,14 @@
             onSubMenu (menu, local = false) {
                 util.submenu(menu, this, lime.cookie_get('login_token'), local)
             },
+            handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 数据初始化
             init () {
                 this.loading = true
                 lime.req('VcShopProjectList', {
-                    login_token: lime.cookie_get('login_token')
+                    login_token: lime.cookie_get('login_token'),
+                     page_num:this.SearchFormData.page_num,
+                    page_len:this.SearchFormData.page_len,
                 }).then(res => {
                     console.log(res.data)
                     this.loading = false
@@ -289,8 +310,8 @@
         line-height: 40px;
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right: 0;
+        bottom: 40px;
+        right: 40px;
         overflow: hidden;
     }
 

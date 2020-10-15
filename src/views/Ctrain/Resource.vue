@@ -15,7 +15,7 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
@@ -23,9 +23,9 @@
 
                 <!-- 前端自定义功能 -->
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right; font-size:14px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
-                        <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
+                        <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
 
                         <el-link class="menu" @click="onSubMenu(item)" 
                             v-for="(item,index) in $store.state.AdminData.right_menus" :key="index">
@@ -36,16 +36,27 @@
             </el-row>
         </div>
 
+        <div style="width: 100%;height: 45px;margin-top: 30px;font-size: 14px;padding-left: 20px;box-sizing: border-box">    
+                搜索 <el-input v-model="SearchFormData.title" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">确 定</el-button>
+        </div>
+
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
-            <el-table :data="rows" :height="height - 60 - 46 - 48" 
+            <!-- lement-loading-spinner="el-icon-loading" -->
+            <el-table 
+                :data="rows" 
+                 stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
+                :height="height - 228" 
                 v-loading="loading" element-loading-text="拼命加载中" 
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)" 
+            
+                element-loading-background="rgba(0, 0, 0, 0.1)" 
                 @sort-change="onSortChange" :highlight-current-row="true" 
                 @current-change="onSelectRow" style="width: 100%" size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标题" align="center"></el-table-column>
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="title" label="标题" align="left"></el-table-column>
                 <el-table-column prop="cont_type" label="文件类型" align="center" >
                      <template slot-scope="scope">
                         {{scope.row.cont_type == 1 ? '视频' : '图文'}}
@@ -68,6 +79,7 @@
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
+                background
                 @size-change="handleSizeChange"
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_no"
@@ -96,12 +108,17 @@
         </el-dialog>
 
         <!-- 添加 -->
-        <el-dialog title="添加" :visible.sync="add_show" width="500px" height="100px">
-            <el-form :model="AddFormData" label-width="80px" label-position="left">
-                <el-form-item label="标题:" prop="title" :required='true'>
-                    <el-input v-model="AddFormData.title" />
+        <!-- <el-dialog title="添加" :visible.sync="add_show" width="500px" height="100px"> -->
+        <el-drawer
+            title="添加"
+            :visible.sync="add_show"
+            direction="rtl" size="50%">
+            <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
+            <el-form :model="AddFormData" label-width="120px" label-position="left" :rules="rules" style="margin-top: 10px">
+                <el-form-item label="标题:" prop="title">
+                    <el-input style="width: 360px" v-model="AddFormData.title" />
                 </el-form-item>
-                <el-form-item label="类型:" prop="cont_type" :required='true'>
+                <el-form-item label="类型:" prop="cont_type" required>
                     <el-radio-group v-model="AddFormData.cont_type">
                         <el-radio :label="1">视频</el-radio>
                         <el-radio :label="2">图文</el-radio>
@@ -112,7 +129,8 @@
                         <el-radio :label="0">免费</el-radio>
                         <el-radio :label="1">收费</el-radio>
                         <el-form-item v-if="AddFormData.is_pay==1 ? visible=true:visible=false" label="学币:" prop="min_num" label-width="50px">
-                            <el-input v-model="AddFormData.min_num" class="coinstyle"/>
+                            <el-input-number v-model="AddFormData.min_num" @change="handleChange" :min="1" :max="10000" label="描述文字"></el-input-number>
+                            <!-- <el-input v-model="AddFormData.min_num" class="coinstyle"/> -->
                         </el-form-item>
                     </el-radio-group>
                 </el-form-item>
@@ -120,10 +138,18 @@
                     <file ref="thumb_img"/>
                     <!-- <el-input v-model="AddFormData.thumb" /> -->
                 </el-form-item>
-                <el-form-item label="上传内容" prop="content" :required='true'>
+                <el-form-item v-if="AddFormData.cont_type == 1" label="是否加密：" prop="encrypt">
+                    <div>
+                        <!-- AddFormData.encrypt -->
+                        <el-radio-group v-model="add_encrypt">
+                            <el-radio :label="0">不加密</el-radio>
+                            <el-radio :label="1">加密</el-radio>
+                        </el-radio-group>
+                    </div>
+                </el-form-item>
+                <el-form-item label="上传附件" prop="content" :required='true'>
                     <file v-if="AddFormData.cont_type == 2" ref="content_img"/>
-                    <vediofile v-else ref="content_vedio"/>
-                    <!-- <el-input v-model="AddFormData.content" /> -->
+                    <UploadAuth v-else ref="ref_vedio"/>
                 </el-form-item>
                 <el-form-item label="是否展示" :required='true' class="paystyle">
                     <el-switch v-model="add_isshow" style="float: left;margin-top: 10px;"></el-switch>
@@ -134,24 +160,35 @@
                     </el-form-item>
                 </el-form-item>
                  <el-form-item label="备注:">
-                    <el-input v-model="AddFormData.remark" />
+                    <el-input style="width: 360px" :rows="8" type="textarea" v-model="AddFormData.remark" />
                 </el-form-item>
-                <el-form-item label="时长:" v-if="AddFormData.cont_type === 1">
-                    <el-input v-model="AddFormData.content_time" />
+                <el-form-item label="时长:"  v-if="AddFormData.cont_type === 1">
+                    <el-input-number v-model="AddFormData.content_time" @change="handleChange" :min="1" :max="200" label="描述文字"></el-input-number>
+                    <!-- <el-input style="width: 360px" type="number" v-model="AddFormData.content_time" /> -->
                 </el-form-item>
             </el-form>
-
-            <span slot="footer">
+            </div>
+            <div class="drawer-footer">
+                    <el-button @click="add_show = false">取消</el-button>
+                <el-button @click="onAddSubmit" type="primary">确定</el-button>
+                </div>
+            <!-- <span slot="footer">
                 <el-button @click="add_show = false">取消</el-button>
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+            </span> -->
+        </el-drawer>
+        <!-- </el-dialog> -->
 
         <!-- 编辑 -->
-        <el-dialog title="编辑" :visible.sync="edit_show" width="500px">
-            <el-form :model="EditFormData" label-width="80px" label-position="left">
+        <!-- <el-dialog title="编辑" :visible.sync="edit_show" width="500px"> -->
+        <el-drawer
+            title="编辑"
+            :visible.sync="edit_show"
+            direction="rtl" size="50%">
+            <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
+            <el-form :model="EditFormData" label-width="80px" label-position="left" style="margin-top: 10px">
                 <el-form-item label="标题:" prop="title">
-                    <el-input v-model="EditFormData.title" />
+                    <el-input style="width: 360px" v-model="EditFormData.title" />
                 </el-form-item>
                 <el-form-item label="类型:" prop="cont_type">
                     <el-radio-group v-model="EditFormData.cont_type">
@@ -164,26 +201,22 @@
                         <el-radio :label="0">免费</el-radio>
                         <el-radio :label="1">收费</el-radio>
                         <el-form-item v-if="EditFormData.is_pay==1 ? visible=true:visible=false" label="学币:" prop="min_num" label-width="50px">
-                            <el-input v-model="EditFormData.min_num" class="coinstyle"/>
+                             <el-input-number v-model="EditFormData.min_num" @change="handleChange" :min="1" :max="10000" label="描述文字"></el-input-number>
+                            <!-- <el-input v-model="EditFormData.min_num" class="coinstyle"/> -->
                         </el-form-item>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item label="封面" prop="thumb">
-                    <img v-if="EditFormData.thumb" :src="EditFormData.thumb" alt="" style="width: 40px;">
-                    <span v-else>---</span>
+                    <file ref="edit_thumb_img" :imgUrl="EditFormData.thumb"/>
                     <!-- <el-input v-model="EditFormData.thumb" /> -->
                 </el-form-item>
-                <el-form-item label="修改封面" prop="thumb">
-                    <file ref="edit_thumb_img"/>
-                </el-form-item>
-                <el-form-item label="内容" prop="content">
-                    <img v-if="EditFormData.content" :src="EditFormData.content" alt="" style="width: 40px;">
-                    <span v-else>---</span>
+                <el-form-item label="附件" prop="content">
+                   <file ref="edit_content_img" :imgUrl="EditFormData.thumb"/>
                     <!-- <el-input v-model="EditFormData.content" /> -->
                 </el-form-item>
-                <el-form-item label="修改内容" prop="content">
+                <!-- <el-form-item label="修改内容" prop="content">
                     <file ref="edit_content_img"/>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="是否展示" class="paystyle">
                     <el-switch v-model="edit_isshow" style="float: left;margin-top: 10px;"></el-switch>
                     <el-form-item v-if="edit_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
@@ -193,15 +226,21 @@
                     </el-form-item>
                 </el-form-item>
                  <el-form-item label="备注:">
-                    <el-input v-model="EditFormData.remark" />
+                    <el-input style="width: 360px" :rows="8" type="textarea" v-model="EditFormData.remark" />
                 </el-form-item>
             </el-form>
+            </div>
 
-            <span slot="footer">
+             <div class="drawer-footer">
                 <el-button @click="edit_show = false">取消</el-button>
                 <el-button @click="onEditSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+            </div>
+            <!-- <span slot="footer">
+                <el-button @click="edit_show = false">取消</el-button>
+                <el-button @click="onEditSubmit" type="primary">确定</el-button>
+            </span> -->
+        </el-drawer>
+        <!-- </el-dialog> -->
     </div>
 </template>
 
@@ -210,11 +249,17 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-    import file from "@/components/imgUpload/upload.vue"
-    import vediofile from "@/components/imgUpload/vedio.vue"
+    import file from "@/components/imgUpload/drapload.vue"
+    // import vediofile from "@/components/imgUpload/vedio.vue"
+    import UploadAuth from '@/components/video/videoUpload.vue'
     
     if (!store.state.ShopResourceData) {
         Vue.set(store.state, 'ShopResourceData', {
+             rules: {
+                      title: [
+                        { required: true, message: '标题必填', trigger: 'blur' }
+                      ],
+             },
             rows:[],
             total:0,
             loading:false,
@@ -244,6 +289,7 @@
                 login_token:'',
                 content_time:0,
             },
+            add_encrypt: 0,
             // 编辑
             edit_show:false,
             edit_isshow:false,//是否展示选择项
@@ -261,13 +307,15 @@
                 content_time:0,
             },
 
+
         });
     }
 
     export default {
         components: {
             file,
-            vediofile
+            // vediofile,
+            UploadAuth
         },
         data() {return store.state.ShopResourceData;},
         computed:{
@@ -278,6 +326,9 @@
         },
         created(){this.init();},
         methods:{
+            handleChange(value) {
+                console.log(value)
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {util.submenu(menu,this,lime.cookie_get('login_token'), local);},
             // 数据初始化
@@ -389,10 +440,12 @@
             // 添加展示
             handleAdd() {this.add_show = true;},
             onAddSubmit() {
+                // console.log(this.$refs.ref_vedio.uploader._uploadList[0].videoId)
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                this.AddFormData.is_show = this.timeFormat(this.add_showtime);
+                this.AddFormData.is_show = this.AddFormData.is_show == 0 ? 0 : new Date(this.AddFormData.is_show).getTime();
                 this.AddFormData.thumb = this.$refs.thumb_img.img_url
-                this.AddFormData.content = this.$refs.content_img.img_url
+                this.AddFormData.content = this.AddFormData.cont_type == 0 ? this.$refs.ref_vedio.uploader._uploadList[0].videoId : this.$refs.content_img.img_url
+                this.AddFormData.encrypt = this.add_encrypt + ''
                 lime.req('ShopResourceAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_no = 1;
                     this.init();
@@ -409,6 +462,7 @@
                     return;
                 }
                 this.edit_show =true;
+                this.edit_isshow = this.curr_row.is_show == 0 ? false : true
                 lime.req('ShopResourceDetail', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid
@@ -488,6 +542,9 @@
     }
 </script>
 
+<style>
+    @import '../../assets/styles/common.css'; 
+</style>
 <style lang="less" scoped>
     .menu{
         display: inline-block;
@@ -500,8 +557,8 @@
         line-height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right:0;
+        bottom: 40px;
+        right:40px;
         overflow: hidden;
     }
 
@@ -513,6 +570,21 @@
        .el-form-item{
             display: inline-block;
         } 
+    }
+
+    .drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999999;
     }
 
 </style>

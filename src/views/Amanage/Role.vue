@@ -29,24 +29,68 @@
         </div>
 
         <!-- 数据表格 -->
+        <!-- fontFamily: 'FZCYJ', -->
         <div style="border-top: solid 1px #f2f1f4;">
             <el-table 
                 ref="role"
                 :data="rows"
+                 stripe
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
                 row-key="uuid"
-                :height="height - 60 - 95"
+                :height="height - 156"
                 v-loading="loading"
                 :default-expand-all="true"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+               
+                element-loading-background="rgba(0, 0, 0, 0.1)"
 
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
+                <!-- has_menus -->
+                <el-table-column type="index" width="80px" label="序号"></el-table-column>
                 <el-table-column prop="name" label="角色名称"></el-table-column>
+                <el-table-column 
+                    prop="has_menus" 
+                    label="状态" 
+                    align="center"
+                   >
+                    <template slot-scope="scope">
+                        {{scope.row.has_menus == 0 ? '未设置' : '已设置'}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="230px" align="center">
+                    <template slot-scope="scope">
+                    <el-dropdown trigger="hover">
+                        <span class="el-dropdown-link">
+                            更多<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click="handleEdit(scope.$index, scope.row)">
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleSetMenu(scope.$index, scope.row)">设置菜单</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+                </el-table-column>
+
             </el-table>
         </div>
 
@@ -150,7 +194,7 @@
                         </div>
                     </fieldset>
 
-                    <el-form-item>
+                    <el-form-item style="text-align: right;padding-right: 20px;box-sizing: border-box">
                         <el-button @click="onSetMenuSubmit" type="primary">设 置</el-button>
                     </el-form-item>
                 </el-form>
@@ -298,7 +342,6 @@
 
                 let _rows = [];
                 this.edit_rows = [];
-
                 this.list.forEach(item => {
                     if (item.uuid != this.curr_row.uuid) {
                         _rows.push({
@@ -363,10 +406,13 @@
                     module:'ShopRoleSetMenu',
                     ver:'1.0.0',
                     relation_module:'ShopMenuList',
-                    relation_ver:'1.0.0'
+                    relation_ver:'1.0.0',
+                    // uuid: this.curr_row.uuid,
+                    // login_token:lime.cookie_get('login_token')
                 },
                 {
                     login_token:lime.cookie_get('login_token'),
+                    // uuid: this.curr_row.uuid,
                     role_uuid:this.curr_row.parent_uuid
                 }).then(res => {
                     // 数据初始化,所有菜单都归属不选
@@ -506,8 +552,13 @@
         }
     }
 </script>
-
+<style >
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+        background:#f4f8fe;
+    }
+</style>
 <style scoped>
+@import '../../assets/font/font.css';
     .menu{
         display: inline-block;
         padding:0 16px;

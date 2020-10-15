@@ -345,6 +345,10 @@ function empty(val) {
     return false;
 }
 
+function eleDate(date) {
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+}
+
 
 
 
@@ -374,5 +378,7 @@ export default {
 
     submenu,
 
-    empty
+    empty,
+
+    eleDate
 }
