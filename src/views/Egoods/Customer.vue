@@ -55,7 +55,11 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
+<<<<<<< HEAD
                     <el-table-column type="index" width="80px" label="序号"></el-table-column>
+=======
+                    <el-table-column type="index" width="80px" label="#"></el-table-column>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-table-column prop="name" align="left" label="承运方名称"></el-table-column>
                     <el-table-column prop="phone_number" label="联系手机号"></el-table-column>
                     <el-table-column prop="license" label="承运人许可证"></el-table-column>
@@ -65,7 +69,10 @@
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
+<<<<<<< HEAD
                     background
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     @size-change="handleSizeChange"
                     @current-change="onPageChange"
                     :current-page.sync="SearchFormData.page_num"

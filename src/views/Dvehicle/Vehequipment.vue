@@ -15,14 +15,22 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
+<<<<<<< HEAD
                         <span style="padding-left:9px;font-size: 16px">
+=======
+                        <span style="padding-left:9px;">
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
+<<<<<<< HEAD
                     <div style="text-align: right;font-size: 14px ">
+=======
+                    <div style="text-align: right; ">
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
 
@@ -41,9 +49,12 @@
         <div style="border-top: solid 1px #f2f1f4;" v-if="!show_map">
             <el-table 
                 :data="rows"
+<<<<<<< HEAD
                 stripe
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px'}"
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 :height="height - 60 - 46 - 48"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
@@ -54,7 +65,11 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini" >
+<<<<<<< HEAD
                     <el-table-column width="80px" type="index" label="序号"></el-table-column>
+=======
+                    <el-table-column width="80px" type="index" label="#"></el-table-column>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-table-column prop="plate_number" align="left" label="车牌号"></el-table-column>
                     <el-table-column prop="trailer_plate_number" label="挂车牌照号"></el-table-column>
                     <el-table-column prop="plate_color" label="车辆颜色">
@@ -80,7 +95,10 @@
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                  <el-pagination
+<<<<<<< HEAD
                     background
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     @size-change="handleSizeChange"
                     @current-change="onPageChange"
                     :current-page.sync="SearchFormData.page_num"

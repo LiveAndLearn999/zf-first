@@ -59,14 +59,21 @@
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
+<<<<<<< HEAD
                 <el-table-column type="index" label="序号" width="80px"></el-table-column>
+=======
+                <el-table-column type="index" label="#" width="80px"></el-table-column>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 <el-table-column prop="title" label="标签" align="left"></el-table-column>
                 <el-table-column prop="remark" label="备注" align="center"></el-table-column>
             </el-table>
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                 <el-pagination
+<<<<<<< HEAD
                 background
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 @size-change="handleSizeChange"
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_num"

@@ -48,9 +48,13 @@
                 @current-change="onSelectRow"
                 style="width: 100%;margin-top: 20px" 
                 size="mini">
+<<<<<<< HEAD
                 <!-- element-loading-spinner="el-icon-loading"
                 element-loading-background="rgba(0, 0, 0, 0.8)" -->
                 <el-table-column width="80px" type="index" label="序号"></el-table-column>
+=======
+                <el-table-column width="80px" type="index" label="#"></el-table-column>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 <el-table-column align="left" prop="name" label="姓名"></el-table-column>
                 <el-table-column align="center" prop="mobile" label="登录手机"></el-table-column>
                 <el-table-column align="center" prop="role_name" label="角色" >
@@ -152,6 +156,12 @@
                     <el-form-item label="登录手机号:">{{DetailFormData.mobile }}</el-form-item>
                     <el-form-item label="角色名称:">{{DetailFormData.role_name }}</el-form-item>
                     <el-form-item label="状态:">{{DetailFormData.state == 1 ? '启用' : '冻结'}}</el-form-item>
+<<<<<<< HEAD
+=======
+                    <el-form-item label="添加时间:">{{DetailFormData.add_time }}</el-form-item>
+                    <el-form-item label="最近修改时间:">{{DetailFormData.last_time}}</el-form-item>
+                    <el-form-item label="最近修改ip:">{{DetailFormData.last_ip}}</el-form-item>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-form-item label="紧急联系人:">{{DetailFormData.emergency_contact || '---' }}</el-form-item>                    
                     <el-form-item label="紧急联系电话:">{{DetailFormData.emergency_conttel}}</el-form-item>
                     <el-form-item label="与紧急联系人关系:">{{DetailFormData.emergency_about}}</el-form-item>
@@ -160,11 +170,16 @@
                     <el-form-item label="银行卡姓名:">{{DetailFormData.bank_staff_name}}</el-form-item>
                     <el-form-item label="入职时间:">{{DetailFormData.start_time}}</el-form-item>
                     <el-form-item label="试用期时间:">{{DetailFormData.try_time}}</el-form-item>
+<<<<<<< HEAD
+=======
+                    <el-form-item label="离职时间:">{{DetailFormData.out_time}}</el-form-item>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-form-item label="身份证:">{{DetailFormData.person_code}}</el-form-item>
                     <el-form-item label="性别:">{{DetailFormData.sex == 1 ? '男' : '女'}}</el-form-item>
                     <el-form-item label="当前居住地:">{{DetailFormData.now_addr}}</el-form-item>
                     <el-form-item label="籍贯所在地:">{{DetailFormData.home_addr}}</el-form-item>
                     <el-form-item label="身份证正面:"><!-- {{DetailFormData.person_code_img0}} -->
+<<<<<<< HEAD
                         <!-- <img v-if="DetailFormData.person_code_img0" :src="DetailFormData.person_code_img0" alt="" style="width: 50px;height: 50px"> -->
                         <el-image 
                             v-if="DetailFormData.person_code_img0"
@@ -182,6 +197,13 @@
                             :src="DetailFormData.person_code_img1" 
                             :preview-src-list="[DetailFormData.person_code_img1]">
                         </el-image>
+=======
+                        <img v-if="DetailFormData.person_code_img0" :src="DetailFormData.person_code_img0" alt="" style="width: 50px;height: 50px">
+                        <span v-else>未上传</span>
+                    </el-form-item>
+                    <el-form-item label="身份证反面:">
+                        <img v-if="DetailFormData.person_code_img1" :src="DetailFormData.person_code_img1" alt="" style="width: 50px;height: 50px">
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                         <span v-else>未上传</span>
                         <!-- {{DetailFormData.person_code_img1}} -->
                     </el-form-item>
@@ -200,6 +222,10 @@
                         <span v-else>丧偶</span>
                     </el-form-item>
                     <el-form-item label="民族:">{{DetailFormData.nation}}</el-form-item>
+<<<<<<< HEAD
+=======
+                    <el-form-item label="微信号:">{{DetailFormData.weixin_code}}</el-form-item>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-form-item label="薪资:">{{((DetailFormData.salary - 0) / 100) + '元'}}</el-form-item> 
                     <el-form-item label="是否已交社保:">
                         <span v-if="DetailFormData.is_social == 0 ">未交</span>
@@ -227,8 +253,30 @@
                             <el-radio :label="0">冻结</el-radio>
                             <el-radio :label="1">启用</el-radio>
                         </el-radio-group>
+<<<<<<< HEAD
                     </el-form-item>       
                     <el-form-item label="紧急联系人:"><el-input maxlength="10" style="width: 360px" v-model="AddFormData.emergency_contact" /></el-form-item>
+=======
+                    </el-form-item>
+                    <el-form-item label="添加时间:">
+                         <el-date-picker
+                            v-model="AddFormData.add_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.add_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="最近修改时间:">
+                        <el-date-picker
+                            v-model="AddFormData.last_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.last_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="最近修改ip:"><el-input v-model="AddFormData.last_ip" /></el-form-item>
+                    <el-form-item label="紧急联系人:"><el-input v-model="AddFormData.emergency_contact" /></el-form-item>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <el-form-item label="紧急联系电话:">
                         <el-input onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="11" style="width: 360px" v-model="AddFormData.emergency_conttel" />
                     </el-form-item>
@@ -263,10 +311,23 @@
                         </el-date-picker>
                         <!-- <el-input v-model="AddFormData.try_time" /> -->
                     </el-form-item>
+<<<<<<< HEAD
                     <el-form-item label="身份证号:">
                         <el-input style="width: 360px" v-model="AddFormData.person_code" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="18"
 ></el-input>
                        <!--  <el-input style="width: 360px" v-model="personCode"></el-input> -->
+=======
+                    <el-form-item label="离职时间:">
+                        <el-date-picker
+                            v-model="AddFormData.out_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                        <!-- <el-input v-model="AddFormData.out_time" /> -->
+                    </el-form-item>
+                    <el-form-item label="身份证号:">
+                        <el-input v-model="AddFormData.person_code" />
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item>
                     <el-form-item label="性别:">
                         <el-radio-group v-model="add_sex">
@@ -313,9 +374,13 @@
                         <el-input style="width: 360px" v-model="AddFormData.nation" />
                     </el-form-item>
                    <el-form-item label="薪资:">
+<<<<<<< HEAD
                        <el-input-number v-model="AddFormData.salary" :min="1" :max="100000" ></el-input-number>
                     <!-- <el-input-number style="width: 360px" v-model="AddFormData.salary" :precision="2" :step="0.1" :max="100000"></el-input-number> -->
                        <!-- <el-input type="number" v-model="AddFormData.salary" /> -->
+=======
+                       <el-input type="number" v-model="AddFormData.salary" />
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item> 
                     <el-form-item label="是否已交社保:">
                         <el-radio-group v-model="add_is_social">
@@ -383,8 +448,20 @@
                             placeholder="选择日期时间">
                         </el-date-picker>
                     </el-form-item>
+<<<<<<< HEAD
                     <el-form-item label="身份证号:">
                         <el-input style="width: 360px" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');" maxlength="18" v-model="EditFormData.person_code" />
+=======
+                    <el-form-item label="离职时间:">
+                        <el-date-picker
+                            v-model="EditFormData.out_time"
+                            type="datetime"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="身份证号:">
+                        <el-input v-model="EditFormData.person_code" />
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item>
                     <el-form-item label="性别:">
                         <el-radio-group v-model="edit_sex">
@@ -399,10 +476,21 @@
                         <el-input style="width: 360px" v-model="EditFormData.home_addr" />
                     </el-form-item>
                     <el-form-item label="身份证正面:">
+<<<<<<< HEAD
                         <file ref="edtimg_code" :imgUrl="EditFormData.person_code_img0"/>
                     </el-form-item>
                     <el-form-item label="身份证反面:">
                          <file :imgUrl="EditFormData.person_code_img1" ref="edtimg_codes"/>
+=======
+                        <img v-if="EditFormData.person_code_img0" :src="EditFormData.person_code_img0" alt="" style="width: 50px">
+                        <file v-else ref="edit_img"/>
+                        <!-- <el-input v-model="EditFormData.person_code_img0" /> -->
+                    </el-form-item>
+                    <el-form-item label="身份证反面:">
+                         <img v-if="EditFormData.person_code_img1" :src="EditFormData.person_code_img1" alt="" style="width: 50px">
+                         <file v-else ref="edit_imgs"/>
+                        <!-- <el-input v-model="EditFormData.person_code_img1" /> -->
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item>
                     <el-form-item label="受教育类型:">
                         <el-radio-group v-model="edit_edu_type">
@@ -426,9 +514,13 @@
                         <el-input style="width: 360px" v-model="EditFormData.nation" />
                     </el-form-item>
                    <el-form-item label="薪资:">
+<<<<<<< HEAD
                         <el-input-number v-model="EditFormData.salary" :min="1" :max="100000" ></el-input-number>
                     <!-- <el-input-number style="width: 260px" v-model="EditFormData.salary" :precision="2" :step="0.1" :max="100000"></el-input-number> -->
                        <!-- <el-input v-model="EditFormData.salary" type="number"/> -->
+=======
+                       <el-input v-model="EditFormData.salary" type="number"/>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     </el-form-item> 
                     <el-form-item label="是否已交社保:">
                         <el-radio-group v-model="edit_is_social">
@@ -495,6 +587,7 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+<<<<<<< HEAD
     // import file from "@/components/imgUpload/upload.vue"
     import file from "@/components/imgUpload/drapload.vue"
     // import drawer from "@/components/drawer/drawer.vue"
@@ -612,12 +705,47 @@
                       ]
 
                   },
+=======
+    import file from "@/components/imgUpload/upload.vue"
+
+    export default {
+        components:{
+            file
+        },
+        data() {
+            return {
+                rows:[],
+                total:0,
+                loading:false,
+                curr_row:null,
+                SearchFormData:{
+                    real_name:'',
+                    page_num:1,
+                    page_len:10,
+                    order_field:'add_time',
+                    order_sort:'desc'
+                },
+                search_show:false,
+                //详细
+                detail_show: false,
+                DetailFormData:{},
+                // 添加
+                add_show:false,
+                AddFormData:{
+                    real_name:'',
+                    mobile:'',
+                    pwd:'',
+                },
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 add_is_social: 0,
                 add_sex: 0,
                 add_state: 0,
                 add_is_marry: 0,
                 add_edu_type: 0,
+<<<<<<< HEAD
                 add_name: '',
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
         
                 //编辑
                 edit_show:false,
@@ -669,6 +797,7 @@
             // this.add_show = false
         },
         methods:{
+<<<<<<< HEAD
             changeCard() {
                 this.$nextTick(() => {
                     if(this.AddFormData.person_code !== null){
@@ -682,6 +811,9 @@
                 this.add_name = val
             },
            // 按钮点击 menu:参数数据 local是否本地程序
+=======
+            // 按钮点击 menu:参数数据 local是否本地程序
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
             onSubMenu(menu, local = false) {util.submenu(menu,this,lime.cookie_get('login_token'), local);},
             // 数据初始化
             init() {
@@ -770,8 +902,11 @@
                 this.AddFormData.person_code_img0 = this.$refs.img_code.img_url
                 this.AddFormData.person_code_img1 = this.$refs.imgs_code.img_url
                 this.AddFormData.start_time = util.eleDate(this.AddFormData.start_time)
+<<<<<<< HEAD
                 this.AddFormData.try_time = util.eleDate(this.AddFormData.try_time)
                 this.AddFormData.bank_staff_name = this.add_name
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 lime.req('ShopStaffAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_num = 1;
                     this.init();
@@ -804,11 +939,19 @@
                 this.EditFormData.edu_type  = this.edit_edu_type;
                 this.EditFormData.is_social  = this.edit_is_social + '';
                 this.EditFormData.is_marry  = this.edit_is_marry;
+<<<<<<< HEAD
                 if(this.$refs.edtimg_code.img_url) {
                     this.EditFormData.person_code_img0 = this.$refs.edtimg_code.img_url
                 }
                 if(this.$refs.edtimg_codes.img_url) {
                     this.EditFormData.s = this.$refs.edtimg_codes.img_url
+=======
+                if(this.$refs.edit_img.img_url) {
+                    this.EditFormData.person_code_img0 = this.$refs.edit_img.img_url
+                }
+                if(this.$refs.edit_imgs.img_url) {
+                    this.EditFormData.s = this.$refs.edit_imgs.img_url
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 }
                 lime.req('ShopStaffEdit', this.EditFormData).then(res => {
                     this.init();

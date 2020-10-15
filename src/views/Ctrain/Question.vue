@@ -71,7 +71,11 @@
                         {{scope.row.is_pay == 1 ? '是' : '否' }}
                     </template>
                 </el-table-column>
+<<<<<<< HEAD
                 <!-- <el-table-column prop="is_show" label="是否展示" align="center">
+=======
+                <el-table-column prop="is_show" label="是否展示" align="center">
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                     <template slot-scope="scope">
                         {{formatDate(scope.row.is_show * 1000)}}
                     </template>
@@ -82,6 +86,7 @@
                        {{scope.row.ques_type == 1 ? '单选' : scope.row.ques_type == 2 ? '多选' : '判断'}}
                     </template>
                 </el-table-column>
+<<<<<<< HEAD
                 <el-table-column prop="answer" label="答案" align="center"></el-table-column>
                 <!-- <el-table-column prop="optionArr" label="选项" align="center">
                     <template slot-scope="scope">
@@ -89,12 +94,25 @@
                        {{scope.row.check_state == 1 ? '通过' : '未通过'}}
                     </template>
                 </el-table-column> -->
+=======
+                <!-- <el-table-column prop="tag" label="题目" align="center"></el-table-column> -->
+                <el-table-column prop="ques_type" label="题型" align="center">
+                    <template slot-scope="scope">
+                       {{scope.row.ques_type == 1 ? '单选' : scope.row.ques_type == 2 ? '多选' : '判断'}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="answer" label="答案" align="center"></el-table-column>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 <el-table-column prop="check_state" label="审核状态" align="center">
                     <template slot-scope="scope">
                        {{scope.row.check_state == 1 ? '通过' : '未通过'}}
                     </template>
                 </el-table-column>
+<<<<<<< HEAD
                 <!-- <el-table-column prop="add_time" label="添加时间" align="center"></el-table-column>
+=======
+                <el-table-column prop="add_time" label="添加时间" align="center"></el-table-column>
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 <el-table-column prop="last_time" label="最后修改时间" align="center">
                     <template slot-scope="scope">
                         {{scope.row.last_time == '' ? '还未登陆' : scope.row.last_time}}
@@ -110,7 +128,10 @@
                     :total="total">
                 </el-pagination> -->
                  <el-pagination
+<<<<<<< HEAD
                  background
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 @size-change="handleSizeChange"
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_num"
@@ -142,8 +163,12 @@
         <el-drawer
             title="添加"
             :visible.sync="add_show"
+<<<<<<< HEAD
             direction="rtl" size="500px">
             <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
+=======
+            width="500px">
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
             <el-form :model="AddFormData" label-width="120px" label-position="left">
                 <el-form-item label="题目内容:" :required='true'>
                     <el-input type="textarea" v-model="AddFormData.title" />
@@ -225,8 +250,12 @@
                     <el-input v-model="AddFormData.answer" />
                 </el-form-item>
                 <el-form-item label="最小金额:" v-if="AddFormData.is_pay == 1">
+<<<<<<< HEAD
                     <el-input-number v-model="AddFormData.min_num" @change="handleChange" :min="1" :max="10000" label="描述文字"></el-input-number>
                     <!-- <el-input type="number" maxLength="4" v-model="AddFormData.min_num" /> -->
+=======
+                    <el-input type="number" maxLength="4" v-model="AddFormData.min_num" />
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 </el-form-item>
             </el-form>
             </div>

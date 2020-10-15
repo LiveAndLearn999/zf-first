@@ -42,7 +42,10 @@
 
             <div class="page" :style="{width:width - 250 + 'px'}">
                  <el-pagination
+<<<<<<< HEAD
                  background
+=======
+>>>>>>> fceaec7b585ec88b202a7b047d77e93b535d6b28
                 @current-change="onPageChange"
                 :current-page.sync="page_num"
                 layout="prev, pager, next, jumper"
