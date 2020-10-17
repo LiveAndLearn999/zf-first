@@ -63,7 +63,7 @@
                 <el-table-column prop="add_time" label="添加时间"></el-table-column>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 290 + 'px'}">
                 <el-pagination
                 background
                 @size-change="handleSizeChange"

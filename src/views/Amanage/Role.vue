@@ -41,27 +41,44 @@
                 :height="height - 156"
                 v-loading="loading"
                 :default-expand-all="true"
-                element-loading-text="拼命加载中"
-               
+                element-loading-text="拼命加载中"               
                 element-loading-background="rgba(0, 0, 0, 0.1)"
-
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
                 <!-- has_menus -->
-                <el-table-column type="index" width="80px" label="序号"></el-table-column>
-                <el-table-column prop="name" label="角色名称"></el-table-column>
+                <!-- <el-table-column type="index" width="80px" label="序号"></el-table-column> -->
+                <el-table-column align="left" prop="name" label="角色名称">
+                     <template slot-scope="scope">
+                        <span v-if="scope.row.has_menus == 0">
+                             <img src="@/assets/imgs/no-tree.png" style="height: 15px;margin-top:10px">
+                            {{scope.row.name}}
+                        </span>
+                        <span v-else >
+                             <img src="@/assets/imgs/tree.png" style="height: 15px;margin-top:10px">
+                            {{scope.row.name}}
+                        </span>
+                        <!-- <span v-else>已设置</span>
+                        {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
+                    </template>
+                </el-table-column>
                 <el-table-column 
                     prop="has_menus" 
                     label="状态" 
                     align="center"
                    >
                     <template slot-scope="scope">
-                        {{scope.row.has_menus == 0 ? '未设置' : '已设置'}}
+                        <span v-if="scope.row.has_menus == 0">
+                            <el-tag type="danger"> 未设置</el-tag>
+                        </span>
+                        <span v-else>
+                            <el-tag type="success"> 已设置</el-tag>
+                        </span>
+                        <!-- {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="230px" align="center">
+                <!-- <el-table-column label="操作" width="230px" align="center">
                     <template slot-scope="scope">
                     <el-dropdown trigger="hover">
                         <span class="el-dropdown-link">
@@ -89,7 +106,7 @@
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
-                </el-table-column>
+                </el-table-column> -->
 
             </el-table>
         </div>
@@ -102,10 +119,12 @@
             <el-form :model="AddFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
+                    ref="cascaderHandle"
                         clearable 
                         :options="add_rows"
-                        :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        :props="{checkStrictly: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
+                        @change="close"
                         v-model="AddFormData.parent_uuid" style="width: 330px">
                     </el-cascader>
                 </el-form-item>
@@ -131,9 +150,11 @@
             <el-form :model="EditFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
+                    @change="closes"
+                    ref="cascaderHandles"
                         clearable 
                         :options="edit_rows"
-                        :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        :props="{checkStrictly: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
                         v-model="EditFormData.parent_uuid" style="width: 320px">
                     </el-cascader>
@@ -258,6 +279,12 @@
             this.init();
         },
         methods:{
+            close(val){
+                this.$refs.cascaderHandle.dropDownVisible = false;
+            },
+            closes(val){
+                this.$refs.cascaderHandles.dropDownVisible = false;
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
@@ -552,10 +579,31 @@
         }
     }
 </script>
-<style >
+<style lang="less">
+
+
 .el-table--striped .el-table__body tr.el-table__row--striped td {
         background:#f4f8fe;
     }
+.el-table__expand-icon {
+    .el-icon-arrow-right:before {
+      content: "\e791";
+      font-size: 20px;
+    }
+  }
+
+.el-submenu__title {
+    .el-icon-arrow-down:before {
+        content: "\e791";
+        font-size: 20px;
+    }
+}
+
+.el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow{
+    -webkit-transform: rotateZ(90deg); 
+    -ms-transform: rotate(90deg);
+    transform: rotateZ(90deg); 
+}
 </style>
 <style scoped>
 @import '../../assets/font/font.css';

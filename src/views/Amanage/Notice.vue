@@ -56,7 +56,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column align="center" prop="is_show" label="显示"></el-table-column>
-                <el-table-column label="操作" width="230px" align="center">
+                <!-- <el-table-column label="操作" width="230px" align="center">
                     <template slot-scope="scope">
                     <el-dropdown trigger="hover">
                         <span class="el-dropdown-link">
@@ -84,10 +84,10 @@
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
-                </el-table-column>
+                </el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 290 + 'px'}">
                 <el-pagination
                     background
                     @size-change="handleSizeChange"

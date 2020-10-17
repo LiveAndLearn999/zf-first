@@ -63,7 +63,7 @@
                 <!-- <el-table-column prop="remark" label="备注"></el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 290 + 'px'}">
                 <el-pagination
                 background
                 @size-change="handleSizeChange"

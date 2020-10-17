@@ -10,7 +10,7 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
@@ -36,25 +36,35 @@
             </el-row>
         </div>
 
-        <div style="width: 100%;height: 45px;margin-top: 30px;font-size: 14px;padding-left: 20px;box-sizing: border-box">    
-                搜索 <el-input v-model="SearchFormData.title" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
-                <el-button type="primary" @click="onSearchSubmit" size="small">确 定</el-button>
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box"> 
+                <el-select v-model="search_value" placeholder="请选择" style="width: 80px;margin-right: 10px"  size="small">
+                    <el-option
+                         v-for="item in search_options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>    
+                <el-input v-model="SearchFormData.title" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
-            <!-- lement-loading-spinner="el-icon-loading" -->
+       <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
+            <!-- lement-loading-spinner="el-icon-loading  stripe" -->
             <el-table 
                 :data="rows" 
-                 stripe
+                
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
-                :height="height - 228" 
+                :height="height - 195 - 68" 
                 v-loading="loading" element-loading-text="拼命加载中" 
             
                 element-loading-background="rgba(0, 0, 0, 0.1)" 
                 @sort-change="onSortChange" :highlight-current-row="true" 
-                @current-change="onSelectRow" style="width: 100%" size="mini">
+                @current-change="onSelectRow" 
+                style="width: 100%;margin-top: 5px;" 
+                size="mini">
                 <el-table-column type="index" width="80px" label="#"></el-table-column>
                 <el-table-column prop="title" label="标题" align="left"></el-table-column>
                 <el-table-column prop="cont_type" label="文件类型" align="center" >
@@ -77,14 +87,15 @@
                 <el-table-column prop="last_time" label="最近登录时间" align="center" :sortable=true></el-table-column>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
                 background
                 @size-change="handleSizeChange"
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_no"
                 :page-size="SearchFormData.page_len"
-                layout="prev, pager, next, jumper"
+                 :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
                 :total="total">
                 </el-pagination>
                 <!-- <el-pagination :current-page.sync="SearchFormData.page_no"
@@ -273,6 +284,10 @@
                 order_sort:'desc'
             },
             search_show:false,
+            search_options: [
+                    {value: 0,label: '标题'},
+                ],
+            search_value: 0,
             // 添加
             add_show:false,
             add_isshow:false,//是否展示选择项
@@ -415,6 +430,11 @@
             onSearchSubmit(){
                 this.search_show = false;
                 this.SearchFormData.page_no = 1;
+                // if(this.search_value == 0) {
+                //     this.SearchFormData.mobile = ''
+                // }else {
+                //     this.SearchFormData.real_name = ''
+                // }
                 this.init();
             },
             // 选择单行
@@ -544,6 +564,12 @@
 
 <style>
     @import '../../assets/styles/common.css'; 
+    .el-table tbody tr:hover>td { 
+        background-color: #cedbeb!important;
+    }
+    .el-table__body tr.current-row>td{
+        background: #cedbeb!important;
+    }
 </style>
 <style lang="less" scoped>
     .menu{
@@ -553,13 +579,17 @@
     }
 
     .page {
-        height: 40px; 
-        line-height: 40px; 
+       height: 40px; 
+        /* line-height: 40px;  */
         text-align: right;
         position: fixed;
-        bottom: 40px;
+        bottom: 20px;
         right:40px;
         overflow: hidden;
+        /* background: #f4f8fe; */
+        /* border: 1px solid red; */
+        z-index: 999;
+        padding-top:  10px;
     }
 
     .coinstyle{

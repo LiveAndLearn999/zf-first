@@ -3,15 +3,22 @@
          <el-upload
             action=""
             :multiple="false"
-            list-type="picture-card"
             :on-remove="uploadRemove"
             :file-list="fileList"
             :on-change="handleChange"
             :http-request="uploadFile">
-            <!-- :on-preview="handlePictureCardPreview" -->
-            
-            <img v-if="iconUrl" src="@/assets/imgs/font.png" alt="" style="width: 210px">
-            <img v-else src="@/assets/imgs/back.png" alt="" style="width: 210px">
+            <!-- list-type="picture-card" -->
+            <div class="img-content" style="">
+                <img v-if="imgUrl" :src="imgUrl" alt="" style="height: 135px">
+                <img v-else-if="img_url" :src="img_url" alt="" style="height: 133px;margin-top: 1px">
+                <img v-else-if="iconUrl" src="@/assets/imgs/back.png" alt="" style="height: 133px;margin-top: 1px">
+                <img v-else src="@/assets/imgs/font.png" alt="" style="height: 133px;margin-top: 1px">
+                <div id="img-word" style="">{{msg}}</div>
+            </div>
+            <div></div>
+
+
+
 
             <!-- <div class="img-flex">点击上传</div> -->
             <!-- <i class="el-icon-plus"></i> -->
@@ -38,7 +45,8 @@ export default {
             img_url: '',
             dialogImageUrl: '',
             dialogVisible: false,
-            fileList: []
+            fileList: [],
+            msg: '点击上传'
 
         }
      },
@@ -50,7 +58,8 @@ export default {
      		console.log(1111)
      		console.log(file)
      		if(!fileList.length) {
-     			this.img_url = ''
+                 this.img_url = ''
+                 this.msg = '点击上传'
      		}
      		console.log(fileList)
      	},
@@ -69,6 +78,7 @@ export default {
                 // this.imgUrl = res.data.url
                 //this.show_img = true
                 this.fullscreenLoading = false
+                 this.msg = '点击重新上传'
             }).catch(err => {
                 this.fullscreenLoading = false
                 this.$message.error(err)
@@ -108,4 +118,39 @@ export default {
         border: 1px solid red;
         margin-bottom: 30px;
     }
+    .img-content {
+        position: relative;
+        width: 240px; 
+        height: 135px;
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid lightgray;
+    }
+
+    /* .img-content:hover .img-word{
+        color: red;
+    } */
+
+    .img-content:hover {
+        /* dotted */
+        border: 1px solid #409EFF;
+    }
+
+     .img-content:hover #img-word{
+       color: #409EFF;
+    }
+
+    #img-word {
+        position: absolute;
+        width: 240px;
+        /* height: 135px; */
+        top: 30%;
+        /* line-height: 135px; */
+        text-align: center;
+        color: lightgray;
+    }
+
+  
+
+   
 </style>

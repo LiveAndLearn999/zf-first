@@ -10,7 +10,7 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
@@ -38,15 +38,30 @@
             </el-row>
         </div>
 
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
+                <el-select v-model="search_value" placeholder="请选择" style="width: 100px;margin-right: 10px"  size="small">
+                            <el-option
+                            v-for="item in search_options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select> 
+                <el-input v-if="search_value == 0" v-model="SearchFormData.title" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-input v-else v-model="SearchFormData.mobile" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
+        </div>
+
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
              <!-- element-loading-spinner="el-icon-loading" -->
+              <!-- stripe -->
             <el-table 
                 :data="rows"
-                stripe
+
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
-                :height="height - 60 - 46 - 48"
+                :height="height - 195 - 68"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
                
@@ -54,21 +69,22 @@
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
-                style="width: 100%" 
+                style="width: 100%;margin-top: 5px" 
                 size="mini">
                 <el-table-column type="index" label="#" width="80px"></el-table-column>
                 <el-table-column prop="title" label="计划名称" align="left"></el-table-column>
                 <el-table-column prop="start_time" label="开始时间" align="center" :sortable=true></el-table-column>
                 <el-table-column prop="end_time" label="结束时间" align="center" :sortable=true></el-table-column>
             </el-table>
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                  <el-pagination
                  background
                 @size-change="handleSizeChange"
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_num"
                 :page-size="SearchFormData.page_len"
-                layout="prev, pager, next, jumper"
+               :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
                 :total="total">
                 </el-pagination>
             </div>
@@ -140,7 +156,16 @@
                         </el-date-picker>
                     </el-form-item> -->
                     <el-form-item label="资源:" required>
-                        <div @click="resuce_show = true" style="width: 80px;height: 36px;border: 1px solid #f2f2f2;border-radius: 4px;text-align: center; line-height: 36px; font-size: 20px"><i class="el-icon-plus"></i></div>
+                        <div v-if="re_ary" style="width: 99%; border-bottom: 1px solid #f2f2f2;">
+                            <div class="re-flex" v-for="item in re_ary" :key="item.uuid">
+                            <div class="re-flexlf">{{item.title}}</div>
+                            <div class="re-flexmd">{{item.add_time}}</div>
+                            <div class="re-flexrg">
+                                <i class="el-icon-close"></i>
+                            </div>
+                        </div>
+                        </div>
+                        <div @click="resuce_show = true" class="re-add"><i class="el-icon-plus"></i></div>
                         <!-- <el-select
                             v-model="resource_value"
                             @change="choseResource"
@@ -200,7 +225,54 @@
                         <el-radio v-model="AddFormData.exam_start_photo" label="0">不拍照</el-radio>
                         <el-radio v-model="AddFormData.exam_start_photo" label="1">拍照 </el-radio>
                     </el-form-item>
-                    <el-form-item label="单选:" label-width="60px">
+                    <el-form-item label="试题选择:" label-width="120px">
+                        <div style="width: 99%; border-bottom: 1px solid #f2f2f2;">
+                            <div class="re-flex" style="text-align: center">
+                                <div class="re-flexlf re-flexlfs">类型</div>
+                                <div class="re-flexmd re-flexlfs">数量</div>
+                                <div class="re-flexrg re-flexrgs" style="text-align: center">
+                                    分值
+                                </div>
+                            </div>
+                            <div class="re-flex" style="text-align: center">
+                                <div class="re-flexlf re-flexlfs">单选</div>
+                                <div class="re-flexmd re-flexlfs">
+                                   <el-input placeholder="请输入" type="text" style="height: 30px" v-model="s_num" @change="change"></el-input>
+                                </div>
+                                <div class="re-flexrg re-flexrgs" style="text-align: center">
+                                    <el-input placeholder="请输入" type="text" v-model="s_score" @change="change"></el-input>
+                                </div>
+                            </div>
+                            <div class="re-flex" style="text-align: center">
+                                <div class="re-flexlf re-flexlfs">多选</div>
+                                <div class="re-flexmd re-flexlfs">
+                                    <el-input placeholder="请输入" type="text" v-model="m_num" @change="change"></el-input>
+                                </div>
+                                <div class="re-flexrg re-flexrgs" style="text-align: center">
+                                    <el-input placeholder="请输入" type="text" v-model="m_score" @change="change"></el-input>
+                                </div>
+                            </div>
+                            <div class="re-flex" style="text-align: center">
+                                <div class="re-flexlf re-flexlfs">判断</div>
+                                <div class="re-flexmd re-flexlfs">
+                                    <el-input placeholder="请输入" type="text" v-model="c_num" @change="change"></el-input>
+                                </div>
+                                <div class="re-flexrg re-flexrgs" style="text-align: center">
+                                    <el-input placeholder="请输入" type="text" v-model="c_score" @change="change"></el-input>
+                                </div>
+                            </div>
+                            <div class="re-flex" style="text-align: center">
+                                <div class="re-flexlf re-flexlfs">简答</div>
+                                <div class="re-flexmd re-flexlfs">
+                                    <el-input placeholder="请输入" type="text" v-model="t_num" @change="change"></el-input>
+                                </div>
+                                <div class="re-flexrg re-flexrgs" style="text-align: center">
+                                    <el-input placeholder="请输入" type="text" v-model="t_score" @change="change"></el-input>
+                                </div>
+                            </div>
+                        </div>
+                    </el-form-item>
+                    <!-- <el-form-item label="单选:" label-width="60px">
                          <el-form-item></el-form-item>
                          <el-form-item label-width="80px" label="题目数:"><el-input type="text" v-model="s_num" @change="change"></el-input></el-form-item>
                          <el-form-item label-width="80px" label="每题分数:" style="margin-top: 8px"><el-input type="text" v-model="s_score" @change="change"></el-input></el-form-item>
@@ -208,8 +280,8 @@
                              <el-radio v-model="s_radio" label="0">免费</el-radio>
                              <el-radio v-model="s_radio" label="1">收费</el-radio>
                          </el-form-item>
-                    </el-form-item>
-                    <el-form-item label="多选:" label-width="60px">
+                    </el-form-item> -->
+                    <!-- <el-form-item label="多选:" label-width="60px">
                         <el-form-item></el-form-item>
                         <el-form-item label-width="80px" label="题目数:"><el-input type="text" v-model="m_num" @change="change"></el-input></el-form-item>
                          <el-form-item label-width="80px" label="每题分数:" style="margin-top: 8px"><el-input type="text" v-model="m_score" @change="change"></el-input></el-form-item>
@@ -217,8 +289,8 @@
                              <el-radio v-model="m_radio" label="0">免费</el-radio>
                              <el-radio v-model="m_radio" label="1">收费</el-radio>
                          </el-form-item>
-                    </el-form-item>
-                    <el-form-item label="判断:" label-width="60px">
+                    </el-form-item> -->
+                    <!-- <el-form-item label="判断:" label-width="60px">
                         <el-form-item></el-form-item>
                         <el-form-item label-width="80px" label="题目数:"><el-input type="text" v-model="c_num" @change="change"></el-input></el-form-item>
                          <el-form-item label-width="80px" label="每题分数:" style="margin-top: 8px"><el-input type="text" v-model="c_score" @change="change"></el-input></el-form-item>
@@ -235,9 +307,10 @@
                              <el-radio v-model="t_radio" label="0">免费</el-radio>
                              <el-radio v-model="t_radio" label="1">收费</el-radio>
                          </el-form-item>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item label="试题标签:" required>
-                        <el-input type="text" @change="change"></el-input>
+                        <!-- <el-input type="text" @change="change"></el-input> -->
+                        <tags />
                     </el-form-item>
                     <el-form-item label="倒计时:" required>
                         <el-input type="text" v-model="AddFormData.spending_duration"></el-input>
@@ -274,69 +347,16 @@
             :append-to-body="true"
             :direction="direction" size="45%">
              <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'hidden',margin:'0 auto',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
-
-                 <div class="resuce_flex">
-                     <div class="resuce_flexlf">
-                         <el-table 
-                            :data="rece_rows"
-                             ref="multipleTable"
-                             @selection-change="handleSelectionChange"
-                            stripe
-                            :row-style="{height:'40px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
-                            :header-cell-style="{height:'40px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '14px',fontWeight: '400'}"
-                            :height="height - 113"
-                            v-loading="loading"
-                            element-loading-text="拼命加载中"                       
-                            element-loading-background="rgba(0, 0, 0, 0.1)"
-                            :highlight-current-row="true"
-                            style="width: 100%" 
-                            size="mini">
-                            <el-table-column
-                            type="selection"
-                            width="55">
-                            </el-table-column>
-
-                
-                            <el-table-column show-overflow-tooltip prop="title" label="课件名称" align="left"></el-table-column>
-                            <el-table-column prop="min_num" label="金额" align="left"></el-table-column>
-                        </el-table>
-                     </div>
-                     <div class="resuce_flexmd">
-                         <div @click="addRece" :style="{width: '80%',marginLeft: '10%',marginTop:(height/3 - 30) +'px',height: 30 + 'px',border: '1px solid red', textAlign: 'center',lineHeight: '30px'}">+</div>
-                         <div  @click="unaddRece" :style="{width: '80%',marginLeft: '10%',marginTop:20 +'px',height: 30 + 'px',border: '1px solid red', textAlign: 'center',lineHeight: '30px'}">-</div>
-                     </div>
-                     <div class="resuce_flexrg">
-                          <el-table 
-                            :data="reces_rows"
-                             ref="multipleTables"
-                             @selection-change="handleSelectionChanges"
-                            stripe
-                            :row-style="{height:'40px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
-                            :header-cell-style="{height:'40px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '14px',fontWeight: '400'}"
-                            :height="height - 113"
-                            v-loading="loading"
-                            element-loading-text="拼命加载中"                       
-                            element-loading-background="rgba(0, 0, 0, 0.1)"
-                            :highlight-current-row="true"
-                            style="width: 100%" 
-                            size="mini">
-                            <el-table-column
-                            type="selection"
-                            width="55">
-                            </el-table-column>             
-                            <el-table-column show-overflow-tooltip prop="title" label="课件名称" align="left"></el-table-column>
-                            <el-table-column prop="min_num" label="金额" align="left"></el-table-column>
-                        </el-table>
-                     </div>
-                 </div>
+                 <resource ref="re_ary"/>
+                 
              </div>
-             <div class="drawer-footer" style="width: 45%;display: flex;flex-direction: row;">
-                <div style="width: 50%;height: 100%;font-size: 14px;color:#A6AAB8;text-align: left; padding-left: 20px;box-sizing: border-box">
+             <div class="drawer-footer" style="width: 45%;display: flex;flex-direction: row;border: 1px solid red">
+                <div style="width: 50%;height: 100%;font-size: 14px;color:#A6AAB8;text-align: left; padding-left: 20px;box-sizing: border-box;border: 1px solid green">
                     付费: <span style="color: #0F7BF6; font-size: 16px">{{all_money}}</span> 学币
                 </div>
                 <div style="width: 50%;height: 100%">
                     <el-button @click="resuce_show = false">取消</el-button>
-                    <el-button @click="resuce_show = false" type="primary">确定</el-button>
+                    <el-button @click="getAry" type="primary">确定</el-button>
                 </div>
             </div>
         </el-drawer>
@@ -464,16 +484,22 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
     import { ShopPlanList, ShopPlanAdd, ShopPlanDel, ShopPlanEdit, ShopPlanDetail } from '@/api/request'
-
+    import resource from "@/components/resource/index.vue"
+    import tags from "@/components/tags/index.vue"
     if (!store.state.ShopPlanData) {
         Vue.set(store.state, 'ShopPlanData', {
             rows:[],
+            re_ary: [],
             total:0,
             loading:false,
             direction: 'rtl',
             curr_row:null,
             // 搜索
             search_show:false,
+             search_options: [
+                    {value: 0,label: '计划名称'}
+                ],
+            search_value: 0,
             SearchFormData:{
                 title:'',
                 page_num:1,
@@ -542,6 +568,10 @@
     }
 
     export default {
+        components: {
+            resource,
+            tags
+        },
         data() {return store.state.ShopPlanData;},
         computed:{
             width:() => {
@@ -573,49 +603,11 @@
             })
         },
         methods:{
-            toggleSelection(rows) {
-                if (rows) {
-                rows.forEach(row => {
-                    this.$refs.multipleTable.toggleRowSelection(row);
-                });
-                } else {
-                this.$refs.multipleTable.clearSelection();
-                }
-            },
-
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-                console.log(this.multipleSelection)
-            },
-
-            handleSelectionChanges(val) {
-                this.multipleSelections = val;
-                console.log(this.multipleSelections)
-            },
-
-            addRece() {
-                let count = 0
-                this.reces_rows =  this.multipleSelection
-                // this.multipleSelection = []
-                // this.$refs.multipleTable.clearSelection();
-                this.reces_rows.forEach((item,index) => {
-                    count =  count + item.min_num
-                })
-                console.log(count)
-                this.all_money = count
-            },
-            unaddRece() {
-            let add =this.reces_rows.filter(item=>!this.multipleSelections.some(ele=>ele.uuid===item.uuid)) 
-            this.reces_rows = add
-
-                let count = 0
-                this.reces_rows.forEach((item,index) => {
-                    count =  count + item.min_num
-                })
-                console.log(count)
-                this.all_money = count
-            },
-
+           getAry() {
+               this.resuce_show = false
+               this.re_ary = this.$refs.re_ary.sel_ary
+               console.log(this.$refs.re_ary.sel_ary)
+           },
 
              handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -801,9 +793,80 @@
         }
     }
 </script>
-
+<style >
+.re-flex input.el-input__inner {
+    border: none;
+    background: transparent
+}
+</style>
 <style scoped>
     @import '../../assets/styles/common.css';
+    .re-add {
+        width: 80px;
+        height: 36px;
+        border: 1px solid #f2f2f2;
+        border-radius: 4px;
+        text-align: center; 
+        line-height: 36px; 
+        font-size: 20px;
+        margin-top: 10px;
+    }
+
+    .re-flex {
+        width: 99%;
+        height: 40px;
+        /* border: 1px solid #f2f2f2; */
+        display: flex;
+        flex-direction: row;
+        /* border-bottom: 1px solid #f2f2f2; */
+        border-right: 1px solid #f2f2f2;
+        line-height: 40px;
+        font-size: 12px;
+        text-align: left;
+    }
+    
+    .re-flexlf {
+        width: 80%;
+        height: 100%;
+        padding-left: 10px;
+        box-sizing: border-box;
+        border-top: 1px solid #f2f2f2;
+        border-left: 1px solid #f2f2f2;
+    }
+    .re-flexmd {
+        width: 12%;
+        height: 100%;
+        border-left: 1px solid #f2f2f2;
+        border-top: 1px solid #f2f2f2;
+        padding-left: 10px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    .re-flexrg {
+        width: 8%;
+        height: 100%;
+        border-left: 1px solid #f2f2f2;
+        border-top: 1px solid #f2f2f2;
+        text-align: center;
+    }
+    .re-flexrg:hover {
+        background: #2080F7;
+        color: white;
+    }
+
+    .re-flexrgs {
+        width: 20%;
+        text-align: center;
+    }
+
+     .re-flexrgs:hover {
+         background: none;
+        color: black;
+     }
+
+     .re-flexlfs {
+        width: 40%;
+    }
     .mbstyle{
         margin-bottom: 0px;
     }
@@ -819,31 +882,8 @@
         box-sizing: border-box;
         border-top: 1px solid #F2F2F2;
         line-height: 50px;
-        z-index: 999999;
+        z-index: 999;
     }
 
-    .resuce_flex {
-        width: 92%;
-        height: 100%;
-        margin-left: 4%;
-        margin-top: 10px;
-        display: flex;
-        flex-direction: row;
-    }
-
-    .resuce_flexlf {
-        width: 45%;
-        height: 100%;
-    }
-
-    .resuce_flexmd {
-        width: 10%;
-        height: 100%;
-       
-    }
-
-    .resuce_flexrg {
-        width: 45%;
-        height: 100%;
-    }
+    
 </style>

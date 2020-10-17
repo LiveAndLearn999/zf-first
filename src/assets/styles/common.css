@@ -6,13 +6,17 @@
 
 .page {
     height: 40px; 
-    line-height: 40px; 
+    /* line-height: 40px;  */
     text-align: right;
     position: fixed;
-    bottom: 40px;
+    bottom: 20px;
     right:40px;
     overflow: hidden;
-}
+    /* background: #f4f8fe; */
+    /* border: 1px solid red; */
+    z-index: 999;
+    padding-top:  10px;
+    }
 
 .footer {
     position: absolute;

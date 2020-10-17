@@ -40,10 +40,10 @@
         <!-- 数据表格 -->
         <div style="border-top: solid 1px #f2f1f4;">
              <!-- element-loading-spinner="el-icon-loading" -->
+              <!-- stripe -->
             <el-table 
                 ref="role"
                 :data="rows"
-                stripe
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
                 row-key="uuid"
@@ -421,6 +421,10 @@
         padding:0 16px;
         text-align: center;
     }
+
+    .el-image-viewer__mask {
+    opacity: 1!important;
+}
 
     .page {
         height: 40px; 

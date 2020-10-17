@@ -23,7 +23,7 @@
             </el-row>
         </div>
 
-        <div style="width: 100%;height: 30px;margin-top: 10px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
+        <div style="width: 100%;height: 30px;margin-top: 0px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
                 搜索 
                 <!-- <el-input v-model="SearchFormData.real_name" style="width: 240px;margin-right: 20px;height: 36px"/> -->
                 <!-- <el-date-picker
@@ -61,7 +61,7 @@
                 :data="rows" 
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
-                :height="height - 215" 
+                :height="height - 250" 
                 v-loading="loading" 
                 element-loading-text="拼命加载中"
                
@@ -86,7 +86,7 @@
                 </el-table-column>
                 <el-table-column prop="check_staff_name" align="center" label="审核人"></el-table-column>
                 <el-table-column prop="check_time" label="审核时间" align="center" :sortable="true"></el-table-column>
-                <el-table-column label="操作" width="230px" align="center">
+                <!-- <el-table-column label="操作" width="230px" align="center">
                     <template slot-scope="scope">
                     <el-dropdown trigger="hover">
                         <span class="el-dropdown-link">
@@ -114,10 +114,10 @@
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
-                </el-table-column>
+                </el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 260 + 'px'}">
                 <el-pagination
                 background
                 @size-change="handleSizeChange"
@@ -254,7 +254,8 @@
                         <el-divider></el-divider>
                         <span>可否审核：  {{CheckFormData.enable_check == 0 ? '不可' : '可'}}</span>
                         <el-divider></el-divider>
-                        <span>点击图片查看大图 :</span>
+                        <div v-if="CheckFormData.imgs[0]">
+                            <span >点击图片查看大图 :</span>
                             <div class="demo-image__preview">
                                 <el-image 
                                     style="width: 30px; height: 30px"
@@ -262,6 +263,8 @@
                                     :preview-src-list="CheckFormData.imgs">
                                 </el-image>
                             </div>
+                        </div>
+                        <div v-else>图片：未上传图片</div>
                     </div>
                 </el-card>
                 <el-card class="box-card1">
@@ -332,14 +335,25 @@
                     <el-divider></el-divider>
                     <span>可否审核：  {{DetailFormData.enable_check == 0 ? '不可' : '可'}}</span>
                     <el-divider></el-divider>
-                    <span>点击图片查看大图 :</span>
+                    <div v-if="DetailFormData.imgs[0]">
+                            <span >点击图片查看大图 :</span>
+                            <div class="demo-image__preview">
+                                <el-image 
+                                    style="width: 30px; height: 30px"
+                                    :src="DetailFormData.imgs[0]" 
+                                    :preview-src-list="DetailFormData.imgs">
+                                </el-image>
+                            </div>
+                        </div>
+                    <div v-else>图片：未上传图片</div>
+                    <!-- <span>点击图片查看大图 :</span>
                         <div class="demo-image__preview">
                             <el-image 
                             style="width: 30px; height: 30px"
                             :src="DetailFormData.imgs[0]" 
                             :preview-src-list="DetailFormData.imgs">
                             </el-image>
-                        </div>
+                        </div> -->
                 </div>
             </el-card>
             <el-card class="box-card2">
@@ -811,12 +825,17 @@
     }
 
     .page {
-        height: 46px;
-        line-height: 46px;
+        height: 40px; 
+        line-height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 36px;
-        right:40px;
+        bottom: 10px;
+        right:20px;
+        overflow: hidden;
+        /* background: #f4f8fe; */
+        border: 1px solid red;
+        z-index: 999;
+        padding-top:  10px;
     }
 
      .footer {

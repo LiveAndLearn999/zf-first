@@ -40,7 +40,7 @@
                     </template>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 290 + 'px'}">
                  <el-pagination
                  background
                 @current-change="onPageChange"
