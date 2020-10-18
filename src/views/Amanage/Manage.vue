@@ -440,14 +440,20 @@
                     <el-form-item label="籍贯所在地:">
                         <el-input style="min-width: 240px" v-model="AddFormData.home_addr" />
                     </el-form-item>
-                     <el-form-item label="身份证正面:">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="身份证正面:">
                                 <file ref="img_code" :iconUrl="iconUrl" class="width_240"/>
                                 <!-- <el-input v-model="AddFormData.person_code_img0" /> -->
                             </el-form-item>
-                    <el-form-item label="身份证反面:">
+                        </el-col>
+                        <el-col :span="12">
+                             <el-form-item label="身份证反面:">
                                 <file ref="imgs_code" :iconUrl="iconUrls" class="width_240"/>
                                 <!-- <el-input v-model="AddFormData.person_code_img1" /> -->
                             </el-form-item>
+                        </el-col>
+                    </el-row>
 
                     <div class="line">
                         <div class="linelf"><div class="line-line"></div></div>
@@ -655,14 +661,20 @@
                     <el-form-item label="籍贯所在地:">
                         <el-input v-model="EditFormData.home_addr" />
                     </el-form-item>
-                     <el-form-item label="身份证正面:">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="身份证正面:">
                                 <file ref="edtimg_code" :imgUrl="EditFormData.person_code_img0" :iconUrl="iconUrl" class="width_240"/>
                                 <!-- <el-input v-model="AddFormData.person_code_img0" /> -->
                             </el-form-item>
-                    <el-form-item label="身份证反面:">
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="身份证反面:">
                                 <file ref="edtimg_codes" :imgUrl="EditFormData.person_code_img1" :iconUrl="iconUrls" class="width_240"/>
                                 <!-- <el-input v-model="AddFormData.person_code_img1" /> -->
                             </el-form-item>
+                        </el-col>
+                    </el-row>
 
                     <div class="line">
                         <div class="linelf"><div class="line-line"></div></div>
@@ -1650,10 +1662,10 @@
         background: #cedbeb!important;
     }
 
-    .el-table--striped .el-table__body tr {
-        /* background:#f4f8fe; */
+    /* .el-table--striped .el-table__body tr {
+        background:#f4f8fe;
         border:  1px solid red;
-    }
+    } */
 
    .el-table--striped .el-table__body tr.el-table__row--striped td {
         background:#f4f8fe;
@@ -1699,12 +1711,12 @@
     }
 
     .el-cascader-panel .el-radio{ 
-    width: 100%;
-    height: 100%;
-    z-index: 10; 
-    position: absolute; 
-    top: 10px;
-    right: 10px; 
+        width: 100%;
+        height: 100%;
+        z-index: 10; 
+        position: absolute; 
+        top: 10px;
+        right: 10px; 
   } 
   .el-cascader-panel .el-radio__input{ 
      visibility: hidden; 

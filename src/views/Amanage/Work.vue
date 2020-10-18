@@ -1,7 +1,7 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px;">
+        <div style="height: 46px; line-height: 46px;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
@@ -23,20 +23,7 @@
             </el-row>
         </div>
 
-        <div style="width: 100%;height: 30px;margin-top: 0px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
-                搜索 
-                <!-- <el-input v-model="SearchFormData.real_name" style="width: 240px;margin-right: 20px;height: 36px"/> -->
-                <!-- <el-date-picker
-                    v-model="SearchFormData.start_date"
-                    type="date"
-                    placeholder="开始时间">
-                </el-date-picker>
-                <el-date-picker
-                    v-model="SearchFormData.start_end"
-                    type="date"
-                    placeholder="结束时间">
-                </el-date-picker> -->
-
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
                 <el-date-picker 
                  size="small"
                         style="width: 240px;margin-right: 20px;height: 36px"
@@ -49,19 +36,18 @@
                         value-format="yyyy-MM-dd" 
                         range-separator="至" start-placeholder="开始日期" 
                         end-placeholder="结束日期"></el-date-picker>
-                <el-button type="primary"  size="small" @click="onSearchSubmit">确 定</el-button>
+                <el-button type="primary"  size="small" @click="onSearchSubmit">搜索</el-button>
         </div>
 
         <!-- 数据表格 -->
-        <div>
+        <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
             <!-- style="border-top: solid 1px #f2f1f4;" -->
-             <!-- element-loading-spinner="el-icon-loading"  fontFamily: 'FZCYJ',-->
+             <!-- element-loading-spinner="el-icon-loading"  fontFamily: 'FZCYJ',:stripe="true"-->
             <el-table 
-                :stripe="true"
                 :data="rows" 
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
-                :height="height - 250" 
+                :height="height - 195 - 68" 
                 v-loading="loading" 
                 element-loading-text="拼命加载中"
                
@@ -69,7 +55,7 @@
                 @sort-change="onSortChange"
                 :highlight-current-row="true" 
                 @current-change="onSelectRow" 
-                style="width: 100%;margin-top: 20px" 
+                style="width: 100%;margin-top: 5px" 
                 size="mini">
                 <el-table-column prop="work_staff_name" label="姓名" align="center"></el-table-column>
                 <el-table-column prop="add_time" label="添加日期" align="center" :sortable="true"></el-table-column>
@@ -117,7 +103,7 @@
                 </el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 260 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
                 background
                 @size-change="handleSizeChange"
@@ -162,32 +148,52 @@
              title="添加"
             :visible.sync="add_show"
             direction="rtl" size="50%" >
-            <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
-                <el-form :model="AddFormData" label-width="100px" label-position="left" style="margin-top: 10px">
-                    <el-form-item label="工作内容:" required>
-                        <el-input 
-                            :rows="8" 
-                            style="width: 360px"
-                            type="textarea" 
-                            placeholder="请输入工作内容" 
-                            v-model="AddFormData.content" />
-                    </el-form-item>
-
-                    <el-form-item label="图片上传:">
-                        <file ref="upload" :imgUrl="AddFormData.imgs[0]"/>
-                        <!-- <el-upload
-                        :action="upload_url"
-                        list-type="picture-card"
-                        :on-success="handleAddUploadSuccess"
-                        :on-remove="handleAddRemove">
-                        <i class="el-icon-plus"></i>
-                        </el-upload> -->
-                    </el-form-item>
-                    
-                    <el-form-item label="允许审核:">
-                        <el-radio v-model="AddFormData.enable_check" :label="1">可审核</el-radio>
-                        <el-radio v-model="AddFormData.enable_check" :label="0">不可审</el-radio>
-                    </el-form-item>
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="AddFormData" label-width="100px" label-position="right" style="margin-top: 10px">
+                    <el-row>
+                        <el-col :span="24">
+                                <el-form-item label="工作内容:" required>
+                                    <el-input 
+                                        :rows="8" 
+                                        type="textarea" 
+                                        placeholder="请输入工作内容" 
+                                        v-model="AddFormData.content" />
+                                </el-form-item>
+                            </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                             <el-form-item label="图片上传:">
+                                <file ref="upload"/>
+                                <!-- <el-upload
+                                :action="upload_url"
+                                list-type="picture-card"
+                                :on-success="handleAddUploadSuccess"
+                                :on-remove="handleAddRemove">
+                                <i class="el-icon-plus"></i>
+                                </el-upload> -->
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                             <el-col :span="12">
+                                 <el-form-item label="是否允许审核:">
+                                    <el-select v-model="enable_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in enable_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                 </el-form-item> 
+                                <!-- AddFormData.enable_check -->
+                                <!-- <el-form-item label="是否允许审核:">
+                                    <el-radio v-model="AddFormData.enable_check" :label="1">可审核</el-radio>
+                                    <el-radio v-model="AddFormData.enable_check" :label="0">不可审</el-radio>
+                                </el-form-item> -->
+                            </el-col>
+                    </el-row>
                 </el-form>
             </div>
 
@@ -203,28 +209,43 @@
             title="编辑"
              direction="rtl" 
              size="50%" >
-            <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
-                    <el-form  :model="EditFormData" label-width="140px" label-position="left" style="margin-top: 10px">
-                        <el-form-item label="工作内容:">
-                            <el-input 
-                                :rows="8" 
-                                style="width: 360px"
-                                type="textarea" 
-                                placeholder="请输入工作内容" 
-                                v-model="EditFormData.content" />
-                        </el-form-item>
-                        
-                        <el-form-item label="图片上传:">
-                            <!-- <img v-if="EditFormData.imgs[0]" :src="EditFormData.imgs[0]" style="width: 50px;height: 50px" alt=""> -->
-                            <file ref="uploads" :imgUrl="EditFormData.imgs[0]"/>
-                        </el-form-item>
-                        
-                        <el-form-item>
-
-                            <el-radio v-model="EditFormData.enable_check" :label="1">可审核</el-radio>
-                            <el-radio v-model="EditFormData.enable_check" :label="0">不可审</el-radio>
-                            
-                        </el-form-item>
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                    <el-form  :model="EditFormData" label-width="100px" label-position="right" style="margin-top: 10px">
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item label="工作内容:">
+                                    <el-input 
+                                        :rows="8" 
+                                        type="textarea" 
+                                        placeholder="请输入工作内容" 
+                                        v-model="EditFormData.content" />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item label="图片上传:">
+                                    <!-- <img v-if="EditFormData.imgs[0]" :src="EditFormData.imgs[0]" style="width: 50px;height: 50px" alt=""> -->
+                                    <file ref="uploads" :imgUrl="EditFormData.imgs[0]"/>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                  <el-form-item label="是否允许审核:">
+                                      <el-select v-model="enables_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in enable_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                        <!-- <el-radio v-model="EditFormData.enable_check" :label="1">可审核</el-radio>
+                                        <el-radio v-model="EditFormData.enable_check" :label="0">不可审</el-radio>                            -->
+                                    </el-form-item>
+                            </el-col>
+                        </el-row>
                     </el-form>
                 </div>
                  <div class="drawer-footer">
@@ -240,20 +261,86 @@
             title="工作审核"
            direction="rtl" 
              size="50%" >
-            <!-- <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '20px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}"> -->
-                <el-card class="box-card1" style="width: 100%">
-                    <div slot="header" class="clearfix">
-                        <span>工作内容</span>
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="CheckFormData" label-width="120px" label-position="right">
+                     <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">工作内容</div>
                     </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="12">
+                            <el-form-item label="添加时间:">{{CheckFormData.add_time}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="添加人:">{{CheckFormData.work_staff_name}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="日清内容:">{{CheckFormData.content}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="可否审核:">{{CheckFormData.enable_check == 0 ? '不可' : '可'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="图片:">
+                                <div v-if="CheckFormData.imgs[0]" class="demo-image__preview">
+                                    <el-image 
+                                        style="width: 30px; height: 30px"
+                                        :src="CheckFormData.imgs[0]" 
+                                        :preview-src-list="CheckFormData.imgs">
+                                    </el-image>
+                                </div>
+                                <div v-else>未上传图片</div>
+                            </el-form-item>
+                        </el-col>   
+                    </el-row>
+                    <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">审核内容</div>
+                    </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="24">
+                            <el-form-item label="审核评价:">
+                                <el-input 
+                                    :rows="5" 
+                                    type="textarea" 
+                                    placeholder="请输入工作内容" 
+                                    v-model="CheckFormData.check_content" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="评分:">
+                                <el-input-number controls-position="right" v-model="CheckFormData.check_grade" :precision="1" :step="0.1" :min="0" :max="100"></el-input-number>
+                                <!-- <el-input v-model="CheckFormData.check_grade" /> -->
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <div class="drawer-footer">
+                    <el-button @click="check_show = false">取 消</el-button>
+                    <el-button type="primary" @click="onCheckSubmit">确 定</el-button>
+                </div>
+                <el-card class="box-card1" style="width: 100%">
+                    <!-- <div slot="header" class="clearfix">
+                        <span>工作内容</span>
+                    </div> -->
                     <div>
-                        <span>添加时间：  {{CheckFormData.add_time}}</span>
+                        <!-- <span>添加时间：  {{CheckFormData.add_time}}</span>
+
+
                         <el-divider></el-divider>
-                        <span>添加人：  {{CheckFormData.work_staff_name}}</span>
-                        <el-divider></el-divider>
+                        <span>添加人：  {{CheckFormData.work_staff_name}}</span> -->
+                        <!-- <el-divider></el-divider>
                         <span>日清内容：  {{CheckFormData.content}}</span>
-                        <el-divider></el-divider>
-                        <span>可否审核：  {{CheckFormData.enable_check == 0 ? '不可' : '可'}}</span>
-                        <el-divider></el-divider>
+                        <el-divider></el-divider> -->
+                        <!-- <span>可否审核：  {{CheckFormData.enable_check == 0 ? '不可' : '可'}}</span> -->
+                        <!-- <el-divider></el-divider>
                         <div v-if="CheckFormData.imgs[0]">
                             <span >点击图片查看大图 :</span>
                             <div class="demo-image__preview">
@@ -264,36 +351,29 @@
                                 </el-image>
                             </div>
                         </div>
-                        <div v-else>图片：未上传图片</div>
-                    </div>
+                        <div v-else>图片：未上传图片</div>-->
+                    </div> 
                 </el-card>
                 <el-card class="box-card1">
-                    <div slot="header" class="clearfix">
+                    <!-- <div slot="header" class="clearfix">
                         <span>审核内容</span>
-                    </div>
+                    </div> -->
                     <el-form :model="CheckFormData" label-width="120px">
-                        <el-form-item label="审核评价:">
-                            <el-input 
-                                :rows="5" 
-                                type="textarea" 
-                                placeholder="请输入工作内容" 
-                                v-model="CheckFormData.check_content" />
-                        </el-form-item>
                         <el-form-item label="评分:">
                             <el-input-number v-model="CheckFormData.check_grade" :precision="1" :step="0.1" :min="0" :max="100"></el-input-number>
                             <!-- <el-input v-model="CheckFormData.check_grade" /> -->
                         </el-form-item>
                     </el-form>
-
+                    
                 <!-- <div style="text-align:right;">
                     <el-button @click="check_show = false">取 消</el-button>
                     <el-button type="primary" @click="onCheckSubmit">确 定</el-button>
                 </div> -->
                 </el-card>
-                <div class="drawer-footer">
+                <!-- <div class="drawer-footer">
                     <el-button @click="check_show = false">取 消</el-button>
                     <el-button type="primary" @click="onCheckSubmit">确 定</el-button>
-                </div>
+                </div> -->
             <!-- </div> -->
         </el-drawer>
 
@@ -322,6 +402,75 @@
             size="50%"
             title="详细"
            direction="rtl" >
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="CheckFormData" label-width="120px" label-position="right">
+                     <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">工作内容</div>
+                    </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="12">
+                            <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="添加人:">{{DetailFormData.work_staff_name}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="日清内容:">{{DetailFormData.content}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="可否审核:">{{DetailFormData.enable_check == 0 ? '不可' : '可'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="图片:">
+                                <div v-if="DetailFormData.imgs[0]" class="demo-image__preview">
+                                    <el-image 
+                                        style="width: 30px; height: 30px"
+                                        :src="DetailFormData.imgs[0]" 
+                                        :preview-src-list="DetailFormData.imgs">
+                                    </el-image>
+                                </div>
+                                <div v-else>未上传图片</div>
+                            </el-form-item>
+                        </el-col>   
+                    </el-row>
+                    <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">审核结果</div>
+                    </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="12">
+                            <el-form-item label="审核时间:">
+                               {{DetailFormData.check_time}}
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="审核人:">
+                               {{DetailFormData.check_staff_name}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row >
+                        <el-col :span="12">
+                            <el-form-item label="审核评价:">
+                               {{DetailFormData.check_content}}
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="审核分数:">
+                               {{DetailFormData.check_grade}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <div class="drawer-footer">
+                    <el-button type="primary" @click="detail_show = false">关闭</el-button>
+                </div>
             <el-card class="box-card1">
                 <div slot="header" class="clearfix">
                     <span>工作内容</span>
@@ -378,7 +527,7 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
     // import file from "@/components/imgUpload/upload.vue"
-    import file from "@/components/imgUpload/drapload.vue"
+    import file from "@/components/imgUpload/mutiimg.vue"
 
     if (!store.state.WorkData) {
         Vue.set(store.state, "WorkData", {
@@ -471,6 +620,12 @@
             },
             
             //添加
+             enable_value: 0,
+              enables_value: 0,
+            enable_options: [
+                {value: 0, label: '可审核'},
+                {value: 1, label: '不可审核'}
+            ],
             add_show: false,
             AddFormData: {
                 content: "",
@@ -825,15 +980,12 @@
     }
 
     .page {
-        height: 40px; 
-        line-height: 40px; 
+         height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 10px;
-        right:20px;
+        bottom: 20px;
+        right:40px;
         overflow: hidden;
-        /* background: #f4f8fe; */
-        border: 1px solid red;
         z-index: 999;
         padding-top:  10px;
     }
@@ -846,8 +998,27 @@
         box-sizing: border-box;
     }
 
+    .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    }
+
     .drawer-footer {
-         position: fixed;
+        position: fixed;
         bottom: 0;
         width: 50%;
         height: 50px;
@@ -858,6 +1029,34 @@
         box-sizing: border-box;
         border-top: 1px solid #F2F2F2;
         line-height: 50px;
-        z-index: 999999;
+        z-index: 999;
+    }
+
+    .line {
+        width: 100%;
+        height: 30px;
+        display: flex;
+        flex-direction: row;
+        border-bottom: 1px solid #F2F2F2;
+    }
+
+    .linelf {
+        width: 2%;
+        height: 100%;
+    }
+
+    .linerg {
+        width: 98%;
+        height: 100%;
+        line-height: 30px;
+        font-size: 14px;
+        color: #2a2f3b;
+    }
+
+    .line-line {
+        width: 2px;
+        height: 16px;
+        margin-top: 7px;
+        background: #0F7BF6;
     }
 </style>

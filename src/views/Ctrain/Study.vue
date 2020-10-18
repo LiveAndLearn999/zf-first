@@ -10,7 +10,7 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
@@ -24,7 +24,7 @@
                 <el-col :span="18">
                     <div style="text-align: right; font-size: 16px">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
-                        <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
+                        <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
                         
                         <el-link
                             class="menu" 
@@ -38,15 +38,26 @@
             </el-row>
         </div>
 
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
+                 <el-date-picker
+                  v-model="value1"
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期" size="small" style="margin-right: 10px">
+                </el-date-picker>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
+        </div>
+
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
              <!-- element-loading-spinner="el-icon-loading" -->
+             <!-- stripe -->
             <el-table 
                 :data="rows"
-                stripe
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
-                :height="height - 60 - 46 - 48"
+                :height="height - 195 - 68"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
                
@@ -55,7 +66,7 @@
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
-                style="width: 100%" 
+                style="width: 100%;margin-top: 5px;" 
                 size="mini">
                 <el-table-column type="index" width="80px" label="#"></el-table-column>
                 <el-table-column prop="plan_name" show-overflow-tooltip label="计划名称" align="left"></el-table-column>
@@ -80,7 +91,7 @@
                 <el-table-column prop="certificate_img" label="证书" align="center"></el-table-column>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
@@ -93,7 +104,8 @@
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_num"
                 :page-size="SearchFormData.page_len"
-                layout="prev, pager, next, jumper"
+                :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
                 :total="total">
                 </el-pagination>
             </div>
@@ -155,25 +167,52 @@
         </el-dialog>
 
         <!-- 详细 -->
-        <el-dialog title="详细" :visible.sync="detail_show" width="450px">
-            <el-form :model="DetailFormData" label-width="120px" label-position="left">
+       <el-drawer
+            title="详细"
+            :visible.sync="detail_show"
+            direction="rtl" size="50%">
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+            <el-form :model="DetailFormData" label-width="120px" label-position="right">
                 <!-- <el-form-item label="UUID:">{{DetailFormData.uuid}}</el-form-item> -->
-                <el-form-item label="状态:">{{DetailFormData.state == 1 ?  '完成' : '未完成'}}</el-form-item>
-                <el-form-item label="开始时间:">{{DetailFormData.start_time || '---'}}</el-form-item>
-                <el-form-item label="结束时间:">{{DetailFormData.end_time== '' ? '未结束' : DetailFormData.end_time}}</el-form-item>
-                <el-form-item label="类型:">{{  DetailFormData.is_online == 1 ? '现场' : '线上'}}</el-form-item>
-                <el-form-item label="首次拍照:">{{DetailFormData.in_face || '---'}}</el-form-item>
-                <el-form-item label="最后拍照:">{{DetailFormData.out_face || '---'}}</el-form-item>
-                <el-form-item label="证书:">
-                    <img v-if="DetailFormData.certificate_img" :src="DetailFormData.certificate_img" alt="">
-                    <span v-else>未上传</span>
-                    <!-- {{DetailFormData.certificate_img}} -->
-                </el-form-item>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="状态:">{{DetailFormData.state == 1 ?  '完成' : '未完成'}}</el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="开始时间:">{{DetailFormData.start_time || '---'}}</el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="结束时间:">{{DetailFormData.end_time== '' ? '未结束' : DetailFormData.end_time}}</el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="类型:">{{  DetailFormData.is_online == 1 ? '现场' : '线上'}}</el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="首次拍照:">{{DetailFormData.in_face || '---'}}</el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="最后拍照:">{{DetailFormData.out_face || '---'}}</el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="证书:">
+                            <img v-if="DetailFormData.certificate_img" :src="DetailFormData.certificate_img" alt="">
+                            <span v-else>未上传</span>
+                            <!-- {{DetailFormData.certificate_img}} -->
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </el-form>
-            <span slot="footer">
-                <el-button type="primary" @click="detail_show = false">确 定</el-button>
-            </span>
-        </el-dialog>
+        </div>
+             <div class="drawer-footer">
+                <el-button @click="detail_show = false" type="primary">关闭</el-button>
+            </div>
+        </el-drawer>
     </div>
 </template>
 <script>
@@ -222,6 +261,7 @@
                 order_field:'add_time',
                 order_sort:'desc',
             },
+            value1: ''
         });
     }
 
@@ -329,8 +369,11 @@
             // 搜索提交
             onSearchSubmit(){
                 this.search_show = false;
+                this.SearchFormData.start_date = this.value1[0]
+                this.SearchFormData.end_date = this.value1[1]
                 this.SearchFormData.page_num = 1;
                 this.init();
+                console.log(this.value1)
             },
             // 选择单行
             onSelectRow(row){
@@ -404,13 +447,47 @@
 </script>
 
 <style scoped>
+@import '../../assets/styles/common.css';
     .menu{
         display: inline-block;
         padding:0 16px;
         text-align: center;
     }
+    .drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
+    }
 
-    .page {
+    .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    }
+
+   /*  .page {
         height: 40px; 
         line-height: 40px; 
         text-align: right;
@@ -418,5 +495,5 @@
         bottom: 40px;
         right:40px;
         overflow: hidden;
-    }
+    } */
 </style>

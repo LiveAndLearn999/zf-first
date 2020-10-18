@@ -10,7 +10,7 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
@@ -24,7 +24,7 @@
                 <el-col :span="18">
                     <div style="text-align: right;font-size: 16px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
-                        <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
+                        <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
 
                         <el-link
                             class="menu" 
@@ -40,15 +40,28 @@
             </el-row>
         </div>
 
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
+                <el-select v-model="search_value" placeholder="请选择" style="width: 100px;margin-right: 10px"  size="small">
+                            <el-option
+                            v-for="item in search_options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select> 
+                <el-input v-if="search_value == 0" v-model="SearchFormData.title" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
+        </div>
+
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
              <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
-                stripe
+                
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
                 :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
                 :data="rows"
-                :height="height - 60 - 46 - 48"
+                :height="height - 195 - 68"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
                
@@ -57,7 +70,7 @@
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
-                style="width: 100%" 
+                style="width: 100%；margin-top: 5px;" 
                 size="mini">
                 <el-table-column type="index" width="80px" label="#"></el-table-column>
                 <el-table-column prop="title" show-overflow-tooltip label="题目" align="left"></el-table-column>
@@ -102,21 +115,16 @@
                 </el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
-                <!-- <el-pagination
-                    :current-page.sync="SearchFormData.page_num"
-                    @current-change="onPageChange"
-                    layout="prev, pager, next"
-                    :total="total">
-                </el-pagination> -->
+            <div class="page" :style="{width:width - 280 + 'px'}">
                  <el-pagination
-                 background
-                @size-change="handleSizeChange"
-                @current-change="onPageChange"
-                :current-page.sync="SearchFormData.page_num"
-                :page-size="SearchFormData.page_len"
-                layout="prev, pager, next, jumper"
-                :total="total">
+                     background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    :page-sizes="[10]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
                 </el-pagination>
             </div>
         </div>
@@ -142,98 +150,159 @@
         <el-drawer
             title="添加"
             :visible.sync="add_show"
-            direction="rtl" size="500px">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
-            <el-form :model="AddFormData" label-width="120px" label-position="left">
-                <el-form-item label="题目内容:" :required='true'>
-                    <el-input type="textarea" v-model="AddFormData.title" />
-                </el-form-item>
-                <el-form-item label="是否需支付:"  :required='true'>
-                     <el-radio-group v-model="AddFormData.is_pay">
-                        <el-radio :label="1">是</el-radio>
-                        <el-radio :label="0">否</el-radio>
-                    </el-radio-group>
-                    <!-- <el-input v-model="AddFormData.is_pay" /> -->
-                </el-form-item>
-                <el-form-item label="是否展示:" :required='true'>
-                    <el-switch
-                    v-model="AddFormData.is_show">
-                    </el-switch>
+            direction="rtl" size="50%">
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+            <el-form :model="AddFormData" label-width="120px" label-position="right">
+                <el-row>
+                    <el-col :span="12">
+                         <el-form-item label="题型:" :required='true'>
+                            <!-- AddFormData.ques_type -->
+                            <el-select v-model="add_ques" placeholder="请选择">
+                                <el-option
+                                    v-for="item in ques_options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select> 
+                            <!-- <el-input v-model="AddFormData.ques_type" /> -->
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="是否需支付:"  :required='true'>
+                            <!-- AddFormData.is_pay -->
+                            <el-select v-model="add_pay" placeholder="请选择">
+                                <el-option
+                                    v-for="item in pay_options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select> 
+                            <!-- <el-input v-model="AddFormData.is_pay" /> -->
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                         <el-form-item label="最小金额:" v-if="add_pay == 1">
+                            <el-input-number controls-position="right" v-model="AddFormData.min_num" @change="handleChange" :min="1" :max="10000" label="描述文字"></el-input-number>
+                            <!-- <el-input type="number" maxLength="4" v-model="AddFormData.min_num" /> -->
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="是否展示:" :required='true'>
+                            <el-select v-model="add_show_value" placeholder="请选择">
+                                <el-option
+                                    v-for="item in show_options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select> 
+                            <!-- ddFormData.is_show -->
+                            <!-- el-switch
+                            v-model="AddFormData.is_show">
+                            </el-switch> -->
+                        </el-form-item>
+                        </el-col>
+                </el-row>
+                <el-row v-if="add_show_value">
+                    <el-col :span="12">
+                        <el-form-item label="展示时间:" :required='true'>
+                            <el-date-picker
+                                    style="margin-left: 10px"
+                                    v-if="AddFormData.is_show == 1"
+                                    v-model="show_date"
+                                    type="date"
+                                    placeholder="选择日期">
+                            </el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                         <el-form-item label="题目内容:" :required='true'>
+                            <el-input :rows="8" type="textarea" v-model="AddFormData.title" />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <!-- answer -->
+                        <el-form-item label="答案:">
+                            <el-input v-if="add_ques == 3" :rows="8" type="textarea"></el-input>
+                            <div class="ques-box" v-if="add_ques == 2">
+                                <div class="ques-flex">
+                                    <div class="ques-flexlf">A</div>
+                                    <div class="ques-flexmd">111</div>
+                                    <div class="ques-flexrg">
+                                         <el-checkbox></el-checkbox>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ques-box" v-if="add_ques == 1">
+                                <div class="ques-flex">
+                                    <div class="ques-flexlf">A</div>
+                                    <div class="ques-flexmd">111</div>
+                                    <div class="ques-flexrg">
+                                        <el-radio  label=""></el-radio>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ques-box" v-if="add_ques == 0">
+                                <div class="ques-flex">
+                                    <div class="ques-flexlf">A</div>
+                                    <div class="ques-flexmd">111</div>
+                                    <div class="ques-flexrg">
+                                        <el-radio  label="正确"></el-radio>
+                                    </div>
+                                </div>
+                                <div class="ques-flex">
+                                    <div class="ques-flexlf">A</div>
+                                    <div class="ques-flexmd">111</div>
+                                    <div class="ques-flexrg">
+                                        <el-radio  label="正确"></el-radio>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="add_ques !== 3" class="ques-add">添加</div>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="标签:">
+                            <tags />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="图片:">
+                            <file ref="pciurls" />
+                            <!-- <el-input v-model="AddFormData.pic_urls" /> -->
+                        </el-form-item>
+                    </el-col>
+                </el-row>
 
-                    <!-- <el-radio-group v-model="AddFormData.is_show">
-                        <el-radio :label="1">是</el-radio>
-                        <el-radio :label="0">否</el-radio>
-                    </el-radio-group> -->
-                     <el-date-picker
-                            style="margin-left: 10px"
-                            v-if="AddFormData.is_show == 1"
-                            v-model="show_date"
-                            type="date"
-                            placeholder="选择日期">
-                        </el-date-picker>
-                    <!-- <el-input v-model="AddFormData.is_show" /> -->
-                </el-form-item>
-                <el-form-item label="标签:">
-                    <el-tag
-                    :key="tag"
-                    v-for="tag in dynamicTags"
-                    closable
-                    :disable-transitions="false"
-                    @close="handleClose(tag)">
-                    {{tag}}
-                    </el-tag>
-                    <el-input
-                    class="input-new-tag"
-                    v-if="inputVisible"
-                    v-model="inputValue"
-                    ref="saveTagInput"
-                    size="small"
-                    @keyup.enter.native="handleInputConfirm"
-                    @blur="handleInputConfirm"
-                    >
-                    </el-input>
-                    <el-button v-else class="button-new-tag" size="small" @click="showInput">
-                        <i class="el-icon-plus"></i>
-                    </el-button>
-
-
-
-                    <!-- <el-button @click="handleTag" type="primary" style="margin-right: 20px;">添加标签</el-button> -->
-                    <!-- <span v-for="(item,index) in AddFormData.tag_list" :key="index">{{item.title}}  </span> -->
-                    <!-- <el-input v-model="AddFormData.tag_uuids" /> -->
-                </el-form-item>
-                <el-form-item label="题型:" :required='true'>
-                     <el-radio-group v-model="AddFormData.ques_type">
-                        <el-radio :label="1">判断</el-radio>
-                        <el-radio :label="2">单选</el-radio>
-                         <el-radio :label="3">多选</el-radio>
-                        <el-radio :label="4">简答</el-radio>
-                    </el-radio-group>
-                    <!-- <el-input v-model="AddFormData.ques_type" /> -->
-                </el-form-item>
-                <el-form-item label="分析:" v-if="AddFormData.ques_type == 4">
+               <!--  <el-form-item label="分析:" v-if="AddFormData.ques_type == 4">
                     <el-input type="textarea" v-model="AddFormData.analysis" />
                 </el-form-item>
-                <el-form-item label="图片:">
-                    <file ref="pciurls" />
-                    <!-- <el-input v-model="AddFormData.pic_urls" /> -->
-                </el-form-item>
-                <!-- <el-form-item label="图片地址:">
-                    <el-input v-model="AddFormData.pic_urls" />
-                </el-form-item> -->
                 <el-form-item label="答案:" :required='true'>
                     <el-input v-model="AddFormData.answer" />
-                </el-form-item>
-                <el-form-item label="最小金额:" v-if="AddFormData.is_pay == 1">
-                    <el-input-number v-model="AddFormData.min_num" @change="handleChange" :min="1" :max="10000" label="描述文字"></el-input-number>
-                    <!-- <el-input type="number" maxLength="4" v-model="AddFormData.min_num" /> -->
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
             </div>
-            <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
-                 <el-button @click="add_show = false">取消</el-button>
+
+            <div class="drawer-footer">
+               <el-button @click="add_show = false">取消</el-button>
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
             </div>
+            <!-- <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                 <el-button @click="add_show = false">取消</el-button>
+                <el-button @click="onAddSubmit" type="primary">确定</el-button>
+            </div> -->
             <!-- <span slot="footer">
                 <el-button @click="add_show = false">取消</el-button>
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
@@ -358,6 +427,7 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
     import file from "@/components/imgUpload/upload.vue"
+    import tags from "@/components/tags/index.vue"
 
     if (!store.state.ShopQuesQuestionData) {
         Vue.set(store.state, 'ShopQuesQuestionData', {
@@ -383,9 +453,30 @@
                 // order_field:'add_time',
                 // order_sort:'desc'
             },
+            search_value: 0,
+            search_options:[
+                {value: 0,label: '标题'}
+            ],
             // 添加
             add_show:false,
             show_date: '',
+            add_ques: 0,
+            ques_options: [
+                {value: 0,label:'判断'},
+                {value: 1,label:'单选'},
+                {value: 2,label:'多选'},
+                {value: 3,label:'简答'},
+            ],
+            add_pay: 0,
+            pay_options: [
+                {value: 0,label:'免费'},
+                {value: 1,label:'付费'},
+            ],
+            add_show_value: 0,
+            show_options: [
+                {value: 0,label:'不展示'},
+                {value: 1,label:'展示'},
+            ],
             AddFormData:{
                 login_token:'',
                 title: '',
@@ -452,7 +543,8 @@
 
     export default {
          components: {
-            file
+            file,
+            tags
         },
         data() {
             return store.state.ShopQuesQuestionData;
@@ -773,6 +865,59 @@
 </script>
 
 <style scoped>
+    .ques-box {
+        width: 100%;
+        border-bottom: 1px solid #f2f2f2;
+
+    }
+
+    .ques-flex {
+        width: 100%;
+        height: 40px;
+        display: flex;
+        flex-direction: row;
+        border-right: 1px solid #f2f2f2;
+        font-size: 14px;
+        line-height: 40px;
+        color: #64676d
+    }
+
+    .ques-flexlf {
+        width: 10%;
+        height: 100%;
+        border-top: 1px solid #f2f2f2;
+        border-left: 1px solid #f2f2f2;
+        text-align: center
+    }
+
+    .ques-flexmd {
+        width: 80%;
+        height: 100%;
+        border-top: 1px solid #f2f2f2;
+        border-left: 1px solid #f2f2f2;
+        text-align: left;
+        padding-left:  10px;
+        box-sizing: border-box
+    }
+
+    .ques-flexrg {
+        width: 10%;
+        height: 100%;
+        border-top: 1px solid #f2f2f2;
+        border-left: 1px solid #f2f2f2;
+        text-align: center
+    }
+
+    .ques-add {
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+        color:  #0F7BF6;
+        cursor:pointer;
+        margin-top:  0px;
+    }
+
     .menu{
         display: inline-block;
         padding:0 16px;
@@ -781,12 +926,16 @@
 
     .page {
         height: 40px; 
-        line-height: 40px; 
+        /* line-height: 40px;  */
         text-align: right;
         position: fixed;
-        bottom: 40px;
+        bottom: 20px;
         right:40px;
         overflow: hidden;
+        /* background: #f4f8fe; */
+        /* border: 1px solid red; */
+        z-index: 999;
+        padding-top:  10px;
     }
 
     .mbstyle{
@@ -820,6 +969,40 @@
         width: 90px;
         margin-left: 10px;
         vertical-align: bottom;
+    }
+
+    .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    }
+
+    .drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
     }
 
 </style>

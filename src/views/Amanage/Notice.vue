@@ -32,23 +32,24 @@
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 150 + 'px',background: 'white'}">
              <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 @current-change="onSelectCurrRow"
                 :data="rows" 
-                stripe
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
                 :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
-                :height="height - 156"
+                :height="height - 195 - 8"
                 v-loading="loading"
                 :default-expand-all="true"
                 element-loading-text="拼命加载中"
                 element-loading-background="rgba(0, 0, 0, 0.1)"
                 :highlight-current-row="true" 
-                size="mini">
+                style="width: 100%;margin-top: 5px;" 
+                size="mini"
+                >
                 <el-table-column type="index" width="80px" label="序号"></el-table-column>
-                <el-table-column align="left" prop="title" label="标题"></el-table-column>
+                <el-table-column align="left"  show-overflow-tooltip prop="title" label="标题"></el-table-column>
                 <el-table-column align="center" show-overflow-tooltip prop="content" label="内容"></el-table-column>
                 <el-table-column align="center" prop="state" label="状态">
                     <template slot-scope="scope">
@@ -56,45 +57,17 @@
                     </template>
                 </el-table-column>
                 <el-table-column align="center" prop="is_show" label="显示"></el-table-column>
-                <!-- <el-table-column label="操作" width="230px" align="center">
-                    <template slot-scope="scope">
-                    <el-dropdown trigger="hover">
-                        <span class="el-dropdown-link">
-                            更多<i class="el-icon-arrow-down el-icon--right"></i>
-                        </span>
-                        <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click="handleEdit(scope.$index, scope.row)">
-                                <el-button
-                                size="mini"
-                                type="text"
-                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                            </el-dropdown-item>
-                            <el-dropdown-item>
-                                <el-button
-                                size="mini"
-                                type="text"
-                                @click="handleDetail(scope.$index, scope.row)">详情</el-button>
-                            </el-dropdown-item>
-                            <el-dropdown-item>
-                                <el-button
-                                size="mini"
-                                type="text"
-                                @click="handleDel(scope.$index, scope.row)">删除</el-button>
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </el-dropdown>
-                </template>
-                </el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 290 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
                     background
                     @size-change="handleSizeChange"
                     @current-change="onPageChange"
                     :current-page.sync="SearchFormData.page_num"
                     :page-size="SearchFormData.page_len"
-                    layout="prev, pager, next, jumper"
+                    :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
                     :total="total">
                 </el-pagination>
                 <!-- <el-pagination
@@ -111,32 +84,50 @@
             title="添加"
             :visible.sync="add_show"
             :direction="direction" size="50%">
-            <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
-                <el-form :model="AddFormData" label-width="80px" label-position="left" :rules="rules" style="margin-top: 10px">
-                    <el-form-item label="标题:" prop="title" required>
-                        <el-input v-model="AddFormData.title" style="width: 360px"/>
-                    </el-form-item>
-                    <el-form-item label="内容:" prop="content" required>
-                        <el-input type="textarea" :rows="8" style="width: 360px" v-model="AddFormData.content"></el-input>
-                    </el-form-item>
-                    <el-form-item label="状态:" required>
-                        <el-radio-group v-model="add_state">
-                            <el-radio :label="-1">作废</el-radio>
-                            <el-radio :label="0">待审</el-radio>
-                            <el-radio :label="1">已审</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item label="图片:">
-                        <file ref="upload" />
-                    </el-form-item>
-                     <el-form-item label="显示" :required='true' class="paystyle">
-                        <el-switch v-model="add_isshow" style="float: left;margin-top: 10px;"></el-switch>
-                        <el-form-item v-if="add_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
-                            <el-col :span="11">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="showTime" style="width: 265px;width: 165px;"></el-date-picker>
-                            </el-col>
-                        </el-form-item>
-                    </el-form-item>
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="AddFormData" label-width="80px" label-position="right" :rules="rules" style="margin-top: 10px">
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="标题:" prop="title" required>
+                                <el-input v-model="AddFormData.title"/>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="内容:" prop="content" required>
+                                <el-input type="textarea" :rows="8" v-model="AddFormData.content"></el-input>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="12">
+                            <el-form-item label="状态:" required>
+                                <el-radio-group v-model="add_state">
+                                    <el-radio :label="-1">作废</el-radio>
+                                    <el-radio :label="0">待审</el-radio>
+                                    <el-radio :label="1">已审</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                       </el-col>
+                       <el-col :span="12">
+                            <el-form-item label="显示" :required='true' class="paystyle">
+                                <el-switch v-model="add_isshow" style="float: left;margin-top: 10px;"></el-switch>
+                                <el-form-item v-if="add_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
+                                    <el-col :span="11">
+                                        <el-date-picker type="date" placeholder="选择日期" v-model="showTime" style="width: 265px;width: 165px;"></el-date-picker>
+                                    </el-col>
+                                </el-form-item>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="图片:">
+                                <file ref="upload" />
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
                     <!-- <el-form-item label="显示:">
                         <el-date-picker
                             v-model="AddFormData.is_show"
@@ -157,21 +148,50 @@
             title="编辑"
             :visible.sync="edit_show"
             :direction="direction" size="50%">
-          <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
-                <el-form :model="EditFormData" label-width="80px" label-position="left">
-                    <el-form-item label="标题:">
-                        <el-input v-model="EditFormData.title" style="width: 360px"/>
-                    </el-form-item>
-                    <el-form-item label="内容:">
-                        <el-input type="textarea" style="width: 360px" :rows="8" v-model="EditFormData.content"></el-input>
-                    </el-form-item>
-                    <el-form-item label="状态:">
-                        <el-radio-group v-model="EditFormData.state">
-                            <el-radio :label="-1">作废</el-radio>
-                            <el-radio :label="0">待审</el-radio>
-                            <el-radio :label="1">已审</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
+          <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="EditFormData" label-width="80px" label-position="right">
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="标题:">
+                                <el-input v-model="EditFormData.title" style="width: 360px"/>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="内容:">
+                                <el-input type="textarea" style="width: 360px" :rows="8" v-model="EditFormData.content"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="状态:">
+                                <el-radio-group v-model="EditFormData.state">
+                                    <el-radio :label="-1">作废</el-radio>
+                                    <el-radio :label="0">待审</el-radio>
+                                    <el-radio :label="1">已审</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-col>
+                       <el-col :span="12">
+                            <el-form-item label="显示" :required='true' class="paystyle">
+                                <el-switch v-model="add_isshow" style="float: left;margin-top: 10px;"></el-switch>
+                                <el-form-item v-if="add_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
+                                    <el-col :span="11">
+                                        <el-date-picker type="date" placeholder="选择日期" v-model="showTime" style="width: 265px;width: 165px;"></el-date-picker>
+                                    </el-col>
+                                </el-form-item>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="图片:">
+                                <file ref="upload" />
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
                     <!-- <el-form-item label="原图片:" v-if="EditFormData.imgs[0]">
                         <img style="width: 50px" :src="EditFormData.imgs[0]" alt="">
                     </el-form-item>
@@ -201,28 +221,44 @@
             title="详细"
             :visible.sync="detail_show"
             :direction="direction" size="50%">
-           <div class="draw-content" :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',margin:'0 auto',paddingLeft: '60px',paddingTop: '20px',paddingBottom: '10px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
+           <div class="draw-content" :style="{height:height - 80 +'px'}">
                 <el-form :model="EditFormData" label-width="80px" label-position="right">
-                    <el-form-item label="标题:">{{DetailFormData.title}}</el-form-item>
-                    <el-form-item v-if="DetailFormData.imgs[0]" label="图片:">
-                        <el-image 
-                            style="width: 30px; height: 30px"
-                            :src="DetailFormData.imgs[0]" 
-                            :preview-src-list="DetailFormData.imgs">
-                        </el-image>
-                        <!-- <img :src="DetailFormData.imgs[0]" style="width: 50px" alt=""> -->
-                    </el-form-item>
-                    <el-form-item  label="状态:" prop="state">
-                        <template slot-scope="scope">
-                            {{scope.state  == -1 ? '作废' : (scope.state  == 0 ? '待审' : '已审')}}
-                        </template>
-                    </el-form-item>
-                    <el-form-item label="显示:">{{DetailFormData.is_show}}</el-form-item>
-                    <el-form-item label="内容:">
-                        <div style="width: 100%;height: auto;word-wrap:break-word;text-align: left">
-                            {{DetailFormData.content}}
-                        </div>
-                    </el-form-item>
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="标题:">{{DetailFormData.title}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                             <el-form-item v-if="DetailFormData.imgs[0]" label="图片:">
+                                <el-image 
+                                    style="width: 60px; "
+                                    :src="DetailFormData.imgs[0]" 
+                                    :preview-src-list="DetailFormData.imgs">
+                                </el-image>
+                                <!-- <img :src="DetailFormData.imgs[0]" style="width: 50px" alt=""> -->
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item  label="状态:" prop="state">
+                                <template slot-scope="scope">
+                                    {{scope.state  == -1 ? '作废' : (scope.state  == 0 ? '待审' : '已审')}}
+                                </template>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12"><el-form-item label="显示:">{{DetailFormData.is_show ? DetailFormData.is_show : '否'}}</el-form-item></el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="内容:">
+                                <div style="width: 100%;height: auto;word-wrap:break-word;text-align: left">
+                                    {{DetailFormData.content}}
+                                </div>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                 </el-form>
             </div>
              <div class="drawer-footer">
@@ -478,6 +514,22 @@
 .img-load {
     cursor: pointer;
 }
+
+.drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
+    }
+    
 .drawer-footer {
          position: fixed;
         bottom: 0;
@@ -491,5 +543,24 @@
         border-top: 1px solid #F2F2F2;
         line-height: 50px;
         z-index: 999999;
+    }
+
+ .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
     }
 </style>

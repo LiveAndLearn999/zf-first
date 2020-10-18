@@ -30,19 +30,19 @@
 
         <!-- 数据表格 -->
         <!-- fontFamily: 'FZCYJ', -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 144 + 'px',background: 'white'}">
+             <!-- stripe 
+              v-loading="loading"
+              element-loading-text="拼命加载中"
+               element-loading-background="rgba(0, 0, 0, 0.1)" -->
             <el-table 
                 ref="role"
                 :data="rows"
-                 stripe
                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
                 :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
                 row-key="uuid"
-                :height="height - 156"
-                v-loading="loading"
-                :default-expand-all="true"
-                element-loading-text="拼命加载中"               
-                element-loading-background="rgba(0, 0, 0, 0.1)"
+                :height="height - 196"
+                :default-expand-all="true"              
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
@@ -73,7 +73,7 @@
                             <el-tag type="danger"> 未设置</el-tag>
                         </span>
                         <span v-else>
-                            <el-tag type="success"> 已设置</el-tag>
+                            <el-tag> 已设置</el-tag>
                         </span>
                         <!-- {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
                     </template>
@@ -229,6 +229,15 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+     import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+     NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.RoleData) {
         Vue.set(store.state, 'RoleData', {
@@ -293,12 +302,14 @@
             
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                NProgress.start();
 
                 lime.req('ShopRoleList', {
                     login_token:lime.cookie_get('login_token'),
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done()
                     this.curr_row = null;
                     this.$refs.role.setCurrentRow();
                     this.list = res.data;
@@ -330,6 +341,7 @@
                     name:'',
                     parent_uuid:'',
                 }
+                 NProgress.start();
                 // 如果选择列表数据,则获取作为父类
                 if (!util.empty(this.curr_row)) {
                     this.AddFormData.parent_uuid = this.curr_row.uuid;
@@ -345,16 +357,19 @@
                     })
                 });
                 this.add_rows = util.toTree(_rows);
+                NProgress.done()
                 this.add_show = true;
             },
             // 添加向后台提交
             onAddSubmit() {
+                NProgress.start();
                 this.AddFormData.login_token = lime.cookie_get('login_token');
                 lime.req('ShopRoleAdd', this.AddFormData).then(res => {
                     
                     this.init();
                     this.add_show = false;
                 }).catch(err => {
+                   NProgress.done()
                     this.$message.error(err.msg);
                 })
             },
@@ -366,7 +381,7 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
+                NProgress.start();
                 let _rows = [];
                 this.edit_rows = [];
                 this.list.forEach(item => {
@@ -381,7 +396,7 @@
 
                 this.edit_rows = util.toTree(_rows);
 
-
+               NProgress.done()
                 this.EditFormData.parent_uuid = this.curr_row.parent_uuid;
                 this.EditFormData.name = this.curr_row.name;
                 this.edit_show = true;
@@ -390,11 +405,12 @@
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
                 this.EditFormData.uuid        = this.curr_row.uuid;
-
+                NProgress.start();
                 lime.req('ShopRoleEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
                 }).catch(err => {
+                    NProgress.start();NProgress.done()
                     this.$message.error(err.msg);
                 });
             },
@@ -409,6 +425,7 @@
 
 
                 this.$confirm('确认删除?', '提示').then(() => {
+                    NProgress.start();
                     lime.req('ShopRoleDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
@@ -416,6 +433,7 @@
                         this.init();
                         this.$message.success('操作成功');
                     }).catch(err => {
+                       NProgress.done()
                         this.$message.error(err.msg);
                     })
                 })
@@ -427,7 +445,7 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
+                NProgress.start();
                 lime.req(
                 {
                     module:'ShopRoleSetMenu',
@@ -469,11 +487,13 @@
                                 item.checked = false;
                             }
                         })
+                       NProgress.done()
                     });
 
                     this.SetMenuList = util.toTree(res.data);
                     this.set_show = true;
                 }).catch(err => {
+                   NProgress.done()
                     this.$message.error(err.msg);
                 })
             },
@@ -564,6 +584,7 @@
             },
 
             onSetMenuSubmit() {
+                NProgress.start();
                 lime.req('ShopRoleSetMenu', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid,
@@ -573,6 +594,7 @@
                     this.init();
                     this.set_show = false;
                 }).catch(err => {
+                  NProgress.done()
                     this.$message.error(err.msg);
                 })
             }
