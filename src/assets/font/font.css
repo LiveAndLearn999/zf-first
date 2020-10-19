@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* DINHabMed */
 
 @font-face {  
@@ -5,4 +6,13 @@
     src: url('DINHabMed.ttf'); 
     font-weight: normal;  
     font-style: normal;  
+=======
+/* DINHabMed */
+
+@font-face {  
+    font-family: 'FZCYJ'; 
+    src: url('DINHabMed.ttf'); 
+    font-weight: normal;  
+    font-style: normal;  
+>>>>>>> 1d56e43ea6b161b46d322e5ba7941a16d67a2276
 }
