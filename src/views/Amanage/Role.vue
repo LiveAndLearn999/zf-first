@@ -29,24 +29,85 @@
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <!-- fontFamily: 'FZCYJ', -->
+        <div :style="{height: height - 144 + 'px',background: 'white'}">
+             <!-- stripe 
+              v-loading="loading"
+              element-loading-text="拼命加载中"
+               element-loading-background="rgba(0, 0, 0, 0.1)" -->
             <el-table 
                 ref="role"
                 :data="rows"
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
                 row-key="uuid"
-                :height="height - 60 - 48"
-                v-loading="loading"
-                :default-expand-all="true"
-                element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-
+                :height="height - 196"
+                :default-expand-all="true"              
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="角色名称"></el-table-column>
+                <!-- has_menus -->
+                <!-- <el-table-column type="index" width="80px" label="序号"></el-table-column> -->
+                <el-table-column align="left" prop="name" label="角色名称">
+                     <template slot-scope="scope">
+                        <span v-if="scope.row.has_menus == 0">
+                             <img src="@/assets/imgs/no-tree.png" style="height: 15px;margin-top:10px">
+                            {{scope.row.name}}
+                        </span>
+                        <span v-else >
+                             <img src="@/assets/imgs/tree.png" style="height: 15px;margin-top:10px">
+                            {{scope.row.name}}
+                        </span>
+                        <!-- <span v-else>已设置</span>
+                        {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
+                    </template>
+                </el-table-column>
+                <el-table-column 
+                    prop="has_menus" 
+                    label="状态" 
+                    align="center"
+                   >
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.has_menus == 0">
+                            <el-tag type="danger"> 未设置</el-tag>
+                        </span>
+                        <span v-else>
+                            <el-tag> 已设置</el-tag>
+                        </span>
+                        <!-- {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
+                    </template>
+                </el-table-column>
+                <!-- <el-table-column label="操作" width="230px" align="center">
+                    <template slot-scope="scope">
+                    <el-dropdown trigger="hover">
+                        <span class="el-dropdown-link">
+                            更多<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click="handleEdit(scope.$index, scope.row)">
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleSetMenu(scope.$index, scope.row)">设置菜单</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+                </el-table-column> -->
+
             </el-table>
         </div>
 
@@ -55,19 +116,21 @@
             title="添加"
             width="450px"
             :visible.sync="add_show">
-            <el-form :model="AddFormData" label-width="80px">
+            <el-form :model="AddFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
+                    ref="cascaderHandle"
                         clearable 
                         :options="add_rows"
-                        :props="{checkStrictly:true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
-                        placeholder="不选择则为顶级"
-                        v-model="AddFormData.parent_uuid">
+                        :props="{checkStrictly: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        placeholder="请选择"
+                        @change="close"
+                        v-model="AddFormData.parent_uuid" style="width: 330px">
                     </el-cascader>
                 </el-form-item>
 
                 <el-form-item label="角色名称:">
-                    <el-input v-model="AddFormData.name" />
+                    <el-input v-model="AddFormData.name" style="width: 330px"/>
                 </el-form-item>
 
 
@@ -84,19 +147,21 @@
             title="编辑"
             width="450px"
             :visible.sync="edit_show">
-            <el-form :model="EditFormData" label-width="80px">
+            <el-form :model="EditFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
+                    @change="closes"
+                    ref="cascaderHandles"
                         clearable 
                         :options="edit_rows"
-                        :props="{checkStrictly:true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
-                        placeholder="不选择则为顶级"
-                        v-model="EditFormData.parent_uuid">
+                        :props="{checkStrictly: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        placeholder="请选择"
+                        v-model="EditFormData.parent_uuid" style="width: 320px">
                     </el-cascader>
                 </el-form-item>
 
                 <el-form-item label="角色名称:">
-                    <el-input v-model="EditFormData.name" />
+                    <el-input v-model="EditFormData.name" style="width: 320px"/>
                 </el-form-item>
             </el-form>
 
@@ -150,7 +215,7 @@
                         </div>
                     </fieldset>
 
-                    <el-form-item>
+                    <el-form-item style="text-align: right;padding-right: 20px;box-sizing: border-box">
                         <el-button @click="onSetMenuSubmit" type="primary">设 置</el-button>
                     </el-form-item>
                 </el-form>
@@ -164,6 +229,15 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+     import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+     NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.RoleData) {
         Vue.set(store.state, 'RoleData', {
@@ -214,6 +288,12 @@
             this.init();
         },
         methods:{
+            close(val){
+                this.$refs.cascaderHandle.dropDownVisible = false;
+            },
+            closes(val){
+                this.$refs.cascaderHandles.dropDownVisible = false;
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
@@ -222,12 +302,14 @@
             
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                NProgress.start();
 
                 lime.req('ShopRoleList', {
                     login_token:lime.cookie_get('login_token'),
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done()
                     this.curr_row = null;
                     this.$refs.role.setCurrentRow();
                     this.list = res.data;
@@ -259,6 +341,7 @@
                     name:'',
                     parent_uuid:'',
                 }
+                 NProgress.start();
                 // 如果选择列表数据,则获取作为父类
                 if (!util.empty(this.curr_row)) {
                     this.AddFormData.parent_uuid = this.curr_row.uuid;
@@ -274,16 +357,19 @@
                     })
                 });
                 this.add_rows = util.toTree(_rows);
+                NProgress.done()
                 this.add_show = true;
             },
             // 添加向后台提交
             onAddSubmit() {
+                NProgress.start();
                 this.AddFormData.login_token = lime.cookie_get('login_token');
                 lime.req('ShopRoleAdd', this.AddFormData).then(res => {
                     
                     this.init();
                     this.add_show = false;
                 }).catch(err => {
+                   NProgress.done()
                     this.$message.error(err.msg);
                 })
             },
@@ -295,10 +381,9 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
+                NProgress.start();
                 let _rows = [];
                 this.edit_rows = [];
-
                 this.list.forEach(item => {
                     if (item.uuid != this.curr_row.uuid) {
                         _rows.push({
@@ -311,7 +396,7 @@
 
                 this.edit_rows = util.toTree(_rows);
 
-
+               NProgress.done()
                 this.EditFormData.parent_uuid = this.curr_row.parent_uuid;
                 this.EditFormData.name = this.curr_row.name;
                 this.edit_show = true;
@@ -320,11 +405,12 @@
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
                 this.EditFormData.uuid        = this.curr_row.uuid;
-
+                NProgress.start();
                 lime.req('ShopRoleEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
                 }).catch(err => {
+                    NProgress.start();NProgress.done()
                     this.$message.error(err.msg);
                 });
             },
@@ -339,6 +425,7 @@
 
 
                 this.$confirm('确认删除?', '提示').then(() => {
+                    NProgress.start();
                     lime.req('ShopRoleDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
@@ -346,6 +433,7 @@
                         this.init();
                         this.$message.success('操作成功');
                     }).catch(err => {
+                       NProgress.done()
                         this.$message.error(err.msg);
                     })
                 })
@@ -357,16 +445,19 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-
+                NProgress.start();
                 lime.req(
                 {
                     module:'ShopRoleSetMenu',
                     ver:'1.0.0',
                     relation_module:'ShopMenuList',
-                    relation_ver:'1.0.0'
+                    relation_ver:'1.0.0',
+                    // uuid: this.curr_row.uuid,
+                    // login_token:lime.cookie_get('login_token')
                 },
                 {
                     login_token:lime.cookie_get('login_token'),
+                    // uuid: this.curr_row.uuid,
                     role_uuid:this.curr_row.parent_uuid
                 }).then(res => {
                     // 数据初始化,所有菜单都归属不选
@@ -396,11 +487,13 @@
                                 item.checked = false;
                             }
                         })
+                       NProgress.done()
                     });
 
                     this.SetMenuList = util.toTree(res.data);
                     this.set_show = true;
                 }).catch(err => {
+                   NProgress.done()
                     this.$message.error(err.msg);
                 })
             },
@@ -491,6 +584,7 @@
             },
 
             onSetMenuSubmit() {
+                NProgress.start();
                 lime.req('ShopRoleSetMenu', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid,
@@ -500,14 +594,41 @@
                     this.init();
                     this.set_show = false;
                 }).catch(err => {
+                  NProgress.done()
                     this.$message.error(err.msg);
                 })
             }
         }
     }
 </script>
+<style lang="less">
 
+
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+        background:#f4f8fe;
+    }
+.el-table__expand-icon {
+    .el-icon-arrow-right:before {
+      content: "\e791";
+      font-size: 20px;
+    }
+  }
+
+.el-submenu__title {
+    .el-icon-arrow-down:before {
+        content: "\e791";
+        font-size: 20px;
+    }
+}
+
+.el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow{
+    -webkit-transform: rotateZ(90deg); 
+    -ms-transform: rotate(90deg);
+    transform: rotateZ(90deg); 
+}
+</style>
 <style scoped>
+@import '../../assets/font/font.css';
     .menu{
         display: inline-block;
         padding:0 16px;

@@ -56,7 +56,7 @@
                 return (store.state.AppData.width -250) / 2;
             },
             height:() => {
-                return (store.state.AppData.height - 124)/ 2;
+                return (store.state.AppData.height - 144)/ 2;
             }
         },
         mounted() {

@@ -1,7 +1,7 @@
 <!--
  * @Author: zs
  * @Date: 2020-09-10 11:35:01
- * @LastEditTime: 2020-09-17 19:55:48
+ * @LastEditTime: 2020-09-27 14:02:21
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Admin/Information.vue
@@ -14,12 +14,12 @@
         <el-col :span="6">
           <div style="padding-left:16px;">
             <i class="el-icon-s-unfold"></i>
-            <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+            <span style="padding-left:9px;font-size: 16px">{{$store.state.AdminData.active_title}}</span>
           </div>
         </el-col>
 
         <el-col :span="18">
-          <div style="text-align: right;">
+          <div style="text-align: right;font-size: 16px">
             <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
 
             <el-link
@@ -37,6 +37,9 @@
     <div style="border-top: solid 1px #f2f1f4;">
       <el-table
         :data="rows"
+        stripe
+        :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white'}" 
+        :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px'}"
         :height="height - 60 - 46 - 48"
         v-loading="loading"
         element-loading-text="加载中..."
@@ -55,22 +58,34 @@
         </el-table-column>
       </el-table>
 
-      <div class="page" :style="{width:width - 250 + 'px'}">
+      <!-- <div class="page" :style="{width:width - 250 + 'px'}">
         <el-pagination
+          background
           :current-page.sync="SearchFormData.page_num"
           @current-change="onPageChange"
           layout="prev, pager, next"
           :total="total"
         ></el-pagination>
-      </div>
+      </div> -->
     </div>
 
     <!-- 编辑 -->
-    <el-dialog title="编辑" width="650px" :visible.sync="edit_show">
+    <el-dialog title="编辑" width="380px" :visible.sync="edit_show">
         <div>
-          <el-checkbox-group v-model="checkedAry">
+          <!-- <el-checkbox-group v-model="checkedAry">
             <el-checkbox v-for="item in all_uuid" :label="item" :key="item"></el-checkbox>
-          </el-checkbox-group>
+          </el-checkbox-group> -->
+          <el-form :model="EditFormData" label-width="80px" label-position="left">
+              <el-form-item label="角色:">
+                <el-cascader 
+                      clearable 
+                      :options="edit_rows"
+                      :props="{multiple: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                      placeholder="请选择"
+                      v-model="EditFormData.checked_uuid" style="width:240px">
+                </el-cascader>
+              </el-form-item>
+          </el-form>
         </div>
       <span slot="footer">
         <el-button @click="edit_show = false">取消</el-button>
@@ -85,27 +100,21 @@ import Vue from "vue"
 import store from "@/store"
 import lime from "@/lime.js"
 import util from "@/util.js"
-import {ShopRoleList, SetShopSave} from  "@/api/request"
-
+// import {ShopRoleList, SetShopSave} from  "@/api/request"
 if (!store.state.GetShopConfigData) {
   Vue.set(store.state, 'GetShopConfigData', {
     rows: [],
     total: 0,
     loading: false,
-
     curr_row: null,
-
     SearchFormData: {
       real_name: '',
       aa: [],
       page_num: 1,
       page_len: 10,
     },
-
     edit_show: false,
     edit_rows: [],
-    EditFormData: {},
-
     ready_uuid: [],
     role_type: 'auditor',
     checkedAry: [],
@@ -113,7 +122,10 @@ if (!store.state.GetShopConfigData) {
     check_uuid: [],
     allCheck: [],
 
-    
+    edit_rows: [],
+    EditFormData: {
+      
+    }
   })
 }
 
@@ -181,7 +193,6 @@ export default {
         })
         this.role_type = row.config_key
       }
-      // console.log(row.config_key)
     },
     // 分页处理
     onPageChange (page) {
@@ -195,51 +206,86 @@ export default {
         this.$message.error('请选择一条数据')
         return
       }
-      ShopRoleList({login_token: lime.cookie_get('login_token')},res => {
-         this.allCheck = res.data
-         this.checkedAry = []
-         this.all_uuid = []
-         res.data.forEach((item, index) => { 
-          if(this.ready_uuid.includes(item.uuid, 0)) {
-            this.checkedAry.push(item.name)
-            this.all_uuid.push(item.name)
-          }else {
-            this.all_uuid.push(item.name)
-          }
+      lime.req('ShopRoleList',{
+              login_token: lime.cookie_get('login_token')
+      }).then(res => {
+              this.allCheck = res.data
+              this.checkedAry = []
+              this.all_uuid = []
 
-         })
-         // check_uuid: [],
-         // allCheck: [],
-         this.edit_show = true
+
+              let _rows = [];
+              this.edit_rows = [];
+              res.data.forEach(item => {
+                    if (item.uuid != this.curr_row.uuid) {
+                        _rows.push({
+                            name:item.name,
+                            parent_uuid:item.parent_uuid,
+                            uuid:item.uuid,
+                        });
+                    }
+                });
+                this.edit_rows = util.toTree(_rows);
+              // res.data.forEach((item, index) => { 
+              //   if(this.ready_uuid.includes(item.uuid, 0)) {
+              //     this.checkedAry.push(item.name)
+              //     this.all_uuid.push(item.name)
+              //   }else {
+              //     this.all_uuid.push(item.name)
+              //   }
+
+              // })
+              this.edit_show = true
       })
-      // this.edit_show = true
     },
     // 保存编辑提交
     onEditSubmit () {
-      console.log(this.checkedAry)
       this.check_uuid = []
       this.allCheck.forEach((item, index) => {
         if(this.checkedAry.includes(item.name, 0)) {
             this.check_uuid.push(item.uuid)
         }
       })
-      this.EditFormData.login_token = lime.cookie_get('login_token')
       let that = this
-      console.log("=====" + this.role_type)
-      lime.req(
-                {
-                    module:'SetShopSave',
-                    ver:'1.0.0',
-                    relation_module:'ShopRoleList',
-                    relation_ver:'1.0.0'
-                },
-                {
-                    login_token:lime.cookie_get('login_token'),
-                    [that.role_type]:this.check_uuid
-                }).then(res => {
-                  this.edit_show = false
-                  this.init()
-                })
+      console.log(this.EditFormData.checked_uuid)
+      lime.req('SetShopSave',{
+              login_token:lime.cookie_get('login_token'),
+              [that.role_type]:this.EditFormData.checked_uuid
+      }).then(res => {
+              this.edit_show = false
+              this.init()
+      })
+      // lime.req('SetShopSave',{
+      //         login_token:lime.cookie_get('login_token'),
+      //         [that.role_type]:this.check_uuid
+      // }).then(res => {
+      //         this.edit_show = false
+      //         this.init()
+      // })
+
+      // SetShopSave({
+      //   login_token:lime.cookie_get('login_token'),
+      //   [that.role_type]:this.check_uuid,
+      // }, res => {
+      //   this.edit_show = false
+      //   this.init()
+      // })
+
+      // lime.req(
+      //           {
+      //               module:'SetShopSave',
+      //               ver:'1.0.0',
+      //               relation_module:'ShopRoleList',
+      //               relation_ver:'1.0.0'
+      //           },
+      //           {
+      //               login_token:lime.cookie_get('login_token'),
+      //               [that.role_type]:this.check_uuid
+      //           }
+      //           ).then(res => {
+      //             this.edit_show = false
+      //             this.init()
+      //           })
       
     },
   }
@@ -258,8 +304,8 @@ export default {
   line-height: 40px;
   text-align: right;
   position: fixed;
-  bottom: 0;
-  right: 0;
+  bottom: 40px;
+  right: 40px;
   overflow: hidden;
 }
 

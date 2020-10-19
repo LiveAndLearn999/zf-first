@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:41:47
- * @LastEditTime: 2020-09-15 10:48:21
+ * @LastEditTime: 2020-09-23 08:37:17
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Egoods/Type.vue
@@ -46,7 +46,7 @@
             title="添加"
             :visible.sync="add_show"
             width="500px">
-            <el-form :model="AddFormData" label-width="120px">
+            <el-form :model="AddFormData" label-width="120px" label-position="left">
                 <el-form-item label="类型名称:" required>
                     <el-input v-model="AddFormData.type_name" />
                 </el-form-item>
@@ -63,7 +63,7 @@
             title="编辑"
             :visible.sync="edit_show"
             width="500px">
-            <el-form :model="EditFormData" label-width="120px">
+            <el-form :model="EditFormData" label-width="120px" label-position="left">
                 <el-form-item label="包装类型名称:">
                     <el-input v-model="EditFormData.type_name" @input="change($event)"/>
                 </el-form-item>
@@ -88,7 +88,6 @@
 
     if (!store.state.EbGoodsTypeData) {
         Vue.set(store.state, 'EbGoodsTypeData', {
-            rows:[],
             total:0,
             loading:false,
             curr_row:null,

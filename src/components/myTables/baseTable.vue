@@ -1,7 +1,7 @@
 <!--
  * @Author: xk
  * @Date: 2020-09-14 09:26:53
- * @LastEditTime: 2020-09-16 16:18:13
+ * @LastEditTime: 2020-09-24 18:26:57
  * @LastEditors: Please set LastEditors
  * @Description: the components of base-table
  * @FilePath: /shop/src/components/myTables/baseTable.vue
@@ -11,30 +11,57 @@
        <div style="border-top: solid 1px #f2f1f4;">
             <el-table 
                 :data="rows"
+                stripe
+               :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400',height: '48px'}"
                 :height="height - 60 - 46 - 48"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+                
+                element-loading-background="rgba(0, 0, 0, 0.1)"
 
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
-                size="mini">
-                    <el-table-column type="index" label="#"></el-table-column>
+                size="mini" >
+                    <el-table-column type="index" width="80px" label="序号"></el-table-column>
                     <template v-for="(column, index) in columns">
-                         <el-table-column :key="index" :prop="column.prop" :label="column.label"></el-table-column>
+                         <el-table-column  show-overflow-tooltip  align="center" :key="index" :prop="column.prop" :label="column.label">
+                             <span v-if="column.showSt">
+                                 <!-- slot-scope="scope" -->
+                                 <!-- stateFormat(scope.row.state) -->
+                                 <template>
+                                    {{column.status}}
+                                    <!-- {{scope.row.status + '111111'}} -->
+                                </template>
+                             </span>
+                         </el-table-column>
                     </template>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
+            <div class="page" :style="{width:width - 290 + 'px'}">
+                 <el-pagination
+                 background
+                @current-change="onPageChange"
+                :current-page.sync="page_num"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                 <!-- <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                layout="prev, pager, next, jumper"
+                :total="total">
+                </el-pagination> -->
+                <!-- <el-pagination
                     :current-page.sync="page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div> 
      
@@ -84,6 +111,17 @@ export default {
        },
        onPageChange(page) {
           this.$emit('pageChange', page)
+      },
+      stateFormat(state) {
+          if (state == 0) {
+                    return '未开始';
+                } else if (state == 1) {
+                    return '处理中';
+                } else if (state == 2){
+                    return '已处理';
+                }else{
+                    return '已接收';
+                }
       }
    }
   };

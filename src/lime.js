@@ -1,6 +1,6 @@
-
 const config = {
-    host:process.env.NODE_ENV == 'development' ? 'http://test-open-admin.ggjtaq.com' : 'https://open.ggjtaq.com',
+    // host:process.env.NODE_ENV == 'development' ? 'http://test-open-admin.ggjtaq.com' : 'https://open.ggjtaq.com',
+    host:process.env.NODE_ENV == 'development' ? 'http://test-open-admin.ggjtaq.com' : 'http://test-open-admin.ggjtaq.com',
     appid:'20200807111155590064',
     secret:'542d2e280b6a9f2391ed2408f5fee844',
     ver:'1.0.0',

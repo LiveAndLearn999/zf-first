@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 11:07:57
- * @LastEditTime: 2020-09-16 16:05:31
+ * @LastEditTime: 2020-09-25 16:50:55
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Amanage/Notice.vue
@@ -13,11 +13,11 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+                        <span style="padding-left:9px;font-size: 16px">{{$store.state.AdminData.active_title}}</span>
                     </div>
                 </el-col>
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right; font-size: 14px">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <el-link
                             class="menu" 
@@ -32,125 +32,231 @@
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 150 + 'px',background: 'white'}">
+             <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 @current-change="onSelectCurrRow"
                 :data="rows" 
-                :height="height - 60 - 48"
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
+                :height="height - 195 - 8"
                 v-loading="loading"
                 :default-expand-all="true"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+                element-loading-background="rgba(0, 0, 0, 0.1)"
                 :highlight-current-row="true" 
-                size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标题"></el-table-column>
-                <el-table-column prop="content" label="内容"></el-table-column>
-                <el-table-column prop="imgs" label="附件"></el-table-column>
-                <el-table-column prop="state" label="状态">
+                style="width: 100%;margin-top: 5px;" 
+                size="mini"
+                >
+                <el-table-column type="index" width="80px" label="序号"></el-table-column>
+                <el-table-column align="left"  show-overflow-tooltip prop="title" label="标题"></el-table-column>
+                <el-table-column align="center" show-overflow-tooltip prop="content" label="内容"></el-table-column>
+                <el-table-column align="center" prop="state" label="状态">
                     <template slot-scope="scope">
                         {{stateFormat(scope.row.state)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="is_show" label="显示"></el-table-column>
+                <el-table-column align="center" prop="is_show" label="显示"></el-table-column>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
         <!-- 添加 -->
-        <el-dialog 
+        <el-drawer
             title="添加"
-            width="450px"
-            :visible.sync="add_show">
-            <el-form :model="AddFormData" label-width="80px">
-
-                <el-form-item label="标题:" required>
-                    <el-input v-model="AddFormData.title" />
-                </el-form-item>
-                <el-form-item label="内容:" required>
-                    <el-input type="textarea" v-model="AddFormData.content"></el-input>
-                </el-form-item>
-                <!-- <el-form-item label="图片:">
-                    <input type="file" @change="getImg">
-                </el-form-item> -->
-                <el-form-item label="状态:" required>
-                    <!-- <el-input v-model="AddFormData.state" /> -->
-                    <!-- <el-switch v-model="AddFormData.state"></el-switch> -->
-                    <!-- <el-radio v-model="AddFormData.state" label="-1">作废</el-radio>
-                    <el-radio v-model="AddFormData.state" label="0">待审</el-radio>
-                    <el-radio v-model="AddFormData.state" label="1">已审</el-radio> -->
-                    <el-radio-group v-model="AddFormData.state">
-                        <el-radio :label="-1">作废</el-radio>
-                        <el-radio :label="0">待审</el-radio>
-                        <el-radio :label="1">已审</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                 <!-- <el-form-item label="显示:">
-                    <el-switch v-model="AddFormData.is_show"></el-switch>
-                </el-form-item> -->
-                
-            </el-form>
-
-            <span slot="footer">
-                <el-button @click="add_show = false">取消</el-button>
-                <el-button type="primary" @click="onAddSubmit">确认</el-button>
-            </span>
-        </el-dialog>
+            :visible.sync="add_show"
+            :direction="direction" size="50%">
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form ref="addform" :model="AddFormData" label-width="80px" label-position="right" :rules="rules" style="margin-top: 10px">
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="标题:" prop="title">
+                                <el-input v-model="AddFormData.title"/>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="内容:" prop="content">
+                                <el-input type="textarea" :rows="8" v-model="AddFormData.content"></el-input>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="12">
+                            <el-form-item label="状态:" required>
+                                <el-select v-model="state_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in state_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                            </el-form-item>
+                       </el-col>
+                       <el-col :span="12">
+                            <el-form-item label="显示"  class="paystyle">
+                                <el-switch v-model="add_isshow" style="float: left;margin-top: 10px;"></el-switch>
+                                <el-form-item v-if="add_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
+                                    <el-col :span="11">
+                                        <el-date-picker type="date" placeholder="选择日期" v-model="showTime" style="width: 265px;width: 165px;"></el-date-picker>
+                                    </el-col>
+                                </el-form-item>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="图片:">
+                                <file ref="upload" />
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                    <!-- <el-form-item label="显示:">
+                        <el-date-picker
+                            v-model="AddFormData.is_show"
+                            type="date"
+                            placeholder="选择日期时间">
+                        </el-date-picker>
+                    </el-form-item> -->
+                </el-form>
+            </div>
+            <div class="drawer-footer">
+                    <el-button @click="add_show = false">取消</el-button>
+                    <el-button @click="onAddSubmit" type="primary">确定</el-button>
+                </div>
+        </el-drawer>
 
          <!-- 编辑 -->
-        <el-dialog 
+         <el-drawer
             title="编辑"
-            width="450px"
-            :visible.sync="edit_show">
-            <el-form :model="EditFormData" label-width="80px">
-
-                <el-form-item label="标题:">
-                    <el-input v-model="EditFormData.title" @input="change($event)"/>
-                </el-form-item>
-                <el-form-item label="内容:">
-                    <el-input type="textarea" v-model="EditFormData.content" @input="change($event)"></el-input>
-                </el-form-item>
-                <el-form-item label="状态:">
-                    <!-- <el-input v-model="EditFormData.state" @input="change($event)"/> -->
-                    <!-- <el-radio v-model="EditFormData.state" label="-1">作废</el-radio>
-                    <el-radio v-model="EditFormData.state" label="0">待审</el-radio>
-                    <el-radio v-model="EditFormData.state" label="1">已审</el-radio> -->
-                    <el-radio-group v-model="EditFormData.state">
-                        <el-radio :label="-1">作废</el-radio>
-                        <el-radio :label="0">待审</el-radio>
-                        <el-radio :label="1">已审</el-radio>
-                    </el-radio-group>
-                    <!-- <el-switch v-model="EditFormData.state"></el-switch> -->
-                </el-form-item>
-
-            </el-form>
-
-            <span slot="footer">
-                <el-button @click="edit_show = false">取消</el-button>
-                <el-button type="primary" @click="onEditSubmit">确认</el-button>
-            </span>
-        </el-dialog>
+            :visible.sync="edit_show"
+            :direction="direction" size="50%">
+          <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="EditFormData" label-width="80px" label-position="right" ref="editform" :rules="rules">
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item prop="title" label="标题:">
+                                <el-input v-model="EditFormData.title" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="内容:" prop="content">
+                                <el-input type="textarea"  :rows="8" v-model="EditFormData.content"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="状态:">
+                                 <el-select v-model="states_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in state_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                            </el-form-item>
+                        </el-col>
+                       <el-col :span="12">
+                            <el-form-item label="显示" :required='true' class="paystyle">
+                                <el-switch v-model="edit_isshow" style="float: left;margin-top: 10px;"></el-switch>
+                                <el-form-item v-if="edit_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
+                                    <el-col :span="11">
+                                        <el-date-picker type="date" placeholder="选择日期" v-model="editTime" style="width: 265px;width: 165px;"></el-date-picker>
+                                    </el-col>
+                                </el-form-item>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                   <el-row>
+                       <el-col :span="24">
+                            <el-form-item label="图片:">
+                                <file ref="uploads" :fileListss="EditFormData.imgs"/>
+                            </el-form-item>
+                       </el-col>
+                   </el-row>
+                </el-form>
+            </div>
+            <div class="drawer-footer">
+                    <el-button @click="edit_show = false">取消</el-button>
+                    <el-button @click="onEditSubmit" type="primary">确定</el-button>
+                </div>
+        </el-drawer>
 
         <!-- 详细 -->
-        <el-dialog 
-            title=""
-            width="450px"
-            :visible.sync="detail_show">
-            <el-form  label-width="80px">
-                <el-form-item label="标题:">{{DetailFormData.title}}</el-form-item>
-                <el-form-item label="内容:">{{DetailFormData.content}}</el-form-item>
-                <el-form-item label="状态:">{{DetailFormData.state == 0 ? '待审' : (DetailFormData.state == 1 ? '已审' : '作废')}}</el-form-item>
-            </el-form>
-        </el-dialog>
+        <el-drawer
+            title="详细"
+            :visible.sync="detail_show"
+            :direction="direction" size="50%">
+           <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="DetailFormData" label-width="80px" label-position="right">
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="标题:">{{DetailFormData.title}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                             <el-form-item label="图片:">
+                                <el-image 
+                                v-if="DetailFormData.imgs[0]"
+                                    style="width: 60px; "
+                                    :src="DetailFormData.imgs[0]" 
+                                    :preview-src-list="DetailFormData.imgs">
+                                </el-image>
+                                <span v-else>未上传</span>
+                                <!-- <img :src="DetailFormData.imgs[0]" style="width: 50px" alt=""> -->
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item  label="状态:" prop="state">
+                                <template slot-scope="scope">
+                                    {{scope.state  == -1 ? '作废' : (scope.state  == 0 ? '待审' : '已审')}}
+                                </template>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12"><el-form-item label="显示:">{{DetailFormData.is_show ? DetailFormData.is_show : '否'}}</el-form-item></el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="内容:">
+                                <div style="width: 100%;height: auto;word-wrap:break-word;text-align: left">
+                                    {{DetailFormData.content}}
+                                </div>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+             <div class="drawer-footer">
+                    <el-button @click="detail_show = false" type="primary">关闭</el-button>
+                </div>
+        </el-drawer>
 
 
         
@@ -164,14 +270,34 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
     import { noticeList, noticeAdd , noticeDel, noticeEdit} from "@/api/request"
+    // import file from "@/components/imgUpload/upload.vue"
+     import file from "@/components/imgUpload/mutiimg.vue"
 
     if (!store.state.NoticeData) {
         Vue.set(store.state, 'NoticeData', {
+            editTime: '',
+            showTime:'',
+            edit_isshow: false,
+            state_value: 0,
+            states_value: 0,
+            state_options: [
+                {value: 0, label:'作废'},
+                {value: 1, label:'待审'},
+                {value: 2, label:'已审'}
+            ],
             list:[],
             rows:[],
             total:0,
             loading:false,
             curr_row:null, // 当前选中行
+            rules: {
+                      title: [
+                        { required: true, message: '标题必填', trigger: 'blur' }
+                      ],
+                      content: [
+                        {required: true, message: '内容必填', trigger: 'blur' }
+                      ]
+                  },
             SearchFormData:{
                 name:'',
                 page_num:1,
@@ -182,7 +308,11 @@
             search_show:false,
             // 添加
             add_show:false,
-            AddFormData:{},
+            AddFormData:{
+                is_show: new Date()
+            },
+            showTime: new Date(),
+            add_state: -1,
             // 编辑
             edit_show:false,
             EditFormData:{
@@ -192,12 +322,19 @@
             delete_show: false,
             //详细
             detail_show: false,
-            DetailFormData: {}
+            DetailFormData: {
+                imgs: []
+            },
+            direction: 'rtl',
+            add_isshow: false
             
         });
     }
 
     export default {
+        components: {
+            file
+        },
         data() {
             return store.state.NoticeData
         },
@@ -263,25 +400,48 @@
                 this.SearchFormData.page_num = page;
                 this.init();
             },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             // 添加,
             handleAdd() {
                 this.add_show = true;
+                this.AddFormData = {}
             },
             onAddSubmit() {
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                let pam = {
-                    content: this.AddFormData.content,
-                    title: this.AddFormData.title,
-                    login_token: this.AddFormData.login_token,
-                    // state: this.AddFormData.state ? 1 : 0?
-                    state: this.AddFormData.state 
-                }
-                noticeAdd(pam,res => {
-                   this.init();
-                   this.add_show = false;
-                }).catch(err => {
-                    this.$message.error(err.msg);
+                this.AddFormData.state = this.state_value - 0 - 1
+                this.$refs['addform'].validate((valid) => {
+                    if (valid) {
+                        if(!this.$refs.upload.fileListss[0]){
+                             this.$confirm('确定不上传图片?', '提示').then(() => {
+                                noticeAdd(this.AddFormData,res => {
+                                    this.init();
+                                    this.add_show = false;
+                                }).catch(err => {
+                                    this.$message.error(err.msg);
+                                })
+                                return;
+                            }).catch( err => {
+                                return;
+                            })
+                        }
+                        // this.AddFormData.imgs  = [this.$refs.upload.img_url];
+                        this.AddFormData.imgs  = this.$refs.upload.fileListss;
+                         this.AddFormData.is_show = this.add_isshow ? util.eleDate(this.showTime) : '0'
+                        // this.AddFormData.is_show = this.AddFormData.is_show.getFullYear() + '-' + (this.AddFormData.is_show.getMonth() + 1) + '-' + this.AddFormData.is_show.getDate()
+                        noticeAdd(this.AddFormData,res => {
+                           this.init();
+                           this.add_show = false;
+                        }).catch(err => {
+                            this.$message.error(err.msg);
+                        })
+                    }else {
+                        return false
+                        console.log(999)
+                    }
                 })
+                
             },
             // 删除
             handleDel() {
@@ -312,10 +472,17 @@
                     this.$message.error('请选择一条数据');
                     return false;
                 }
-                this.EditFormData.title = this.curr_row.title;
-                this.EditFormData.content = this.curr_row.content;
-                this.EditFormData.state = this.curr_row.state;
-                this.EditFormData.uuid  = this.curr_row.uuid;
+                // uploadedt
+
+                this.EditFormData = this.curr_row
+                this.states_value = this.curr_row.state +  1
+                this.edit_isshow = this.curr_row.is_show - 0 ? true : false
+                // editTime edit_isshow
+                console.log(this.EditFormData)
+                // this.EditFormData.title = this.curr_row.title;
+                // this.EditFormData.content = this.curr_row.content;
+                // this.EditFormData.state = this.curr_row.state;
+                // this.EditFormData.uuid  = this.curr_row.uuid;
                 this.edit_show = true;
             },
             onEditSubmit() {
@@ -323,14 +490,24 @@
                    login_token:lime.cookie_get('login_token'),
                    title:this.EditFormData.title,
                    content:this.EditFormData.content,
-                   state: this.EditFormData.state,
-                   uuid : this.EditFormData.uuid 
+                   state: this.states_value - 1,
+                   uuid : this.EditFormData.uuid,
+                   is_show: this.edit_isshow ? util.eleDate(this.editTime) : '0',
+                   imgs: this.$refs.uploads.fileListss
+                //    imgs: [this.$refs.uploadedt.img_url],
+                //    is_show: this.EditFormData.is_show.getFullYear() + '-' + (this.EditFormData.is_show.getMonth() + 1) + '-' + this.EditFormData.is_show.getDate()
                 }
-                noticeEdit(pam, res => {
+                 this.$refs['editform'].validate((valid) => {
+                    if (valid) {
+                        noticeEdit(pam, res => {
                     this.edit_show = false;
                     this.init();
                 }).catch(err => {
                     this.$message.error(err.msg);
+                })
+                    }else {
+                        return false
+                    }
                 })
             },
             //详细
@@ -339,10 +516,11 @@
                     this.$message.error('请选择一条数据');
                     return false;
                 }
+                this.DetailFormData = this.curr_row
                 this.detail_show = true;
-                this.DetailFormData.title = this.curr_row.title;
-                this.DetailFormData.content = this.curr_row.content;
-                this.DetailFormData.state = this.curr_row.state;
+                // this.DetailFormData.title = this.curr_row.title;
+                // this.DetailFormData.content = this.curr_row.content;
+                // this.DetailFormData.state = this.curr_row.state;
             },
             onDetailSubmit() {
                 console.log('submit')
@@ -353,7 +531,63 @@
     }
 </script>
 
+<style>
+    .el-image-viewer__mask {
+        opacity: 1!important;
+    }
+</style>
 <style scoped>
 @import '../../assets/styles/common.css';
+.img-load {
+    cursor: pointer;
+}
 
+.drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
+    }
+    
+.drawer-footer {
+         position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999999;
+    }
+
+ .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    }
 </style>

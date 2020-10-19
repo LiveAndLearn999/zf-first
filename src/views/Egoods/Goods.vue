@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:38:37
- * @LastEditTime: 2020-09-15 10:15:19
+ * @LastEditTime: 2020-09-23 08:34:52
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /shop/src/views/Egoods/Goods.vue
@@ -15,14 +15,14 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right;font-size: 14px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
 
@@ -46,7 +46,7 @@
             title="添加"
             :visible.sync="add_show"
             width="500px">
-            <el-form :model="AddFormData" label-width="120px">
+            <el-form :model="AddFormData" label-width="120px" label-position="left">
                 <el-form-item label="货物名称:" required>
                     <el-input v-model="AddFormData.name" />
                 </el-form-item>
@@ -64,9 +64,9 @@
             title="编辑"
             :visible.sync="edit_show"
             width="500px">
-            <el-form :model="EditFormData" label-width="120px">
+            <el-form :model="EditFormData" label-width="120px" label-position="left">
                 <el-form-item label="货物名称:">
-                    <el-input v-model="EditFormData.name" />
+                    <el-input v-model="EditFormData.name" @input="change($event)"/>
                 </el-form-item>
             </el-form>
 
@@ -78,10 +78,10 @@
 
          <!-- 详细 -->
         <el-dialog  
-            title=""
+            title="详细"
             :visible.sync="detail_show"
             width="500px">
-            <el-form :model="DetailFormData" label-width="120px">
+            <el-form :model="DetailFormData" label-width="120px" label-position="left">
                 <el-form-item label="货物名称:">{{DetailFormData.name}}</el-form-item>
                 <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
                 <el-form-item label="修改时间:">{{DetailFormData.last_time}}</el-form-item>
@@ -139,6 +139,9 @@
                 this.init()
         },
         methods: {
+            change(e) {
+                this.$forceUpdate()
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
@@ -255,4 +258,9 @@
 
 <style scoped>
    @import '../../assets/styles/common.css'; 
+   .menu{
+        display: inline-block;
+        padding:0 16px;
+        text-align: center;
+    }
 </style>

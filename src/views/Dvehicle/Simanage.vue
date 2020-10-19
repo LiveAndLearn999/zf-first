@@ -126,7 +126,6 @@
 
     if (!store.state.SimanageData) {
         Vue.set(store.state, 'SimanageData', {
-            rows:[],
             total:0,
             charge_show: false,
             loading:false,
