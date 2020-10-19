@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!--
  * @Author: your name
  * @Date: 2020-09-24 11:36:40
@@ -55,61 +54,3 @@ export default {
 </style>>
 
 
-=======
-<!--
- * @Author: your name
- * @Date: 2020-09-24 11:36:40
- * @LastEditTime: 2020-09-24 13:41:44
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /shop/src/components/choosePeople/choosePeock.vue
--->
-<template>
-    <span>
-        <el-select
-            v-model="people_value"
-            @change="chosePeople"
-            multiple
-            placeholder="请选择参与人">
-                <el-option
-                v-for="item in peopleAry"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-                </el-option>
-        </el-select>
-    </span>
-</template>
-<script>
-import lime from "@/lime.js";
-export default {
-     name: "chooseAre",
-     data() {
-        return {
-           people_value: '',
-           peopleAry: [],
-           people_uuid: ''
-        }
-     },
-     mounted() {
-         lime.req('EbShopListCertificate',{login_token : lime.cookie_get('login_token')}).then(res => {
-            this.peopleAry = res.data.rows.map(v => {
-                return {value: v.uuid, label: v.name, ...v}
-            });
-        })
-     },
-     methods: {
-        chosePeople(dd) {
-            console.log(dd)
-            this.people_uuid = dd
-        },
-        
-     }
-}
-</script>
-<style scoped>
-    
-</style>>
-
-
->>>>>>> 1d56e43ea6b161b46d322e5ba7941a16d67a2276
