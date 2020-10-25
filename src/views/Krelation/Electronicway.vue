@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!--
  * @Author: your name
  * @Date: 2020-09-10 17:49:07
@@ -228,4 +229,30 @@
 
 <style scoped>
     @import '../../assets/styles/common.css';
+=======
+<!--
+ * @Author: your name
+ * @Date: 2020-09-17 08:36:10
+ * @LastEditTime: 2020-09-17 08:36:48
+ * @LastEditors: your name
+ * @Description: In User Settings Edit
+ * @FilePath: /shop/src/views/Krelation/Electronicway.vue
+-->
+<template>
+    <h1>{{cpname}}</h1>
+</template>
+<script>
+    export default {
+        data() {
+            return {
+               cpname: '电子运单'
+            }
+        },
+        
+    }
+</script>
+
+<style scoped>
+    
+>>>>>>> 1f702aa4e73375b5b4e4a49a41d31abce6883975
 </style>

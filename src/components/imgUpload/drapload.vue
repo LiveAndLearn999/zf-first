@@ -1,6 +1,11 @@
 <template>
+<<<<<<< HEAD
     <span class="dd" style="display: inline-block;width: 240px">
                 <el-upload drag :multiple="false" :show-file-list="false"  :http-request="uploadFile" action="" :on-remove="uploadRemove">
+=======
+    <span style="display: inline-block;width: 240px">
+                <el-upload drag :multiple="false"  :http-request="uploadFile" action="" :on-remove="uploadRemove">
+>>>>>>> 1f702aa4e73375b5b4e4a49a41d31abce6883975
                 	<!-- :auto-upload="false" -->
                      <img v-if="img_url" :src="img_url" alt="" style="width: 240px">
                     <img v-else-if="imgUrl" :src="imgUrl" alt="" style="width: 240px">
@@ -69,6 +74,7 @@ export default {
      	}
      }
  }
+<<<<<<< HEAD
 </script>
 <style>
      .dd .el-upload-dragger {
@@ -80,3 +86,6 @@ export default {
     border: 1px dashed #d9d9d9; */
     }
 </style>
+=======
+</script>
+>>>>>>> 1f702aa4e73375b5b4e4a49a41d31abce6883975
