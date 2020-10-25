@@ -10,17 +10,17 @@
     <!-- <h1>{{cpname}}</h1> -->
         <div v-wechat-title="$route.meta.title">
             <!-- 菜单 -->
-            <div style="height: 46px; line-height: 46px; overflow: hidden;">
+            <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
                     <el-row>
                         <el-col :span="6">
                         <div style="padding-left:16px;">
                             <i class="el-icon-s-unfold"></i>
-                            <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+                            <span style="padding-left:9px;font-size: 16px">{{$store.state.AdminData.active_title}}</span>
                         </div>
                         </el-col>
 
                         <el-col :span="18">
-                        <div style="text-align: right;">
+                        <div style="text-align: right;font-size: 14px">
                             <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
 
                             <el-link
@@ -34,19 +34,34 @@
                     </el-row>
             </div>
 
+             <!-- <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
+                <el-select v-model="search_value" placeholder="请选择" style="width: 100px;margin-right: 10px"  size="small">
+                            <el-option
+                            v-for="item in search_options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select> 
+                <el-input v-if="search_value == 0" v-model="SearchFormData.name" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
+        </div> -->
+
             <!-- 数据表格 -->
-            <div style="border-top: solid 1px #f2f1f4;">
+            <div :style="{height: height - 190 - 20 + 65 + 'px',background: 'white'}">
+                <!-- element-loading-text="加载中..."
+                    element-loading-spinner="el-icon-loading"
+                    element-loading-background="rgba(0, 0, 0, 0.8)" -->
                 <el-table
                     :data="rows"
-                    :height="height - 60 - 46 - 48"
+                    :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
+                    :height="height - 195 - 3"
                     v-loading="loading"
-                    element-loading-text="加载中..."
-                    element-loading-spinner="el-icon-loading"
-                    element-loading-background="rgba(0, 0, 0, 0.8)"
                     @sort-change="onSortChange"
                     :highlight-current-row="true"
                     @current-change="onSelectRow"
-                    style="width: 100%; height:60px;"
+                    style="width: 100%;"
                     size="mini"
                 >
                     <el-table-column type="index" label="#"></el-table-column>
@@ -61,13 +76,24 @@
                     </el-table-column> -->
                 </el-table>
 
-                <div class="page" :style="{width:width - 250 + 'px'}">
+                <div class="page" :style="{width:width - 280 + 'px'}">
                     <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                   :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+                    </el-pagination>
+                    <!-- <el-pagination
+                    background
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total"
-                    ></el-pagination>
+                    ></el-pagination> -->
                 </div>
             </div>
 
@@ -110,16 +136,19 @@
             <!-- 详细 -->
             <el-dialog title="详细" width="450px" :visible.sync="detail_show">
                 <div>
-                        <el-form :model="DetailFormData" label-width="120px" label-position="left">
+                        <el-form :model="DetailFormData" label-width="100px" label-position="right">
                             <el-form-item label="企业名称:">{{DetailFormData.shop_name}}</el-form-item>
-                            <el-form-item label="是否被选中:">{{DetailFormData.is_select}}</el-form-item>
-                            <el-form-item label="排查项检查项集合:">{{DetailFormData.check_list}}</el-form-item>
-                            <el-form-item label="状态:">{{DetailFormData.status}}</el-form-item>
+                            <el-form-item label="是否被选中:">{{DetailFormData.is_select == 1? '是' : '否'}}</el-form-item>
+                           <!--  <el-form-item label="排查项检查项集合:">
+                                {{DetailFormData.check_list}}
+                                <div v-for="item in DetailFormData.check_list" :key="item.uuid">{{item.add_time}}</div>
+                            </el-form-item> -->
+                            <el-form-item label="状态:">{{DetailFormData.status == 1 ? '通过' : '----'}}</el-form-item>
                             <el-form-item label="名称:">{{DetailFormData.name}}</el-form-item>
                         </el-form>
                         </div>
                     <span slot="footer">
-                        <el-button type="primary" @click="detail_show = false">确定</el-button>
+                        <el-button type="primary" @click="detail_show = false">关闭</el-button>
                     </span>
             </el-dialog>
 
@@ -130,10 +159,22 @@
     import store from "@/store"
     import lime from "@/lime.js"
     import util from "@/util.js"
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     export default {
         data() {
             return {
+                search_options: [
+                    {value: 0,label: '状态'}
+                ],
                 cpname: '隐患排查',
                 rows: [],
                 total: 0,
@@ -144,6 +185,7 @@
                     aa: [],
                     page_num: 1,
                     page_len: 10,
+
                 },
                 add_show: false,
                 AddFormData: {},
@@ -171,24 +213,34 @@
             this.init()
         },
         methods: {
+            // 搜索提交
+            onSearchSubmit(){
+                // this.SearchFormData.page_num = 1;
+                this.init();
+            },
+
+            handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 按钮点击 menu: 参数数据 local是否本地程序
             onSubMenu (menu, local = false) {
                 util.submenu(menu, this, lime.cookie_get('login_token'), local)
             },
             // 数据初始化
             init () {
-                this.loading = true
+                // this.loading = true
+                NProgress.start();
                 lime.req('VcShopTemplatePublicList', {
                     login_token: lime.cookie_get('login_token')
                 }).then(res => {
                     console.log(res.data)
-                    this.loading = false
+                    // this.loading = false
+                    NProgress.done();
                     this.rows = res.data.rows
                     this.total = res.data.total
                 })
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false
+                    // this.loading = false
+                    NProgress.done();
                 }, 10000)
             },
             // 表格数据刷新
@@ -285,14 +337,18 @@
         text-align: center;
     }
 
-    .page {
-        height: 40px;
-        line-height: 40px;
+      .page {
+        height: 40px; 
+        /* line-height: 40px;  */
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right: 0;
+        bottom: 20px;
+        right:40px;
         overflow: hidden;
+        /* background: #f4f8fe; */
+        /* border: 1px solid red; */
+        z-index: 999;
+        padding-top:  10px;
     }
 
     .dialog-box {

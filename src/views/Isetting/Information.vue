@@ -9,17 +9,17 @@
 <template>
   <div v-wechat-title="$route.meta.title">
     <!-- 菜单 -->
-    <div style="height: 46px; line-height: 46px; overflow: hidden;">
+    <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
       <el-row>
         <el-col :span="6">
           <div style="padding-left:16px;">
             <i class="el-icon-s-unfold"></i>
-            <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+            <span style="padding-left:9px;font-size: 16px">{{$store.state.AdminData.active_title}}</span>
           </div>
         </el-col>
 
         <el-col :span="18">
-          <div style="text-align: right;">
+          <div style="text-align: right;font-size: 16px">
             <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
 
             <el-link
@@ -34,14 +34,16 @@
     </div>
 
     <!-- 数据表格 -->
-    <div style="border-top: solid 1px #f2f1f4;">
-      <el-table
-        :data="rows"
-        :height="height - 60 - 46 - 48"
-        v-loading="loading"
+    <div :style="{height: height - 190  + 45 + 'px',background: 'white'}">
+        <!-- v-loading="loading"
         element-loading-text="加载中..."
         element-loading-spinner="el-icon-loading"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
+        element-loading-background="rgba(0, 0, 0, 0.8)" -->
+      <el-table
+        :data="rows"
+       :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
+        :height="height - 195 - 3"
         :highlight-current-row="true"
         @current-change="onSelectRow"
         style="width: 100%; height:60px;"
@@ -55,14 +57,15 @@
         </el-table-column>
       </el-table>
 
-      <div class="page" :style="{width:width - 250 + 'px'}">
+      <!-- <div class="page" :style="{width:width - 250 + 'px'}">
         <el-pagination
+          background
           :current-page.sync="SearchFormData.page_num"
           @current-change="onPageChange"
           layout="prev, pager, next"
           :total="total"
         ></el-pagination>
-      </div>
+      </div> -->
     </div>
 
     <!-- 编辑 -->
@@ -96,6 +99,15 @@ import Vue from "vue"
 import store from "@/store"
 import lime from "@/lime.js"
 import util from "@/util.js"
+import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 // import {ShopRoleList, SetShopSave} from  "@/api/request"
 if (!store.state.GetShopConfigData) {
   Vue.set(store.state, 'GetShopConfigData', {
@@ -158,18 +170,21 @@ export default {
 
     // 数据初始化
     init () {
-      this.loading = true
+      // this.loading = true
+      NProgress.start();
       lime.req('SetShopDetail', {
         login_token: lime.cookie_get('login_token')
       }).then(res => {
         console.log(res.data)
-        this.loading = false
+        // this.loading = false
+        NProgress.done();
         this.rows = res.data.config
         this.total = this.rows.length
       })
       // 超时关闭遮罩层
       setTimeout(() => {
-        this.loading = false
+        // this.loading = false
+        NProgress.done();
       }, 10000)
     },
 
@@ -300,8 +315,8 @@ export default {
   line-height: 40px;
   text-align: right;
   position: fixed;
-  bottom: 0;
-  right: 0;
+  bottom: 40px;
+  right: 40px;
   overflow: hidden;
 }
 

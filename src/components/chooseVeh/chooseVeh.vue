@@ -34,6 +34,7 @@ export default {
      },
      mounted() {
          lime.req('EbShopVehicleList',{login_token : lime.cookie_get('login_token')}).then(res => {
+             this.veh_value = res.data.rows[0].uuid
             this.vehAry = res.data.rows.map(v => {
                 return {value: v.uuid, label: v.plate_number, ...v}
             });

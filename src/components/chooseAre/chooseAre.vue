@@ -9,21 +9,55 @@
 <template>
     <div>
         <div>
-            <el-select
-            v-model="provice_value"
-            @change="choseProvince"
-            placeholder="请选择省">
-                <el-option
-                    v-for="item in proviceAry"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                </el-option>
-        </el-select>
+           <el-row>
+               <el-col :span="8">
+                    <el-select
+                        v-model="provice_value"
+                        @change="choseProvince"
+                        placeholder="请选择省">
+                            <el-option
+                                v-for="item in proviceAry"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                    </el-select>
+               </el-col>
+               <el-col :span="8">
+                    <el-select 
+                        v-if="showCity"
+                        style=""
+                        v-model="city_value"
+                        @change="choseCity"
+                        placeholder="请选择市">
+                            <el-option
+                                v-for="item in cityAry"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                    </el-select>
+               </el-col>
+               <el-col :span="8">
+                   <el-select
+                    v-if="showArea"
+                    style=""
+                    v-model="area_value"
+                    @change="choseArea"
+                    placeholder="请选择区">
+                        <el-option
+                            v-for="item in areaAry"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                        </el-option>
+                </el-select>
+               </el-col>
+           </el-row>
         </div>
 
         <div>
-            <el-select
+            <!-- <el-select
             v-if="showCity"
             style="margin-top: 10px"
             v-model="city_value"
@@ -35,11 +69,11 @@
                     :label="item.label"
                     :value="item.value">
                 </el-option>
-        </el-select>
+        </el-select> -->
         </div>
 
         <div>
-            <el-select
+            <!-- <el-select
             v-if="showArea"
             style="margin-top: 10px"
             v-model="area_value"
@@ -51,7 +85,7 @@
                     :label="item.label"
                     :value="item.value">
                 </el-option>
-        </el-select>
+        </el-select> -->
         </div>
 
     </div>
@@ -66,12 +100,12 @@ export default {
             provice_value: '',
             proviceAry: [],
             
-            showCity: false,
+            showCity: true,
             city_uuid: '',
             city_value: '',
             cityAry: [],
             
-            showArea: false,
+            showArea: true,
             area_uuid: '',
             area_value: '',
             areaAry: []
@@ -79,9 +113,24 @@ export default {
      },
      mounted() {
          lime.req('GetArea',{}).then(res => {
+             this.provice_value = res.data[0].uuid
             this.proviceAry = res.data.map(v => {
                 return {value: v.uuid, label: v.name, ...v}
             });
+              lime.req('GetArea',{parent_uuid: this.proviceAry[0].value}).then(res => {
+                  this.city_value = res.data[0].uuid
+                    this.cityAry = res.data.map(v => {
+                        return {value: v.uuid, label: v.name, ...v}
+                    });
+                    lime.req('GetArea',{parent_uuid: this.cityAry[0].value}).then(res => {
+                   this.area_value = res.data[0].uuid
+                    this.area_uuid = res.data[0].uuid
+                    this.areaAry = res.data.map(v => {
+                        return {value: v.uuid, label: v.name, ...v}
+                    });
+              })
+
+              })
         })
      },
      methods: {
@@ -89,9 +138,18 @@ export default {
             if(data){
               this.provice_uuid = data
               lime.req('GetArea',{parent_uuid: data}).then(res => {
+                  this.city_value = res.data[0].uuid
                     this.cityAry = res.data.map(v => {
                         return {value: v.uuid, label: v.name, ...v}
                     });
+                    lime.req('GetArea',{parent_uuid: this.cityAry[0].value}).then(res => {
+                   this.area_value = res.data[0].uuid
+                    this.area_uuid = res.data[0].uuid
+                    this.areaAry = res.data.map(v => {
+                        return {value: v.uuid, label: v.name, ...v}
+                    });
+                    })
+                    
               })
               this.city_value = ''
               this.area_value = ''
@@ -105,6 +163,8 @@ export default {
             if(data){
               this.city_uuid = data
               lime.req('GetArea',{parent_uuid: data}).then(res => {
+                   this.area_value = res.data[0].uuid
+                    this.area_uuid = res.data[0].uuid
                     this.areaAry = res.data.map(v => {
                         return {value: v.uuid, label: v.name, ...v}
                     });

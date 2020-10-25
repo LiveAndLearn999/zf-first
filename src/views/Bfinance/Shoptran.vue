@@ -36,21 +36,23 @@
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 150 + 'px',background: 'white'}">
+             <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 :data="rows"
-                :height="height - 60 - 46 - 48"
+               :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400',height: '48px'}"
+                :height="height - 195 - 8"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
 
+                element-loading-background="rgba(0, 0, 0, 0.1)"
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
-                style="width: 100%" 
+                style="width: 100%;margin-top: 5px;" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
+                <el-table-column type="index" width="80px" label="序号"></el-table-column>
                 <el-table-column prop="trade_type" label="交易类型"></el-table-column>
                 <el-table-column prop="trade_code" label="交易编号"></el-table-column>
                 <el-table-column prop="trade_state" label="交易状态"></el-table-column>
@@ -60,18 +62,70 @@
                 <el-table-column prop="add_time" label="添加时间"></el-table-column>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
+                background
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
+        <el-drawer
+            title="详细"
+            :visible.sync="detail_show"
+            direction="rtl" size="50%">
+           <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form  label-width="100px" label-position="right">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="交易类型:">{{DetailFormData.trade_type == 10 ? '结算' : '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                           <el-form-item label="交易编号:">{{DetailFormData.trade_code || '----'}}</el-form-item> 
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="交易状态:">{{DetailFormData.trade_state || '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="学币数:">{{DetailFormData.coins || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="交易金额:">{{DetailFormData.trade_money || '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="交易备注:">{{DetailFormData.remark || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="添加时间:">{{DetailFormData.add_time || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+             <div class="drawer-footer">
+                    <el-button @click="detail_show = false" type="primary">关闭</el-button>
+                </div>
+        </el-drawer>
+
         <!-- 详情模板 -->
-        <el-dialog  
+        <!-- <el-dialog  
             title=""
             :visible.sync="detail_show"
             width="500px">
@@ -84,7 +138,7 @@
                 <el-form-item label="交易备注:">{{DetailFormData.remark}}</el-form-item>
                 <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
             </el-form>
-        </el-dialog>
+        </el-dialog> -->
 
     </div>
 </template>
@@ -93,6 +147,15 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.ShoptranData) {
         Vue.set(store.state, 'ShoptranData', {
@@ -129,13 +192,15 @@
             this.init();
         },
         methods:{
+            handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
             },
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                NProgress.start();
 
                 lime.req('ShopTradeAccountList', {
                     login_token:lime.cookie_get('login_token'),
@@ -146,7 +211,8 @@
                     order_field:this.SearchFormData.order_field,
                     order_sort:this.SearchFormData.order_sort
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done();
                     this.rows = res.data.rows;
                     this.total = res.data.total;
                 });
@@ -154,7 +220,8 @@
 
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false;
+                    NProgress.done();
+                    // this.loading = false;
                 }, 10000);
             },
             // 表格数据刷新
@@ -197,4 +264,36 @@
 
 <style scoped>
     @import '../../assets/styles/common.css';
+    .drawer-footer {
+         position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999999;
+    }
+
+ .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+}
 </style>

@@ -10,7 +10,7 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
@@ -38,86 +38,66 @@
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 140 + 'px',background: 'white'}">
+             <!-- element-loading-spinner="el-icon-loading" -->
+              <!-- stripe -->
             <el-table 
                 ref="role"
                 :data="rows"
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
                 row-key="uuid"
-                :height="height - 60 - 95"
+                :height="height -  192"
                 v-loading="loading"
                 :default-expand-all="true"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-
+                element-loading-background="rgba(0, 0, 0, 0.1)"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="计划名称" align="center"></el-table-column>
+                <!-- <el-table-column type="index" width="80px" label="序号"></el-table-column> -->
+                <el-table-column prop="name" label="计划名称" align="left">
+                     <template slot-scope="scope">
+                        <span>
+                            <img src="@/assets/imgs/tree.png" style="height: 15px;margin-top:10px">
+                            {{scope.row.name}}
+                        </span>
+                        <!-- {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
+                    </template>
+                </el-table-column>
                 <el-table-column prop="img" label="图片" align="center">
                     <template slot-scope="scope">
-                        <img class="imgclass" v-if="scope.row.img" :src="scope.row.img" @click="showImg(scope.row.img)" alt="未上传" style="width: 40px;">
-                        <span v-else style="color: red">未上传</span>
+                        <el-image 
+                            v-if="scope.row.img"
+                            style="width: 30px; height: 30px"
+                            :src="scope.row.img" 
+                            :preview-src-list="[scope.row.img]">
+                        </el-image>
+                        <span v-else>
+                            <el-tag type="danger">未上传</el-tag>
+                        </span>
                     </template>
                 </el-table-column>
             </el-table>
-            <!-- <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
-                    :current-page.sync="SearchFormData.page_num"
-                    @current-change="onPageChange"
-                    layout="prev, pager, next"
-                    :total="total">
-                </el-pagination>
-            </div> -->
         </div>
-        <!-- <div style="border-top: solid 1px #f2f1f4;">
-            <el-table 
-                :data="rows"
-                :height="height - 60 - 46 - 48"
-                v-loading="loading"
-                element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-
-                @sort-change="onSortChange"
-                :highlight-current-row="true"
-                @current-change="onSelectRow"
-                style="width: 100%" 
-                size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="计划名称"></el-table-column>
-               
-            </el-table>
-
-            <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination
-                    :current-page.sync="SearchFormData.page_num"
-                    @current-change="onPageChange"
-                    layout="prev, pager, next"
-                    :total="total">
-                </el-pagination>
-            </div>
-        </div> -->
-
         <!-- 添加模板 -->
         <el-dialog  
             title="添加"
             :visible.sync="add_show"
-            width="500px">
-            <el-form :model="AddFormData" label-width="120px" label-position="left">
+            width="600px">
+            <el-form :rules="rules" ref="addform" :model="AddFormData" label-width="120px" label-position="right">
+                <el-form-item label="计划组名称:" prop="name">
+                    <el-input v-model="AddFormData.name" style="width: 360px"/>
+                </el-form-item>
                 <el-form-item label="所属分组:">
                     <el-cascader 
                         clearable 
                         :options="add_rows"
                         :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
-                        v-model="AddFormData.parent_uuid" style="width: 330px">
+                        v-model="AddFormData.parent_uuid" style="width: 360px">
                     </el-cascader>
-                </el-form-item>
-                <el-form-item label="计划组名称:" :required="true">
-                    <el-input v-model="AddFormData.name" style="width: 330px"/>
                 </el-form-item>
                 <el-form-item label="图片:">
                     <file v-if="add_show" ref="upload"/>
@@ -133,20 +113,22 @@
         <el-dialog  
             title="编辑"
             :visible.sync="edit_show"
-            width="500px">
-            <el-form :model="EditFormData" label-width="80px" label-position="left">
+            width="600px">
+            <el-form :rules="rules" ref="editform" :model="EditFormData" label-width="120px" label-position="right">
+                <el-form-item label="计划名称:" prop="name">
+                    <el-input v-model="EditFormData.name"/>
+                </el-form-item>
                 <el-form-item label="所属父类:">
                     <el-cascader 
                         clearable 
                         :options="edit_rows"
                         :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
-                        v-model="EditFormData.parent_uuid" style="width: 320px">
+                        v-model="EditFormData.parent_uuid">
                     </el-cascader>
                 </el-form-item>
-
-                <el-form-item label="计划名称:">
-                    <el-input v-model="EditFormData.name" style="width: 320px"/>
+                <el-form-item label="图片:">
+                    <file  ref="uploads" :imgUrl="EditFormData.img"/>
                 </el-form-item>
             </el-form>
             <span slot="footer">
@@ -172,10 +154,24 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-    import file from "@/components/imgUpload/upload.vue"
+    import file from "@/components/imgUpload/sigle.vue"
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.ShopPlanGroupData) {
         Vue.set(store.state, 'ShopPlanGroupData', {
+             rules: {
+                      name: [
+                        { required: true, message: '计划组名称必填', trigger: 'blur' },
+                       ]
+             },
             list: [],
             rows:[],
             total:0,
@@ -242,6 +238,9 @@
             this.init();
         },
         methods:{
+             handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             // 时间格式化
             formatDate: function (value) {
                 let date = new Date(value);
@@ -266,16 +265,20 @@
 
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                NProgress.start();
                 lime.req('ShopPlanGroupList', {
                     login_token:lime.cookie_get('login_token'),
+
                     // real_name:this.SearchFormData.real_name,
-                    page_num:this.SearchFormData.page_num,
-                    page_len:this.SearchFormData.page_len,
-                    order_field:this.SearchFormData.order_field,
-                    order_sort:this.SearchFormData.order_sort
+
+                    // page_num:this.SearchFormData.page_num,
+                    // page_len:this.SearchFormData.page_len,
+                    // order_field:this.SearchFormData.order_field,
+                    // order_sort:this.SearchFormData.order_sort
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done();
                     // this.rows = res.data.rows;
                     this.total = res.data.total;
                     this.curr_row = null;
@@ -288,7 +291,8 @@
 
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false;
+                    NProgress.done();
+                    // this.loading = false;
                 }, 10000);
             },
         
@@ -336,10 +340,27 @@
             },
             // 添加向后台提交
             onAddSubmit() {
-                if(!this.$refs.upload.img_url){
-                     this.$confirm('确定不上传图片?', '提示').then(() => {
+                this.$refs['addform'].validate((valid) => {
+                    if (valid) {
+                        // if(!this.$refs.upload.fileListss[0]){
+                        //      this.$confirm('确定不上传图片?', '提示').then(() => {
+                        //         this.AddFormData.login_token = lime.cookie_get('login_token');
+                        //         // this.AddFormData.img  = this.$refs.upload.img_url;
+                        //         lime.req('ShopPlanGroupAdd', this.AddFormData).then(res => {
+                        //             this.SearchFormData.page_num = 1;
+                        //             this.init();
+                        //             this.add_show = false;
+                        //         }).catch(err => {
+                        //             this.$message.error(err.msg);
+                        //         })
+                        //         return;
+                        //     }).catch( err => {
+                        //         return;
+                        //     })
+                        // }
                         this.AddFormData.login_token = lime.cookie_get('login_token');
-                        // this.AddFormData.img  = this.$refs.upload.img_url;
+                        this.AddFormData.img  = this.$refs.upload.img_url || '';
+                        this.AddFormData.parent_uuid = this.AddFormData.parent_uuid ? this.AddFormData.parent_uuid : '0'
                         lime.req('ShopPlanGroupAdd', this.AddFormData).then(res => {
                             this.SearchFormData.page_num = 1;
                             this.init();
@@ -347,20 +368,9 @@
                         }).catch(err => {
                             this.$message.error(err.msg);
                         })
-                        return;
-                    }).catch( err => {
-                        return;
-                    })
-                }
-                this.AddFormData.login_token = lime.cookie_get('login_token');
-                this.AddFormData.img  = this.$refs.upload.img_url;
-                this.AddFormData.parent_uuid = this.AddFormData.parent_uuid ? this.AddFormData.parent_uuid : '0'
-                lime.req('ShopPlanGroupAdd', this.AddFormData).then(res => {
-                    this.SearchFormData.page_num = 1;
-                    this.init();
-                    this.add_show = false;
-                }).catch(err => {
-                    this.$message.error(err.msg);
+                    }else {
+                        return false
+                    }
                 })
             },
 
@@ -401,13 +411,19 @@
             // 编辑后台提交
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
-               
-                lime.req('ShopPlanGroupEdit', this.EditFormData).then(res => {
-                    this.init();
-                    this.edit_show = false;
-                }).catch(err => {
-                    this.$message.error(err.msg);
-                });
+                this.EditFormData.img = this.$refs.uploads.img_url ? this.$refs.uploads.img_url : this.EditFormData.img
+                this.$refs['editform'].validate((valid) => {
+                    if (valid) {
+                        lime.req('ShopPlanGroupEdit', this.EditFormData).then(res => {
+                            this.init();
+                            this.edit_show = false;
+                        }).catch(err => {
+                            this.$message.error(err.msg);
+                        });
+                    }else {
+                        return false
+                    }
+                })
             },
 
 
@@ -422,6 +438,7 @@
                     lime.req('ShopPlanGroupDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
+                        // uuid: '6170f7e3ece37f0c4c1f9471c9c8327b'
                     }).then(res => {
                         this.init();
                         this.$message.success('操作成功');
@@ -440,6 +457,18 @@
         }
     }
 </script>
+<style lang="less">
+    .el-table__expand-icon {
+    .el-icon-arrow-right:before {
+      content: "\e791";
+      font-size: 20px;
+    }
+  }
+
+  .el-image-viewer__mask {
+        opacity: 1!important;
+    }
+</style>
 
 <style scoped>
     .menu{
@@ -448,13 +477,17 @@
         text-align: center;
     }
 
+    .el-image-viewer__mask {
+    opacity: 1!important;
+}
+
     .page {
         height: 40px; 
         line-height: 40px; 
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right:0;
+        bottom: 40px;
+        right:40px;
         overflow: hidden;
     }
 

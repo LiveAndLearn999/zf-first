@@ -26,6 +26,9 @@
 import lime from "@/lime.js";
 export default {
      name: "chooseAre",
+     props: {
+         peoary: {type: Array, default: () => []}
+     },
      data() {
         return {
            people_value: '',
@@ -35,6 +38,7 @@ export default {
      },
      mounted() {
          lime.req('EbShopListCertificate',{login_token : lime.cookie_get('login_token')}).then(res => {
+             this.people_value = !this.peoary[0] ? [res.data.rows[0].uuid] : this.peoary
             this.peopleAry = res.data.rows.map(v => {
                 return {value: v.uuid, label: v.name, ...v}
             });
