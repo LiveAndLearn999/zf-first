@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0d0834"],{"67fc":function(n,e,c){"use strict";c.r(e);var t=function(){var n=this,e=n.$createElement,c=n._self._c||e;return c("h1",[n._v(n._s(n.cpname))])},a=[],u={data:function(){return{cpname:"融资渠道"}}},r=u,s=c("9ca4"),d=Object(s["a"])(r,t,a,!1,null,"6465d3d1",null);e["default"]=d.exports}}]);
+//# sourceMappingURL=chunk-2d0d0834.dc97499e.js.map

@@ -1,18 +1,18 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px;">
+        <div style="height: 46px; line-height: 46px;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">{{$store.state.AdminData.active_title}}</span>
+                        <span style="padding-left:9px;font-size: 16px">{{$store.state.AdminData.active_title}}</span>
                     </div>
                 </el-col>
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right; font-size: 14px">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
-                        <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
+                        <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
                         <el-link 
                             class="menu" 
                             @click="onSubMenu(item)" 
@@ -23,44 +23,163 @@
             </el-row>
         </div>
 
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">     
+                 <!-- <el-date-picker 
+                        size="small"
+                        style="width: 240px;margin-right: 20px;height: 36px"
+                        :clearable="true"
+                        unlink-panels
+                        align="center"
+                        v-model="rangeTime" 
+                        :picker-options="pickerOptions"
+                        type="daterange"
+                        value-format="yyyy-MM-dd" 
+                        range-separator="至" start-placeholder="开始日期" 
+                        end-placeholder="结束日期"></el-date-picker> -->
+
+                  <el-date-picker
+                    v-model="value1"
+                    type="date"
+                    size="small"
+                    :editable="false"
+                    clearable
+                    :picker-options="pickerOptionsstart"
+                    placeholder="开始日期"
+                    style="margin-right: 20px"
+                >
+                </el-date-picker>
+
+                 <el-date-picker
+                    v-model="value2"
+                    type="date"
+                    size="small"
+                    :editable="false"
+                    clearable
+                    :picker-options="pickerOptionsend"
+                    placeholder="结束日期"
+                    style="margin-right: 20px"
+                    >
+                </el-date-picker>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- <el-date-picker 
+                 size="small"
+                        style="width: 240px;margin-right: 20px;height: 36px"
+                        :clearable="true"
+                        unlink-panels
+                        align="center"
+                        v-model="SearchFormData.start_end" 
+                        :picker-options="pickerOptions"
+                        type="daterange" 
+                        value-format="yyyy-MM-dd" 
+                        range-separator="至" start-placeholder="开始日期" 
+                        end-placeholder="结束日期"></el-date-picker> -->
+
+                    <!-- <el-date-picker
+                        v-model="rangeTime"
+                        type="datetimerange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        :picker-options="datePickerOptions">
+                </el-date-picker> -->
+
+                <el-button type="primary"  size="small" @click="onSearchSubmit">搜索</el-button>
+        </div>
+
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
+            <!-- style="border-top: solid 1px #f2f1f4;" -->
+             <!-- element-loading-spinner="el-icon-loading"  fontFamily: 'FZCYJ',:stripe="true"-->
             <el-table 
-                :stripe="true"
                 :data="rows" 
-                :height="height - 60 - 46 - 48" 
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
+                :height="height - 195 - 68" 
                 v-loading="loading" 
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading" 
-                element-loading-background="rgba(0, 0, 0, 0.8)" 
+               
+                element-loading-background="rgba(0, 0, 0, 0.1)" 
                 @sort-change="onSortChange"
                 :highlight-current-row="true" 
                 @current-change="onSelectRow" 
-                style="width: 100%" 
+                style="width: 100%;margin-top: 5px" 
                 size="mini">
-                <el-table-column prop="work_staff_name" label="姓名" align="center"></el-table-column>
-                <el-table-column prop="add_time" label="添加日期" align="center" :sortable="true"></el-table-column>
-                <el-table-column prop="content" label="工作内容" align="center" :show-overflow-tooltip="true"></el-table-column>
-                <el-table-column prop="imgs" align="center" label="参考图片">
-                    <template slot-scope="scope">
-                        {{scope.row.imgs.length > 0 ? '有' : '无'}}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="enable_check" align="center" label="是否可审核">
+                <el-table-column width="80px" type="index" label="序号"></el-table-column>
+                 <el-table-column prop="content" label="工作内容" align="left" :show-overflow-tooltip="true"></el-table-column>
+                <el-table-column prop="work_staff_name" label="员工姓名" align="left"></el-table-column>
+                <el-table-column prop="add_time" show-overflow-tooltip label="添加日期" align="left" :sortable="true"></el-table-column>
+                <el-table-column prop="enable_check" align="left" label="是否可审核">
                     <template slot-scope="scope">
                         {{scope.row.enable_check == 0 ? '不可' : '可'}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="check_staff_name" align="center" label="审核人"></el-table-column>
-                <el-table-column prop="check_time" label="审核时间" align="center" :sortable="true"></el-table-column>
+                 <el-table-column prop="check_staff_name" align="left" label="审核人"></el-table-column>
+                <!-- <el-table-column prop="imgs" align="center" label="参考图片">
+                    <template slot-scope="scope">
+                        {{scope.row.imgs.length > 0 ? '有' : '无'}}
+                    </template>
+                </el-table-column> -->
+                <el-table-column prop="check_time" show-overflow-tooltip label="审核时间" align="left" :sortable="true"></el-table-column>
+                <!-- <el-table-column label="操作" width="230px" align="center">
+                    <template slot-scope="scope">
+                    <el-dropdown trigger="hover">
+                        <span class="el-dropdown-link">
+                            更多<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click="handleEdit(scope.$index, scope.row)">
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleDetail(scope.$index, scope.row)">详情</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+                </el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
-                <el-pagination 
+            <div class="page" :style="{width:width - 280 + 'px'}">
+                <el-pagination
+                background
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination 
+                    background
                     :current-page.sync="SearchFormData.page_num" 
                     @current-change="onPageChange" 
                     layout="prev, pager, next"
-                    :total="total"></el-pagination>
+                    :total="total"></el-pagination> -->
             </div>
         </div>
 
@@ -87,149 +206,242 @@
 
         <!-- 添加模板 -->
         <el-drawer
+             title="添加"
             :visible.sync="add_show"
-            size="40%"
-            title="添加">
+            direction="rtl" size="50%" >
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form ref="addform" :rules="rules" :model="AddFormData" label-width="100px" label-position="right" style="margin-top: 10px">
+                    <el-row>
+                        <el-col :span="24">
+                                <el-form-item prop="content" label="工作内容:">
+                                    <el-input 
+                                        :rows="8" 
+                                        type="textarea" 
+                                        placeholder="请输入工作内容" 
+                                        v-model="AddFormData.content" />
+                                </el-form-item>
+                            </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                             <el-form-item label="图片上传:">
+                                <file ref="upload"/>
+                                <!-- <el-upload
+                                :action="upload_url"
+                                list-type="picture-card"
+                                :on-success="handleAddUploadSuccess"
+                                :on-remove="handleAddRemove">
+                                <i class="el-icon-plus"></i>
+                                </el-upload> -->
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                             <el-col :span="12">
+                                 <el-form-item label="是否允许审核:">
+                                    <el-select v-model="enable_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in enable_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                 </el-form-item> 
+                                <!-- AddFormData.enable_check -->
+                                <!-- <el-form-item label="是否允许审核:">
+                                    <el-radio v-model="AddFormData.enable_check" :label="1">可审核</el-radio>
+                                    <el-radio v-model="AddFormData.enable_check" :label="0">不可审</el-radio>
+                                </el-form-item> -->
+                            </el-col>
+                    </el-row>
+                </el-form>
+            </div>
 
-            <el-form :model="AddFormData" label-width="80px" style="padding:20px;">
-                <el-form-item label="工作内容:" style="text-align:center;">
-                    <el-input 
-                        :rows="8" 
-                        type="textarea" 
-                        placeholder="请输入工作内容" 
-                        v-model="AddFormData.content" />
-                </el-form-item>
-
-                <el-form-item label="图片上传:">
-                    <el-upload
-                      :action="upload_url"
-                      list-type="picture-card"
-                      :on-success="handleAddUploadSuccess"
-                      :on-remove="handleAddRemove">
-                      <i class="el-icon-plus"></i>
-                    </el-upload>
-                </el-form-item>
-                
-                <el-form-item label="允许审核:">
-                    <el-radio v-model="AddFormData.enable_check" :label="1">可审核</el-radio>
-                    <el-radio v-model="AddFormData.enable_check" :label="0">不可审</el-radio>
-                </el-form-item>
-            </el-form>
-
-            <el-divider></el-divider>
-            <el-footer>
-                <div style="text-align:center;">
-                    <el-button @click="add_show = false">取 消</el-button>
-                    <el-button type="primary" @click="onAddSubmit">确 定</el-button>
-                </div>
-            </el-footer>
+            <div class="drawer-footer">
+                <el-button @click="add_show = false">取 消</el-button>
+                <el-button type="primary" @click="onAddSubmit">确 定</el-button>
+            </div>
         </el-drawer>
 
         <!-- 编辑模板 -->
         <el-drawer
             :visible.sync="edit_show"
-            
-            size="40%"
-            :with-header="false">
-            <el-container>
-                <el-divider></el-divider>
-                <el-header style="text-align:center;">编辑窗口</el-header>
-                <el-divider></el-divider>
-                <el-main>
-                    <el-form  :model="EditFormData" label-width="80px">
-                        <el-form-item label="工作内容:" style="text-align:center;">
-                            <el-input 
-                                :rows="8" 
-                                type="textarea" 
-                                placeholder="请输入工作内容" 
-                                v-model="EditFormData.content" />
-                        </el-form-item>
-                        
-                        <el-form-item label="图片上传:">
-                            <el-upload
-                              :action="upload_url"
-                              list-type="picture-card"
-                              :file-list="EditFormData.file_imgs"
-                              :on-success="handleEditUploadSuccess"
-                              :on-remove="handleEditRemove">
-                              <i class="el-icon-plus"></i>
-                            </el-upload>
-                        </el-form-item>
-                        
-                        <el-form-item>
-
-                            <el-radio v-model="EditFormData.enable_check" :label="1">可审核</el-radio>
-                            <el-radio v-model="EditFormData.enable_check" :label="0">不可审</el-radio>
-                            
-                        </el-form-item>
+            title="编辑"
+             direction="rtl" 
+             size="50%" >
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                    <el-form :rules="rules" ref="editform" :model="EditFormData" label-width="100px" label-position="right" style="margin-top: 10px">
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item prop="content" label="工作内容:">
+                                    <el-input 
+                                        :rows="8" 
+                                        type="textarea" 
+                                        placeholder="请输入工作内容" 
+                                        v-model="EditFormData.content" />
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item label="图片上传:">
+                                    <!-- <img v-if="EditFormData.imgs[0]" :src="EditFormData.imgs[0]" style="width: 50px;height: 50px" alt=""> -->
+                                    <file v-if="edit_show" ref="uploads" :fileListss="EditFormData.imgs"/>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                  <el-form-item label="是否允许审核:">
+                                      <el-select v-model="enables_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in enable_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                        <!-- <el-radio v-model="EditFormData.enable_check" :label="1">可审核</el-radio>
+                                        <el-radio v-model="EditFormData.enable_check" :label="0">不可审</el-radio>                            -->
+                                    </el-form-item>
+                            </el-col>
+                        </el-row>
                     </el-form>
-                </el-main>
-                <el-divider></el-divider>
-                <el-footer>
-                    <el-divider></el-divider>
-                    <div style="text-align:center;">
+                </div>
+                 <div class="drawer-footer">
                         <el-button @click="edit_show = false">取 消</el-button>
                         <el-button type="primary" @click="onEditSubmit">确 定</el-button>
                     </div>
-                </el-footer>
-            </el-container>
         </el-drawer>
 
         <!-- 审核模板 -->
         <el-drawer
             :visible.sync="check_show"
             :modle="CheckFormData"
-            size="50%"
-            :with-header="false">
-            <el-card class="box-card1">
-                <div slot="header" class="clearfix">
-                    <span>工作内容</span>
-                </div>
-                <div>
-                    <span>添加时间：  {{CheckFormData.add_time}}</span>
-                    <el-divider></el-divider>
-                    <span>添加人：  {{CheckFormData.work_staff_name}}</span>
-                    <el-divider></el-divider>
-                    <span>日清内容：  {{CheckFormData.content}}</span>
-                    <el-divider></el-divider>
-                    <span>可否审核：  {{CheckFormData.enable_check == 0 ? '不可' : '可'}}</span>
-                    <el-divider></el-divider>
-                    <span>点击图片查看大图 :</span>
-                        <div class="demo-image__preview">
-                            <el-image 
-                                style="width: 30px; height: 30px"
-                                :src="CheckFormData.imgs[0]" 
-                                :preview-src-list="CheckFormData.imgs">
-                            </el-image>
-                        </div>
-                </div>
-            </el-card>
-            <el-card class="box-card1">
-                <div slot="header" class="clearfix">
-                    <span>审核内容</span>
-                </div>
-                <el-form :model="CheckFormData" label-width="120px">
-                <el-form-item label="审核评价:">
-                    <el-input 
-                        :rows="5" 
-                        type="textarea" 
-                        placeholder="请输入工作内容" 
-                        v-model="CheckFormData.check_content" />
-                </el-form-item>
-                <el-form-item label="评分:">
-                    <el-input v-model="CheckFormData.check_grade" />
-                </el-form-item>
-            </el-form>
-
-            <div style="text-align:center;">
-                <el-button @click="check_show = false">取 消</el-button>
-                <el-button type="primary" @click="onCheckSubmit">确 定</el-button>
+            title="工作审核"
+           direction="rtl" 
+             size="50%" >
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="CheckFormData" label-width="120px" label-position="right" :rules="rules" ref="checkform">
+                     <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">工作内容</div>
+                    </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="12">
+                            <el-form-item label="添加时间:">{{CheckFormData.add_time}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="添加人:">{{CheckFormData.work_staff_name}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="日清内容:">{{CheckFormData.content}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="可否审核:">{{CheckFormData.enable_check == 0 ? '不可' : '可'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="图片:">
+                                <div v-if="CheckFormData.imgs[0] || CheckFormData.imgs[1]" class="demo-image__preview">
+                                    <el-image 
+                                        style="width: 30px; height: 30px;margin-left: 10px"
+                                        v-for="(value, index) in CheckFormData.imgs"
+                                        :key="index"
+                                        :src="value" 
+                                        :preview-src-list="[value]">
+                                    </el-image>
+                                </div>
+                                <div v-else>未上传图片</div>
+                            </el-form-item>
+                        </el-col>   
+                    </el-row>
+                    <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">审核内容</div>
+                    </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="24">
+                            <el-form-item label="审核评价:" prop="check_content">
+                                <el-input 
+                                    :rows="5" 
+                                    type="textarea" 
+                                    placeholder="请输入工作内容" 
+                                    v-model="CheckFormData.check_content" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="评分:" prop="check_grade">
+                                <el-input-number controls-position="right" v-model="CheckFormData.check_grade"  :step="1" :min="0" :max="100"></el-input-number>
+                                <!-- <el-input v-model="CheckFormData.check_grade" /> -->
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
             </div>
-            </el-card>
+            <div class="drawer-footer">
+                    <el-button @click="check_show = false">取 消</el-button>
+                    <el-button type="primary" @click="onCheckSubmit">确 定</el-button>
+                </div>
+                <el-card class="box-card1" style="width: 100%">
+                    <!-- <div slot="header" class="clearfix">
+                        <span>工作内容</span>
+                    </div> -->
+                    <div>
+                        <!-- <span>添加时间：  {{CheckFormData.add_time}}</span>
+
+
+                        <el-divider></el-divider>
+                        <span>添加人：  {{CheckFormData.work_staff_name}}</span> -->
+                        <!-- <el-divider></el-divider>
+                        <span>日清内容：  {{CheckFormData.content}}</span>
+                        <el-divider></el-divider> -->
+                        <!-- <span>可否审核：  {{CheckFormData.enable_check == 0 ? '不可' : '可'}}</span> -->
+                        <!-- <el-divider></el-divider>
+                        <div v-if="CheckFormData.imgs[0]">
+                            <span >点击图片查看大图 :</span>
+                            <div class="demo-image__preview">
+                                <el-image 
+                                    style="width: 30px; height: 30px"
+                                    :src="CheckFormData.imgs[0]" 
+                                    :preview-src-list="CheckFormData.imgs">
+                                </el-image>
+                            </div>
+                        </div>
+                        <div v-else>图片：未上传图片</div>-->
+                    </div> 
+                </el-card>
+                <el-card class="box-card1">
+                    <!-- <div slot="header" class="clearfix">
+                        <span>审核内容</span>
+                    </div> -->
+                    <el-form :model="CheckFormData" label-width="120px">
+                        <el-form-item label="评分:">
+                            <el-input-number v-model="CheckFormData.check_grade" :precision="1" :step="0.1" :min="0" :max="100"></el-input-number>
+                            <!-- <el-input v-model="CheckFormData.check_grade" /> -->
+                        </el-form-item>
+                    </el-form>
+                    
+                <!-- <div style="text-align:right;">
+                    <el-button @click="check_show = false">取 消</el-button>
+                    <el-button type="primary" @click="onCheckSubmit">确 定</el-button>
+                </div> -->
+                </el-card>
+                <!-- <div class="drawer-footer">
+                    <el-button @click="check_show = false">取 消</el-button>
+                    <el-button type="primary" @click="onCheckSubmit">确 定</el-button>
+                </div> -->
+            <!-- </div> -->
         </el-drawer>
 
         <!-- 评论 -->
-        <el-dialog title="运营员工评论工作日清" :visible.sync="comment_show" width="30%">
+        <el-dialog title="商户评论工作日清" :visible.sync="comment_show" width="30%">
             <el-form :model="CommentFormData" label-width="120px">
                 <el-form-item label="评论内容:">
                     <el-input 
@@ -251,7 +463,84 @@
             :visible.sync="detail_show"
             :modle="DetailFormData"
             size="50%"
-            :with-header="false">
+            title="详细"
+           direction="rtl" >
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="CheckFormData" label-width="120px" label-position="right">
+                     <div class="line">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">工作内容</div>
+                    </div>
+                    <el-row style="margin-top: 30px">
+                        <el-col :span="12">
+                            <el-form-item label="添加时间:">{{DetailFormData.add_time}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="添加人:">{{DetailFormData.work_staff_name}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="日清内容:">{{DetailFormData.content}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="可否审核:">{{DetailFormData.enable_check == 0 ? '不可' : '可'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="图片:">
+                                <div v-if="DetailFormData.imgs[0] || DetailFormData.imgs[1]" class="demo-image__preview">
+                                     <el-image 
+                                        style="width: 30px; height: 30px;margin-left: 10px"
+                                        v-for="(value, index) in DetailFormData.imgs"
+                                        :key="index"
+                                        :src="value" 
+                                        :preview-src-list="[value]">
+                                    </el-image>
+                                    <!-- <el-image 
+                                        style="width: 30px; height: 30px"
+                                        :src="DetailFormData.imgs[1]" 
+                                        :preview-src-list="DetailFormData.imgs">
+                                    </el-image> -->
+                                </div>
+                                <div v-else>未上传图片</div>
+                            </el-form-item>
+                        </el-col>   
+                    </el-row>
+                    <div class="line" v-if="DetailFormData.check_time">
+                        <div class="linelf"><div class="line-line"></div></div>
+                        <div class="linerg">审核结果</div>
+                    </div>
+                    <el-row style="margin-top: 30px"  v-if="DetailFormData.check_time">
+                        <el-col :span="12">
+                            <el-form-item label="审核时间:">
+                               {{DetailFormData.check_time}}
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="审核人:">
+                               {{DetailFormData.check_staff_name}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row   v-if="DetailFormData.check_time">
+                        <el-col :span="12">
+                            <el-form-item label="审核评价:">
+                               {{DetailFormData.check_content}}
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="审核分数:">
+                               {{DetailFormData.check_grade}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <div class="drawer-footer">
+                    <el-button type="primary" @click="detail_show = false">关闭</el-button>
+                </div>
             <el-card class="box-card1">
                 <div slot="header" class="clearfix">
                     <span>工作内容</span>
@@ -265,14 +554,25 @@
                     <el-divider></el-divider>
                     <span>可否审核：  {{DetailFormData.enable_check == 0 ? '不可' : '可'}}</span>
                     <el-divider></el-divider>
-                    <span>点击图片查看大图 :</span>
+                    <div v-if="DetailFormData.imgs[0]">
+                            <span >点击图片查看大图 :</span>
+                            <div class="demo-image__preview">
+                                <el-image 
+                                    style="width: 30px; height: 30px"
+                                    :src="DetailFormData.imgs[0]" 
+                                    :preview-src-list="DetailFormData.imgs">
+                                </el-image>
+                            </div>
+                        </div>
+                    <div v-else>图片：未上传图片</div>
+                    <!-- <span>点击图片查看大图 :</span>
                         <div class="demo-image__preview">
                             <el-image 
                             style="width: 30px; height: 30px"
                             :src="DetailFormData.imgs[0]" 
                             :preview-src-list="DetailFormData.imgs">
                             </el-image>
-                        </div>
+                        </div> -->
                 </div>
             </el-card>
             <el-card class="box-card2">
@@ -296,9 +596,22 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+    // import file from "@/components/imgUpload/upload.vue"
+    import file from "@/components/imgUpload/mutiimg.vue"
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.WorkData) {
         Vue.set(store.state, "WorkData", {
+            value1: '',
+
             rows: [],
             total: 0,
             loading: false,
@@ -354,15 +667,145 @@
             DetailFormData:{
                 uuid:"",
                 imgs:[]
-            }
-            
+            },
+            pickerOptions:{ 
+                disabledDate:(time) => { 
+                    return this.dealDisabledDate(time) 
+                } 
+            } 
 
         });
     }
 
     export default {
+        components: {
+            file
+        },
         data() {
-            return store.state.WorkData;
+            let that = this;
+            // return store.state.WorkData;
+            return {
+                value1: '',
+                value2: '',
+                pickerOptionsstart:{
+                    disabledDate(time) { //开始时间的禁用
+                    const one = 30 * 24 * 3600 * 1000
+                    // const minTime = this.choiceDate - one
+                    // const maxTime = this.choiceDate + one
+                    // return time.getTime() < minTime || time.getTime() > maxTime
+						return time.getTime() > new Date(that.value2).getTime() ||  time.getTime() < (new Date(that.value2).getTime() - one);
+					}
+                },
+                pickerOptionsend: {
+                     disabledDate(time) { //结束时间的禁用
+                    const one = 30 * 24 * 3600 * 1000
+                    // const minTime = this.choiceDate - one
+                    // const maxTime = this.choiceDate + one
+                    // return time.getTime() < minTime || time.getTime() > maxTime
+						return time.getTime() < new Date(that.value1).getTime() ||  time.getTime() > (new Date(that.value1).getTime() + one) ||  time.getTime() > (new Date().getTime());
+					}
+                },
+
+
+
+
+
+
+
+                rules: {
+                      content: [
+                        { required: true, message: '内容必填', trigger: 'blur' },
+                        ],
+                        check_content: [
+                            { required: true, message: '评价必填', trigger: 'blur' },
+                        ],  
+                        check_grade: [
+                            { required: true, message: '评分必填', trigger: 'blur' },
+                        ]
+                },
+            rows: [],
+            total: 0,
+            loading: false,
+
+            curr_row: null,
+
+            //搜索
+            search_show: false,
+            SearchFormData: {
+                start_end: ['', ''], 
+                order_field: "add_time",
+                order_sort: "asc",
+                page_num: 1,
+                page_len: 10
+            },
+            
+            //添加
+             enable_value: 0,
+              enables_value: 1,
+            enable_options: [
+                {value: 1, label: '可审核'},
+                {value: 0, label: '不可审核'}
+            ],
+            add_show: false,
+            AddFormData: {
+                content: "",
+                imgs: [],
+                enable_check: 1
+            },
+            
+            // 编辑
+            edit_show: false,
+            EditFormData: {
+                content: "",
+                imgs:[],
+                enable_check: ""
+            },
+            
+
+            //审核
+            check_show: false,
+            CheckFormData: {
+                uuid: "",
+                imgs:[],
+                check_content: "",
+                check_grade: ""
+            },
+            
+
+            // 评论
+            comment_show: false,
+            CommentFormData: {
+                uuid: "",
+                content: ""
+            },
+
+            // 日清详细
+            detail_show: false,
+            DetailFormData:{
+                uuid:"",
+                imgs:[]
+            },
+            pickerOptions:{ 
+                disabledDate:(time) => { 
+                    return this.dealDisabledDate(time) 
+                } 
+            },
+            
+            startTime : '',
+            endTime: '',
+            rangeTime: '',
+            datePickerOptions:{
+    disabledDate:(time)=>{
+        let nowDate = new Date();
+        let oneDay = 1000 * 60 * 60 * 24;
+        let oneYearLater = new Date(nowDate.getTime() + (oneDay * 365));
+        return time.getTime() < nowDate || time.getTime() > oneYearLater;
+    }
+},
+
+
+
+            }
         },
         computed: {
             img_host: () => {
@@ -379,9 +822,49 @@
             },
         },
         created() {
+            this.initTime()
             this.init();
         },
         methods: {
+            initTime: function () {
+                let oneDay = 1000 * 60 * 60 * 24;
+                let dateNextZero = new Date(new Date().getTime() - oneDay*30);
+                dateNextZero.setHours(0);
+                dateNextZero.setMinutes(0);
+                dateNextZero.setSeconds(0);
+                // let date6Later = new Date(new Date().getTime() + (oneDay * 6));
+                let date6Later = new Date(new Date().getTime());
+                date6Later.setHours(23);
+                date6Later.setMinutes(59);
+                date6Later.setSeconds(59);
+
+                this.startTime = this.formatDateTime(dateNextZero.getTime());
+                this.endTime = this.formatDateTime(date6Later.getTime());
+                this.rangeTime = [this.startTime, this.endTime];
+            },
+            formatDateTime(date) {
+                var date = new Date(date);
+                var YY = date.getFullYear() + '-';
+                var MM = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                var DD = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate());
+                var hh = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+                var mm = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+                var ss = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+                return YY + MM + DD +" "+hh + mm + ss;
+            },
+
+
+
+
+            dealDisabledDate (time) {
+            // 一天的毫秒数 = 8.64e7  判断时在return处可进行加减
+            let curDate = (new Date()).getTime();
+            let day = 30 * 24 * 3600 * 1000;
+            let dateRegion = curDate - day;
+            return time.getTime() > Date.now() || time.getTime() < dateRegion;
+          },
+
+            handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu, this, lime.cookie_get("login_token"), local);
@@ -390,16 +873,29 @@
             
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                 NProgress.start();
+                // let start_date = '';
+                // let end_date = '';
+                // console.log(this.rangeTime)
+                // if (this.rangeTime && this.rangeTime[0] != '') {
+                //     start_date = this.rangeTime[0].substring(0, 10);
+                // }
+                // if (this.rangeTime && this.rangeTime[1] != '') {
+                //     end_date = this.rangeTime[1].substring(0, 10);
+                // }
 
-                let start_date = '';
-                if (this.SearchFormData.start_end[0] != '') {
-                    start_date = util.dateString(this.SearchFormData.start_end[0]);
-                }
-                let end_date = '';
-                if (this.SearchFormData.start_end[1] != '') {
-                    end_date = util.dateString(this.SearchFormData.start_end[1]);
-                }
+                 let start_date = this.value1 ? util.eleDate(this.value1) : '';
+                let end_date = this.value2 ? util.eleDate(this.value2) : '';
+
+
+                // if (this.SearchFormData.start_end[0] != '') {
+                //     start_date = util.dateString(this.SearchFormData.start_end[0]);
+                // }
+                // let end_date = '';
+                // if (this.SearchFormData.start_end[1] != '') {
+                //     end_date = util.dateString(this.SearchFormData.start_end[1]);
+                // }
 
                 lime.req("ShopWorkDayList", {
                     login_token: lime.cookie_get("login_token"),
@@ -412,14 +908,20 @@
                     page_num: this.SearchFormData.page_num,
                     page_len: this.SearchFormData.page_len
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                     NProgress.done()
                     this.rows = res.data.rows;
                     this.total = res.data.total;
                     this.curr_row = null;
+                }).catch(err => {
+                    this.$message.error(err)
+                    // this.$router.push('/login');
                 });
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false;
+                      NProgress.done()
+                    //   this.$router.push('/login');
+                    // this.loading = false;
                 }, 10000);
             },
 
@@ -487,18 +989,29 @@
             },
 
             onAddSubmit() {
-                
-                lime.req("ShopWorkDayAdd", {
-                    login_token: lime.cookie_get("login_token"),
-                    content: this.AddFormData.content,
-                    imgs: this.AddFormData.imgs,
-                    enable_check: this.AddFormData.enable_check
-                }).then(res => {
-                    this.init();
-                    this.add_show = false;
-                }).catch(err => {
-                    this.$message.error(err.msg);
+                this.$refs['addform'].validate((valid) => {
+                    if (valid) {
+                         NProgress.start();
+                        lime.req("ShopWorkDayAdd", {
+                            login_token: lime.cookie_get("login_token"),
+                            content: this.AddFormData.content,
+                            imgs: this.$refs.upload.fileListss,
+                            // imgs:[this.$refs.upload.img_url],
+                            // enable_check: this.AddFormData.enable_check
+                            enable_check: this.enable_value
+                        }).then(res => {
+                            this.init();
+                            this.add_show = false;
+                        }).catch(err => {
+                            this.$message.error(err.msg);
+                        });
+                        NProgress.done()
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
                 });
+                console.log(this.$refs.upload.fileListss)
             },
 
 
@@ -508,40 +1021,81 @@
                     this.$message.error("请选择一条数据");
                     return false;
                 }
-
-                let file_imgs = [];
-                if (this.curr_row.imgs.length > 0) {
-                    this.curr_row.imgs.forEach(item => {
-                        file_imgs.push({
-                            name:item,
-                            url:item
+                this.enables_value = this.curr_row.enable_check
+                if(this.curr_row.work_staff_name.indexOf("我") != -1) {
+                    lime.req('ShopWorkDayDetail', {
+                    login_token: lime.cookie_get('login_token'),
+                    uuid: this.curr_row.uuid
+                }).then( res => {
+                     let file_imgs = [];
+                    if (res.data.imgs.length > 0) {
+                        this.curr_row.imgs.forEach(item => {
+                            file_imgs.push({
+                                name:item,
+                                url:item
+                            })
                         })
-                    })
+                    }
+                    this.EditFormData = {
+                        uuid: res.data.uuid,
+                        content:res.data.content,
+                        imgs:res.data.imgs,
+                        file_imgs:file_imgs,
+                        enable_check:res.data.enable_check
+                    }
+                    this.edit_show = true;
+                })
+                }else {
+                     this.$message.error("非自己数据，无法编辑");
+                    return false;
                 }
 
-                this.EditFormData = {
-                    uuid:this.curr_row.uuid,
-                    content:this.curr_row.content,
-                    imgs:this.curr_row.imgs,
-                    file_imgs:file_imgs,
-                    enable_check:this.curr_row.enable_check
-                }
-                this.edit_show = true;
+                // let file_imgs = [];
+                // if (this.curr_row.imgs.length > 0) {
+                //     this.curr_row.imgs.forEach(item => {
+                //         file_imgs.push({
+                //             name:item,
+                //             url:item
+                //         })
+                //     })
+                // }
+
+
+                // this.EditFormData = {
+                //     uuid:this.curr_row.uuid,
+                //     content:this.curr_row.content,
+                //     imgs:this.curr_row.imgs,
+                //     file_imgs:file_imgs,
+                //     enable_check:this.curr_row.enable_check
+                // }
+                // this.edit_show = true;
             },
 
             onEditSubmit(){
-                lime.req("ShopWorkDayEdit", {
-                    login_token: lime.cookie_get("login_token"),
-                    uuid: this.EditFormData.uuid,
-                    content: this.EditFormData.content,
-                    imgs: this.EditFormData.imgs,
-                    enable_check: this.EditFormData.enable_check
-                }).then(res => {
-                    this.init();
-                    this.edit_show = false;
-                }).catch(err => {
-                    this.$message.error(err.msg);
-                });
+                this.$refs['editform'].validate((valid) => {
+                     NProgress.start();
+                     let ay = this.$refs.uploads.img_url[0] ? [this.$refs.uploads.img_url,...this.EditFormData.imgs] : this.EditFormData.imgs
+                    if (valid) {
+                        lime.req("ShopWorkDayEdit", {
+                            login_token: lime.cookie_get("login_token"),
+                            uuid: this.EditFormData.uuid,
+                            content: this.EditFormData.content,
+                            imgs: ay.filter((item, index) => ay.indexOf(item) === index),
+
+                            // imgs: [this.$refs.uploads.img_url],
+                            enable_check: this.enables_value
+                        }).then(res => {
+                            this.init();
+                            this.edit_show = false;
+                        }).catch(err => {
+                            this.$message.error(err.msg);
+                        });
+                         NProgress.done()
+                    }else {
+                        NProgress.done()
+                        console.log(999)
+                    }
+                })
             },
 
                 // 编辑上传成功处理
@@ -572,21 +1126,40 @@
                     this.$message.error("请选择一条数据");
                     return false;
                 }
-                this.CheckFormData = this.curr_row;
+                if(this.curr_row.work_staff_name.indexOf("我") != -1) {
+                    this.$message.error("不能审核自己的工作日清！");
+                    return false;
+                }
+
+                lime.req('ShopWorkDayDetail', {
+                    login_token: lime.cookie_get('login_token'),
+                    uuid: this.curr_row.uuid
+                }).then( res => {
+                      this.CheckFormData = res.data;
                 this.check_show = true;
+                })
+
+                // this.CheckFormData = this.curr_row;
+                // this.check_show = true;
             },
             onCheckSubmit() {
-                lime.req("ShopWorkDayCheck", {
-                    login_token: lime.cookie_get("login_token"),
-                    check_content: this.CheckFormData.check_content,
-                    uuid: this.curr_row.uuid,
-                    check_grade: this.CheckFormData.check_grade
-                }).then(res => {
-                    this.init();
-                    this.check_show = false;
-                }).catch(err => {
-                    this.$message.error(err.msg);
-                });
+                 this.$refs['checkform'].validate((valid) => {
+                    if (valid) {
+                        lime.req("ShopWorkDayCheck", {
+                            login_token: lime.cookie_get("login_token"),
+                            check_content: this.CheckFormData.check_content,
+                            uuid: this.curr_row.uuid,
+                            check_grade: this.CheckFormData.check_grade
+                        }).then(res => {
+                            this.init();
+                            this.check_show = false;
+                        }).catch(err => {
+                            this.$message.error(err.msg);
+                        });
+                    }else {
+                        console.log('submit error')
+                    }
+                 })
             },
 
             // 评论
@@ -615,17 +1188,23 @@
                     this.$message.error("请选择一条数据");
                     return;
                 }
-                this.$confirm("确认删除?", "提示").then(() => {
-                    lime.req("ShopWorkDayDel", {
-                        login_token: lime.cookie_get("login_token"),
-                        uuid: this.curr_row.uuid,
-                    }).then(res => {
-                        this.init();
-                        this.$message.success("操作成功");
-                    }).catch(err => {
-                        this.$message.error(err.msg);
+                if(this.curr_row.work_staff_name.indexOf("我") != -1) {
+                    this.$confirm("确认删除?", "提示").then(() => {
+                        lime.req("ShopWorkDayDel", {
+                            login_token: lime.cookie_get("login_token"),
+                            uuid: this.curr_row.uuid,
+                        }).then(res => {
+                            this.init();
+                            this.$message.success("操作成功");
+                        }).catch(err => {
+                            this.$message.error(err.msg);
+                        });
+                    }).catch( err => {
+                        console.log(err)
                     });
-                });
+                }else {
+                    this.$message.error("非本人数据不可删除！");
+                }
             },
 
             //详细
@@ -635,9 +1214,16 @@
                     this.$message.error("请选择一条数据");
                     return false;
                 }
-                this.detail_show = true;
-                this.DetailFormData = this.curr_row
-                this.onDetailSubmit()
+                lime.req('ShopWorkDayDetail', {
+                    login_token: lime.cookie_get('login_token'),
+                    uuid: this.curr_row.uuid
+                }).then( res => {
+                      this.detail_show = true;
+                     this.DetailFormData = res.data
+                })
+                // this.detail_show = true;
+                // this.DetailFormData = this.curr_row
+                // this.onDetailSubmit()
             },
             onDetailSubmit() {
                 lime.req("ShopWorkDayDetail", {
@@ -652,8 +1238,33 @@
         }
     };
 </script>
+<style>
+    .el-image-viewer__mask {
+        opacity: 1!important;
+    }
+     .el-table tbody tr:hover>td { 
+        background-color: #cedbeb!important;
+    }
+    .el-table__body tr.current-row>td{
+        background: #cedbeb!important;
+    }
 
+    /* .el-table--striped .el-table__body tr {
+        background:#f4f8fe;
+        border:  1px solid red;
+    } */
+
+   .el-table--striped .el-table__body tr.el-table__row--striped td {
+        background:#f4f8fe;
+        /* border:  1px solid red; */
+    }
+
+    .el-drawer__header {
+        margin-bottom: 20px !important;
+    }
+</style>
 <style scoped>
+ @import '../../assets/font/font.css';
     .menu {
         display: inline-block;
         padding: 0 16px;
@@ -661,12 +1272,83 @@
     }
 
     .page {
-        height: 46px;
-        line-height: 46px;
+         height: 40px; 
         text-align: right;
         position: fixed;
+        bottom: 20px;
+        right:40px;
+        overflow: hidden;
+        z-index: 999;
+        padding-top:  10px;
+    }
+
+     .footer {
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        padding-right: 10px!important;
+        box-sizing: border-box;
+    }
+
+    .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    }
+
+    .drawer-footer {
+        position: fixed;
         bottom: 0;
-        border-top: solid 1px red;
-        right: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
+    }
+
+    .line {
+        width: 100%;
+        height: 30px;
+        display: flex;
+        flex-direction: row;
+        border-bottom: 1px solid #F2F2F2;
+    }
+
+    .linelf {
+        width: 2%;
+        height: 100%;
+    }
+
+    .linerg {
+        width: 98%;
+        height: 100%;
+        line-height: 30px;
+        font-size: 14px;
+        color: #2a2f3b;
+    }
+
+    .line-line {
+        width: 2px;
+        height: 16px;
+        margin-top: 7px;
+        background: #0F7BF6;
     }
 </style>

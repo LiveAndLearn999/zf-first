@@ -26,6 +26,9 @@
 import lime from "@/lime.js";
 export default {
      name: "chooseAre",
+     props: {
+         peoary: {type: Array, default: () => []}
+     },
      data() {
         return {
            people_value: '',
@@ -34,7 +37,15 @@ export default {
         }
      },
      mounted() {
+         let dd = []
+         if(this.peoary){
+             console.log(this.peoary)
+             this.peoary.forEach((item,index) => {
+                 dd[index] = item.uuid
+             })
+         }
          lime.req('EbShopListCertificate',{login_token : lime.cookie_get('login_token')}).then(res => {
+             this.people_value = !dd[0] ? [res.data.rows[0].uuid] : dd
             this.peopleAry = res.data.rows.map(v => {
                 return {value: v.uuid, label: v.name, ...v}
             });
@@ -44,6 +55,7 @@ export default {
         chosePeople(dd) {
             console.log(dd)
             this.people_uuid = dd
+            // this.peoary = dd
         },
         
      }

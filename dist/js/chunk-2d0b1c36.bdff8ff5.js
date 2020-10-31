@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0b1c36"],{"20df":function(n,c,e){"use strict";e.r(c);var t=function(){var n=this,c=n.$createElement,e=n._self._c||c;return e("h1",[n._v(n._s(n.cpname))])},a=[],u={data:function(){return{cpname:"找运力"}}},r=u,s=e("9ca4"),o=Object(s["a"])(r,t,a,!1,null,"10fa8c13",null);c["default"]=o.exports}}]);
+//# sourceMappingURL=chunk-2d0b1c36.bdff8ff5.js.map

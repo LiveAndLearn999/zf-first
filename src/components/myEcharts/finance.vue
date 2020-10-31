@@ -22,10 +22,10 @@ export default {
         this.$chart.bar('charts',
             {
                 // title: ' 数据统计',
-                xData: ['可用学币', '冻结学币', '可用金额', '冻结金额', '赠送金额', '积分', '经验值'],
+                xData: ['可用学币', '冻结学币'],
                 series: [
                     {
-                        name: '数量',
+                        name: '学币',
                         type: 'bar',
                         barWidth: '40%',
                         // data: [10, 52, 200, 334, 390, 330],
@@ -51,6 +51,6 @@ export default {
 <style  scoped>
     #charts {
         width: 100%;
-        height: 400px;
+        height: 300px;
     }
 </style>

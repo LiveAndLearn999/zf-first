@@ -8,124 +8,185 @@
 -->
 <template>
     <div>
-        <div v-if="!show_map">
-            <TableBase :loading="loading" :page_num="page_num" :total="total" :rows="rows" :columns="columns" @selRow="onSelectCurrRow" @onref="onRefresh" @pageChange="onPageChange" @handleAdd="handleAdd" @handleEdit="handleEdit" @handleDel="handleDel" @handleLookPath="handleLookPath" @handleDetail="handleDetail" @handleBindDevice="handleBindDevice"/>
+        <div>
+            <!-- 菜单 -->
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
+            <el-row>
+                <el-col :span="6">
+                    <div style="padding-left:16px;">
+                        <i class="el-icon-s-unfold"></i>
+                        <span style="padding-left:9px;font-size: 16px">
+                            {{$store.state.AdminData.active_title}}
+                        </span>
+                    </div>
+                </el-col>
+
+                <el-col :span="18">
+                    <div style="text-align: right;font-size: 14px ">
+                        <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
+                        <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
+
+                        <el-link
+                            class="menu" 
+                            @click="onSubMenu(item)"
+                            v-for="(item,index) in $store.state.AdminData.right_menus" 
+                            :key="index">
+                            {{item.name}}
+                        </el-link>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
+                <el-select v-model="search_value" placeholder="请选择" style="width: 100px;margin-right: 10px"  size="small">
+                            <el-option
+                            v-for="item in search_options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select> 
+                <el-input v-if="search_value == 0" v-model="SearchFormData.plate_number" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
+        </div>
+
+
+        <div :style="{height: height - 190 - 20 + 'px',background: 'white'}" v-if="!show_map">
+            <!-- element-loading-text="拼命加载中"
+                element-loading-spinner="el-icon-loading"
+                element-loading-background="rgba(0, 0, 0, 0.8)" -->
+            <el-table 
+                :data="rows"
+                 :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
+                :height="height - 195 - 68"
+                v-loading="loading"
+                
+                @sort-change="onSortChange"
+                :highlight-current-row="true"
+                @current-change="onSelectRow"
+                 style="width: 100%;margin-top: 5px" 
+                size="mini" >
+                    <el-table-column width="80px" type="index" label="序号"></el-table-column>
+                    <el-table-column prop="plate_number" align="left" label="车牌号"></el-table-column>
+                    <el-table-column prop="trailer_plate_number" label="挂车牌照号"></el-table-column>
+                    <el-table-column prop="plate_color" label="车辆颜色">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.plate_color == 1">蓝色</span>
+                            <span v-else-if="scope.row.plate_color == 2">黄色</span>
+                            <span v-else-if="scope.row.plate_color == 3">黑色</span>
+                            <span v-else-if="scope.row.plate_color == 4">白色</span>
+                            <span v-else-if="scope.row.plate_color == 5">绿色</span>
+                            <span v-else-if="scope.row.plate_color == 9">其他</span>
+                            <span v-else-if="scope.row.plate_color == 91">农黄色</span>
+                            <span v-else-if="scope.row.plate_color == 92">农绿色</span>
+                            <span v-else-if="scope.row.plate_color == 93">黄绿色</span>
+                            <span v-else>渐变绿</span>
+                            <!-- {{scope.row.type == 1 ? '企业派送 ' : '员工提交'}} -->
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="brand" label="品牌"></el-table-column>
+                    <el-table-column prop="model" label="型号"></el-table-column>
+                    <el-table-column prop="tank_value" label="罐体编号 "></el-table-column>
+                    <el-table-column prop="tank_no" label="罐体容积"></el-table-column>
+            </el-table>
+
+            <div class="page" :style="{width:width - 280 + 'px'}">
+                 <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                    :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+                </el-pagination>
+            </div>
+        </div> 
+            <!-- <TableBase :loading="loading" :page_num="page_num" :total="total" :rows="rows" :columns="columns" @selRow="onSelectCurrRow" @onref="onRefresh" @pageChange="onPageChange" @handleAdd="handleAdd" @handleEdit="handleEdit" @handleDel="handleDel" @handleLookPath="handleLookPath" @handleDetail="handleDetail" @handleBindDevice="handleBindDevice"/> -->
 
         <!-- 添加 -->
         <el-drawer
             title="添加"
             :visible.sync="add_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
-                <el-form :model="AddFormData" label-width="160px" label-position="left">
-                    <el-form-item label="车辆:" required>
-                        <el-select
-                            v-model="vehicle_value"
-                            @change="choseVehicle"
-                            placeholder="请选择车辆">
-                                <el-option
-                                    v-for="item in vehicleAry"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                </el-option>
-                        </el-select>
-                        <!-- <el-input v-model="AddFormData.vehicle_uuid" /> -->
-                    </el-form-item>
-                    <el-form-item label="车辆厂商:" required>
-                        <el-input v-model="AddFormData.vehicle_firm" />
-                    </el-form-item>
-                    <el-form-item label="车架号:" required>
-                        <el-input v-model="AddFormData.vehicle_vin" />
-                    </el-form-item>
-                    <el-form-item label="车主:" required> 
-                        <el-select
-                            v-model="owner_value"
-                            @change="choseOwner"
-                            placeholder="请选择车主">
-                                <el-option
-                                    v-for="item in ownerAry"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                </el-option>
-                        </el-select>
-                        <!-- <el-input v-model="AddFormData.vehicle_owner" /> -->
-                    </el-form-item>
-                    <el-form-item label="车主手机:" required>
-                        <el-input v-model="AddFormData.owner_tel" />
-                    </el-form-item>
-                    <el-form-item label="责任人 ：市场人员:" required>
-                        <el-select
-                            v-model="market_value"
-                            @change="choseMarket"
-                            placeholder="请选择责任人">
-                                <el-option
-                                    v-for="item in ownerAry"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                </el-option>
-                        </el-select>
-                        <!-- <el-input v-model="AddFormData.market" /> -->
-                    </el-form-item>
-                    <el-form-item label="车辆类型:" required>
-                        <el-select
-                            v-model="type_value"
-                            @change="choseType"
-                            placeholder="请选择车辆类型">
-                                <el-option
-                                    v-for="item in typeAry"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                </el-option>
-                        </el-select>
-                        <!-- <el-input v-model="AddFormData.vehicle_type" /> -->
-                    </el-form-item>
-                    <el-form-item label="总质量（kg）:" required>
-                        <el-input v-model="AddFormData.vehicle_weight" />
-                    </el-form-item>
-                    <el-form-item label="准牵引总质量（kg）:" required>
-                        <el-input v-model="AddFormData.transfer_weight" />
-                    </el-form-item>
-                    <el-form-item label="外廓尺寸（mm）长:" required>
-                        <el-input v-model="AddFormData.outline_long" />
-                    </el-form-item>
-                    <el-form-item label="外廓尺寸（mm）宽:" required>
-                        <el-input v-model="AddFormData.outline_wide" />
-                    </el-form-item>
-                    <el-form-item label="外轮廓高:" required>
-                        <el-input v-model="AddFormData.outline_high" />
-                    </el-form-item>
-                    <el-form-item label="运输类别:" required>
-                        <el-select
-                            v-model="business_value"
-                            @change="choseBusiness"
-                            placeholder="请选择运输类型">
-                                <el-option
-                                    v-for="item in businessAry"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                </el-option>
-                        </el-select>
-                        <!-- <el-input v-model="AddFormData.business_type" /> -->
-                    </el-form-item>
-                    <el-form-item label="入网类型:" required>
-                        <el-radio-group v-model="AddFormData.inline_type">
-                            <el-radio :label="0">新增</el-radio>
-                            <el-radio :label="1">转网</el-radio>
-                        </el-radio-group>
-                        <!-- <el-input v-model="AddFormData.inline_type" /> -->
-                    </el-form-item>
+            :direction="direction" size="50%">
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="AddFormData" label-width="160px" label-position="right">
+                    <el-row>
+                        <el-col :span="12">
+                             <el-form-item label="车牌号:" :required="true">
+                                <el-input v-model="AddFormData.plate_number" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="车牌颜色:" :required="true">
+                                <el-select
+                                    style="width: 100%"
+                                    v-model="color_value"
+                                    @change="choseColor"
+                                    placeholder="车牌颜色">
+                                        <el-option
+                                            v-for="item in colorAry"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                        </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="挂车牌照号:">
+                                <el-input v-model="AddFormData.trailer_plate_number" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                             <el-form-item label="挂车车辆道路运输证:">
+                                <el-input v-model="AddFormData.trailer_road_transport_certificate_number" />
+                            </el-form-item>
+                        </el-col>   
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="品牌:">
+                                <el-input v-model="AddFormData.brand" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="罐体编号:">
+                                <el-input v-model="AddFormData.tank_value" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="罐体容积:">
+                                <el-input v-model="AddFormData.tank_no" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="道路运输证有效期:">
+                                <el-input v-model="AddFormData.road_transport_certificate_number" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="挂车车辆型号:">
+                                <el-input v-model="AddFormData.trailer_model" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="挂车核定吨位:">
+                                <el-input v-model="AddFormData.trailer_tonnage" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                 </el-form>
-
-            <!-- <span slot="footer">
-                <el-button @click="add_show = false">取消</el-button>
-                <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span> -->
-                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+                <div class="drawer-footer">
                     <el-button @click="add_show = false">取消</el-button>
                     <el-button @click="onAddSubmit" type="primary">确定</el-button>
                 </div>
@@ -143,117 +204,83 @@
          <el-drawer
             title="编辑"
             :visible.sync="edit_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
-        <!-- <el-dialog  
-            title="编辑"
-            :visible.sync="edit_show"
-            width="500px"> -->
-            <el-form :model="EditFormData" label-width="140px" label-position="left">
-                <el-form-item label="车辆:">
-                    <el-select
-                        v-model="vehicle_value"
-                        @change="choseVehicle"
-                        placeholder="请选择车辆">
-                        <el-option
-                            v-for="item in vehicleAry"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
-                    <!-- <el-input v-model="EditFormData.vehicle_uuid" /> -->
-                </el-form-item>
-                <el-form-item label="车辆厂商:">
-                    <el-input v-model="EditFormData.vehicle_firm" />
-                </el-form-item>
-                <el-form-item label="车架号:">
-                    <el-input v-model="EditFormData.vehicle_vin" />
-                </el-form-item>
-                <el-form-item label="车主:"> 
-                    <el-select
-                        v-model="owner_value"
-                        @change="choseOwner"
-                        placeholder="请选择车主">
-                        <el-option
-                            v-for="item in ownerAry"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
-                    <!-- <el-input v-model="EditFormData.vehicle_owner" /> -->
-                </el-form-item>
-                <el-form-item label="车主手机:">
-                    <el-input v-model="EditFormData.owner_tel" />
-                </el-form-item>
-                <el-form-item label="责任人 ：市场人员:">
-                    <el-select
-                        v-model="market_value"
-                        @change="choseMarket"
-                        placeholder="请选择责任人">
-                        <el-option
-                            v-for="item in ownerAry"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
-                    <!-- <el-input v-model="EditFormData.market" /> -->
-                </el-form-item>
-                <el-form-item label="车辆类型:">
-                    <el-select
-                        v-model="type_value"
-                        @change="choseType"
-                        placeholder="请选择车辆类型">
-                        <el-option
-                            v-for="item in typeAry"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
-                    <!-- <el-input v-model="EditFormData.vehicle_type" /> -->
-                </el-form-item>
-                <el-form-item label="总质量（kg）:">
-                    <el-input v-model="EditFormData.vehicle_weight" />
-                </el-form-item>
-                <el-form-item label="准牵引总质量（kg）:">
-                    <el-input v-model="EditFormData.transfer_weight" />
-                </el-form-item>
-                <el-form-item label="外廓尺寸（mm）长:">
-                    <el-input v-model="EditFormData.outline_long" />
-                </el-form-item>
-                <el-form-item label="外廓尺寸（mm）宽:">
-                    <el-input v-model="EditFormData.outline_wide" />
-                </el-form-item>
-                <el-form-item label="外轮廓高:">
-                    <el-input v-model="EditFormData.outline_high" />
-                </el-form-item>
-                <el-form-item label="运输类别:">
-                    <el-select
-                        v-model="business_value"
-                        @change="choseBusiness"
-                        placeholder="请选择运输类型">
-                        <el-option
-                            v-for="item in businessAry"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
-                    <!-- <el-input v-model="EditFormData.business_type" /> -->
-                </el-form-item>
-                <el-form-item label="入网类型:">
-                    <el-radio-group v-model="EditFormData.inline_type">
-                        <el-radio :label="0">新增</el-radio>
-                        <el-radio :label="1">转网</el-radio>
-                    </el-radio-group>
-                    <!-- <el-input v-model="EditFormData.inline_type" /> -->
-                </el-form-item>
-            </el-form>
+            :direction="direction" size="50%">
+           <div class="draw-content" :style="{height:height - 80 +'px'}">
+           <el-form :model="EditFormData" label-width="160px" label-position="right">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="车牌号:">
+                                <el-input v-model="EditFormData.plate_number" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="车牌颜色:">
+                                <el-select
+                                    style="width: 100%"
+                                    v-model="color_value"
+                                    @change="choseColor"
+                                    placeholder="请选择车辆">
+                                        <el-option
+                                            v-for="item in colorAry"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                        </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="挂车牌照号:">
+                                <el-input v-model="EditFormData.trailer_plate_number" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="挂车车辆道路运输证:">
+                                <el-input v-model="EditFormData.trailer_road_transport_certificate_number" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="品牌:">
+                                <el-input v-model="EditFormData.brand" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="罐体编号:">
+                                <el-input v-model="EditFormData.tank_value" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="罐体容积:">
+                                <el-input v-model="EditFormData.tank_no" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="道路运输证有效期:">
+                                <el-input v-model="EditFormData.road_transport_certificate_number" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="挂车车辆型号:">
+                                <el-input v-model="EditFormData.trailer_model" />
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="挂车核定吨位:">
+                                <el-input v-model="EditFormData.trailer_tonnage" />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
             
-            <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
+            <div class="drawer-footer">
                     <el-button @click="edit_show = false">取消</el-button>
                     <el-button @click="onEditSubmit" type="primary">确定</el-button>
             </div>
@@ -265,27 +292,80 @@
          <el-drawer
             title="详细"
             :visible.sync="detail_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
-                    
-                <el-form :model="DetailFormData" label-width="180px" label-position="left">
-                    <el-form-item label="车辆:">{{DetailFormData.vehicle_uuid || '---'}}</el-form-item>
-                    <el-form-item label="车辆厂商:">{{DetailFormData.vehicle_firm || '---'}}</el-form-item>
-                    <el-form-item label="车架号:">{{DetailFormData.vehicle_vin || '---'}}</el-form-item>
-                    <el-form-item label="车主:">{{DetailFormData.vehicle_owner || '---'}}</el-form-item>
-                    <el-form-item label="车主手机:">{{DetailFormData.owner_tel || '---'}}</el-form-item>
-                    <el-form-item label="责任人 ：市场人员:">{{DetailFormData.market || '---'}}</el-form-item>
-                    <el-form-item label="车辆类型:">{{DetailFormData.vehicle_type || '---'}}</el-form-item>
-                    <el-form-item label="总质量（kg）:">{{DetailFormData.vehicle_weight || '---'}}</el-form-item>
-                    <el-form-item label="准牵引总质量（kg）:">{{DetailFormData.transfer_weight || '---'}}</el-form-item>
-                    <el-form-item label="外廓尺寸（mm）长:">{{DetailFormData.outline_long || '---'}}</el-form-item>
-                    <el-form-item label="外廓尺寸（mm）宽:">{{DetailFormData.outline_wide || '---'}}</el-form-item>
-                    <el-form-item label="外轮廓高:">{{DetailFormData.outline_high || '---'}}</el-form-item>
-                    <el-form-item label="运输类别:">{{DetailFormData.business_type || '---'}}</el-form-item>
-                    <el-form-item label="入网类型:">{{DetailFormData.inline_type == 0 ? '新增' : '转网' || '---'}}</el-form-item>
+            :direction="direction" size="50%">
+           <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="DetailFormData" label-width="180px" label-position="right">
+                    <el-row>
+                        <el-col :span="12">
+                             <el-form-item label="品牌:">{{DetailFormData.brand || '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="型号:">{{DetailFormData.model || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="车辆颜色:">
+                                <span v-if="DetailFormData.plate_color == 1">蓝色</span>
+                                <span v-else-if="DetailFormData.plate_color == 2">黄色</span>
+                                <span v-else-if="DetailFormData.plate_color == 3">黑色</span>
+                                <span v-else-if="DetailFormData.plate_color == 4">白色</span>
+                                <span v-else-if="DetailFormData.plate_color == 5">绿色</span>
+                                <span v-else-if="DetailFormData.plate_color == 91">农黄色</span>
+                                <span v-else-if="DetailFormData.plate_color == 92">农绿色</span>
+                                <span v-else-if="DetailFormData.plate_color == 93">黄绿色</span>
+                                <span v-else-if="DetailFormData.plate_color == 94">渐变绿</span>
+                                <span v-else-if="DetailFormData.plate_color == 9">其他</span>
+                                <span v-else>无</span>
+                                <!-- {{DetailFormData.plate_color || '---'}} -->
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="车牌号:">{{DetailFormData.plate_number  || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="车辆道路运输证:">{{DetailFormData.road_transport_certificate_number  || '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="罐体容积:">{{DetailFormData.tank_no || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="车辆类型:">{{DetailFormData.vehicle_type || '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="罐体编号:">{{DetailFormData.tank_value || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="罐体吨位:">{{DetailFormData.tonnage || '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="挂车车辆型号:">{{DetailFormData.trailer_model || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                             <el-form-item label="挂车牌照号 :">{{DetailFormData.trailer_plate_number || '---'}}</el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="挂车车辆道路运输证:">{{DetailFormData.trailer_road_transport_certificate_number  || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="挂车核定吨位:">{{DetailFormData.trailer_tonnage  || '---'}}</el-form-item>
+                        </el-col>
+                    </el-row>
+            
+                    <!-- <el-form-item label="入网类型:">{{DetailFormData.inline_type == 0 ? '新增' : '转网' || '---'}}</el-form-item> -->
                 </el-form>
-                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
-                        <el-button @click="detail_show = false" type="primary">确定</el-button>
+                <div class="drawer-footer">
+                        <el-button @click="detail_show = false" type="primary">关闭</el-button>
                 </div>
             </div>
         </el-drawer>
@@ -295,7 +375,7 @@
             title="绑定设备"
             :visible.sync="device_show"
             width="400px">
-            <el-form :model="DeviceFormData" label-width="160px" label-position="left">
+            <el-form :model="DeviceFormData" label-width="70px" label-position="right">
                     <el-form-item label="设备:" required>
                         <el-select
                             v-model="device_value"
@@ -328,10 +408,11 @@
                 <el-button @click="onDeviceSubmit" type="primary">确定</el-button>
             </span>
          </el-dialog>
-        
-        </div>
-        <div v-else>
+
+         <div v-if="show_map">
             <MyMap />
+        </div>
+        
         </div>
     </div>
 </template>
@@ -341,17 +422,37 @@
     import lime from "@/lime.js";
     import util from "@/util.js";
     import { ShopVehExtendList, ShopVehExtendAdd, ShopVehExtendDel, ShopVehExtendEdit, ShopVehExtendDetail, ShopVehExtendBind, ShopVehExtendUnbind} from "@/api/request"
-    import TableBase from "@/components/myTables/myTable.vue"
+    // import TableBase from "@/components/myTables/myTable.vue"
     import MyMap from "@/components/myBmap/myMap.vue"
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.ShopVehExtendData) {
         Vue.set(store.state, 'ShopVehExtendData', {
+             search_options: [
+                    {value: 0,label: '车牌号'}
+                ],
+            search_value: 0,
+
+
             show_map: false,
             rows:[],
             total:0,
             charge_show: false,
             loading:false,
             curr_row:null,
+            SearchFormData:{
+                page_num:1,
+                page_len:10,
+                plate_number: ''
+            },
              // 添加
             add_show:false,
             AddFormData:{},
@@ -455,14 +556,28 @@
             deviceAry: [],
             DeviceFormData: {},
             sim_value: '',
-            simAry: []
+            simAry: [],
+
+            color_value: '1',
+            colorAry: [
+                {label: '蓝色',value: '1'},
+                {label: '黄色',value: '2'},
+                {label: '黑色',value: '3'},
+                {label: '白色',value: '4'},
+                {label: '绿色',value: '5'},
+                {label: '其他',value: '9'},
+                {label: '农黄色',value: '91'},
+                {label: '农绿色',value: '92'},
+                {label: '黄绿色',value: '93'},
+                {label: '渐变绿',value: '94'}
+            ]
         
         });
     }
 
     export default {
         components: {
-            TableBase,
+            // TableBase,
             MyMap
         },
         data() {
@@ -499,14 +614,18 @@
                 login_token: lime.cookie_get('login_token')
             }).then(dt => {
                 // console.log(dt)
+                this.device_value = dt.data.rows[0].uuid
                 this.deviceAry = dt.data.rows.map(v => {
-                    return {value: v.uuid, label: v.device_code, ...v}
+                    if(v.bind_status != 1) {
+                        return {value: v.uuid, label: v.device_code, ...v}
+                    }
                 });
             })
             lime.req('ShopSimList',{
                 login_token: lime.cookie_get('login_token')
             }).then(dt => {
                 // console.log(dt)
+                this.sim_value = dt.data.rows[0].uuid
                 this.simAry = dt.data.rows.map(v => {
                     return {value: v.uuid, label: v.sim , ...v}
                 });
@@ -516,6 +635,23 @@
 
         },
         methods: {
+            // 搜索提交
+            onSearchSubmit(){
+                // this.SearchFormData.page_num = 1;
+                this.init();
+            },
+
+
+            choseColor(uuid) {
+                this.AddFormData.plate_color = uuid
+                this.EditFormData.plate_color = uuid
+                console.log(uuid)
+                // this.AddFormData.vehicle_uuid = uuid
+            },
+            // 按钮点击 menu:参数数据 local是否本地程序
+            onSubMenu(menu, local = false) {
+                util.submenu(menu,this,lime.cookie_get('login_token'), local);
+            },
             choseVehicle(uuid) {
                 // console.log(uuid)
                 this.AddFormData.vehicle_uuid = uuid
@@ -543,24 +679,37 @@
                 console.log(uuid)
             },
             init() {
-               this.loading = true;
+            //    this.loading = true;
+            NProgress.start();
                 let pam = {
                     login_token:lime.cookie_get('login_token'),
-                    page_len: this.page_len,
-                    page_num: this.page_num
+                    page_len: this.SearchFormData.page_len + '',
+                    page_num: this.SearchFormData.page_num + '',
+                    plate_number: this.SearchFormData.plate_number
                 }
-                ShopVehExtendList(pam, res => {
-                    this.loading = false;
+                lime.req('EbShopVehicleList',pam).then(res => {
+                    // this.loading = false;
+                    NProgress.done();
                     this.rows = res.data.rows;
                     this.total = res.data.total;
-                    // this.list = res.data;
                 }).catch(err => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done();
                     this.$message.error(err.msg);
                 })
+                // ShopVehExtendList(pam, res => {
+                //     this.loading = false;
+                //     this.rows = res.data.rows;
+                //     this.total = res.data.total;
+                //     // this.list = res.data;
+                // }).catch(err => {
+                //     this.loading = false;
+                //     this.$message.error(err.msg);
+                // })
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false;
+                    NProgress.done();
+                    // this.loading = false;
                 }, 10000);
             },
            
@@ -569,8 +718,20 @@
                 this.init();
             },
             // 点击单选
-            onSelectCurrRow(row) {
+            onSelectRow(row) {
                 this.curr_row = row;
+            },
+            // 排序处理
+            onSortChange(sort) {
+                console.log(sort);
+                this.SearchFormData.order_field = sort.prop;
+                if (sort.order == 'ascending') {
+                    this.SearchFormData.order_sort  = 'asc';
+                } else {
+                    this.SearchFormData.order_sort  = 'desc';
+                }
+                
+                this.init();
             },
             // 分页处理
             onPageChange(page){
@@ -578,17 +739,19 @@
                 console.log(page)
                 this.init();
             },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
             //添加
             handleAdd(){
                 this.add_show = true
                 console.log(99999)
             },
             onAddSubmit() {
-                this.AddFormData.inline_type = this.AddFormData.inline_type - 0
                 this.AddFormData.login_token = lime.cookie_get('login_token')
-               ShopVehExtendAdd(this.AddFormData, res => {
-                   this.init()
-               }).catch( err => {
+                lime.req('EbShopVehicleAdd',this.AddFormData).then( res => {
+                    this.init()
+                }).catch( err => {
                    this.$$message.error(err)
                })
                this.add_show = false
@@ -604,7 +767,7 @@
                         login_token:lime.cookie_get('login_token'),
                         uuid: this.curr_row.uuid
                     }
-                    ShopVehExtendDel(pam, res => {
+                    lime.req('EbShopVehicleDel',pam).then(res => {
                         this.init();
                         this.$message.success('操作成功');
                     }).catch(err => {
@@ -623,22 +786,32 @@
                     login_token:lime.cookie_get('login_token'),
                     uuid: this.curr_row.uuid
                 }
-                ShopVehExtendDetail( pam, res => {
-                    this.EditFormData = res.data
+                lime.req('EbShopVehicleDetail', {
+                    login_token: lime.cookie_get('login_token'),
+                    uuid: this.curr_row.uuid
+                }).then( res => {
+                   this.EditFormData = res.data
                 }).catch(err => {
                         this.$message.error(err.msg);
                 })
                 this.edit_show = true
+
             },
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token')
                 let pam = this.EditFormData
-                ShopVehExtendEdit(pam, res => {
-                   this.init();
+                lime.req('EbShopVehicleEdit',pam).then( res => {
+                     this.init();
                    this.edit_show = false;
                 }).catch(err => {
                         this.$message.error(err.msg);
                 })
+                // ShopVehExtendEdit(pam, res => {
+                //    this.init();
+                //    this.edit_show = false;
+                // }).catch(err => {
+                //         this.$message.error(err.msg);
+                // })
             },
             
             // 详细
@@ -647,7 +820,7 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-                lime.req('ShopVehExtendDetail', {
+                lime.req('EbShopVehicleDetail', {
                     login_token: lime.cookie_get('login_token'),
                     uuid: this.curr_row.uuid
                 }).then( res => {
@@ -657,28 +830,70 @@
             },
             
             //绑定设备
-            handleBindDevice() {
-                if (util.empty(this.curr_row)) {
-                    this.$message.error('请选择一条数据');
-                    return;
-                }
-                this.device_show = true
-            },
+            // handleBindDevice() {
+            //     if (util.empty(this.curr_row)) {
+            //         this.$message.error('请选择一条数据');
+            //         return;
+            //     }
+            //     this.device_show = true
+            // },
             
             // 绑定设备
             onDeviceSubmit() {
+                // sim_value device_value
                 console.log(99999)
+                lime.req('ShopVehExtendBind',{
+                    login_token: lime.cookie_get('login_token'),
+                    veh_uuid: this.curr_row.uuid,
+                    dev_uuid: this.device_value,
+                    sim_uuid: this.sim_value
+                }).then( res => {
+                    console.log(res)
+                })
             },
             
             //查看轨迹
-            handleLookPath() {
-                this.show_map = true
-                console.log(111111)
-            }
+            // handleLookPath() {
+            //     this.show_map = !this.show_map
+            //     console.log(111111)
+            // }
         }
         
     }
 </script>
 <style scoped>
     @import '../../assets/styles/common.css';
+    .drawer-footer {
+         position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
+    }
+
+ .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    }
 </style>

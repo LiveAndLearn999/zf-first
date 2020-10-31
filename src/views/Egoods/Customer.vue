@@ -10,19 +10,19 @@
 	<div>
 		<!-- <h6>{{cpname}}</h6> -->
          <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right; font-size: 14px">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
 
@@ -37,55 +37,62 @@
                 </el-col>
             </el-row>
         </div>
+
+         <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box">               
+                <el-select v-model="search_value" placeholder="请选择" style="width: 100px;margin-right: 10px"  size="small">
+                            <el-option
+                            v-for="item in search_options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select> 
+                <el-input v-if="search_value == 0" v-model="SearchFormData.name" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
+        </div>
         
-       <div style="border-top: solid 1px #f2f1f4;">
+       <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
+           <!-- element-loading-text="拼命加载中"
+                element-loading-spinner="el-icon-loading"
+                element-loading-background="rgba(0, 0, 0, 0.8)" -->
+
             <el-table 
                 :data="rows"
-                :height="height - 60 - 46 - 48"
+               
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height: '48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
+                :height="height - 195 - 68"
                 v-loading="loading"
-                element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
-                style="width: 100%" 
+                style="width: 100%;margin-top: 5px" 
                 size="mini">
-                    <el-table-column type="index" label="#"></el-table-column>
-                    <el-table-column prop="name" label="承运方名称"></el-table-column>
+                    <el-table-column type="index" width="80px" label="序号"></el-table-column>
+                    <el-table-column prop="name" align="left" label="承运方名称"></el-table-column>
                     <el-table-column prop="phone_number" label="联系手机号"></el-table-column>
                     <el-table-column prop="license" label="承运人许可证"></el-table-column>
                     <el-table-column prop="add_time" label="添加时间"></el-table-column>
                     <el-table-column prop="last_time" label="修改时间"></el-table-column>
-                    <!-- <template v-for="(column, index) in columns">
-                         <el-table-column align="center" :key="index" :prop="column.prop" :label="column.label">
-                             <span v-if="column.showSt">
-                                  columns: [
-                {prop: 'name', label: '承运方名称'},
-                {prop: 'phone_number', label: '联系手机号'},
-                {prop: 'license', label: '承运人许可证'},
-                {prop: 'add_time', label: '添加时间'},
-                {prop: 'last_time', label: '修改时间'} 
-            ],
-                                 slot-scope="scope"
-                                 stateFormat(scope.row.state)
-                                 <template>
-                                    {{column.status}}
-                                    {{scope.row.status + '111111'}}
-                                </template>
-                             </span>
-                         </el-table-column>
-                    </template> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
+                    background
+                    @size-change="handleSizeChange"
+                    @current-change="onPageChange"
+                    :current-page.sync="SearchFormData.page_num"
+                    :page-size="SearchFormData.page_len"
+                     :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
        </div>
 
@@ -93,8 +100,8 @@
         <el-dialog  
             title="添加"
             :visible.sync="add_show"
-            width="500px">
-            <el-form :model="AddFormData" label-width="120px" label-position="left">
+            width="400px">
+            <el-form :model="AddFormData" label-width="110px" label-position="right">
                 <el-form-item label="承运方:" required>
                     <el-input v-model="AddFormData.name" />
                 </el-form-item>
@@ -117,8 +124,8 @@
         <el-dialog  
             title="编辑"
             :visible.sync=" edit_show"
-            width="500px">
-            <el-form :model="EditFormData" label-width="120px" label-position="left">
+            width="400px">
+            <el-form :model="EditFormData" label-width="110px" label-position="right">
                 <el-form-item label="承运方:">
                     <el-input v-model="EditFormData.name" />
                 </el-form-item>
@@ -141,27 +148,43 @@
         <el-drawer
             title="详细"
             :visible.sync="detail_show"
-            :direction="direction" size="45%">
-            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',padding: '30px',boxSizing: 'border-box'}">
-                <el-form :model="DetailFormData" label-width="120px" label-position="left">
-                    <el-form-item label="承运方:" required>
-                        {{DetailFormData.name}}
-                    </el-form-item>
-                    <el-form-item label="承运方电话:" required>
-                        {{DetailFormData.phone_number}}
-                    </el-form-item>
-                    <el-form-item label="承运方许可证:" required>
-                        {{DetailFormData.license}}
-                    </el-form-item>
-                      <el-form-item label="创建时间:">
-                        {{EditFormData.add_time }}
-                    </el-form-item>
-                    <el-form-item label="更新时间:">
-                        {{EditFormData.last_time}}
-                    </el-form-item>
+            :direction="direction" size="50%">
+            <div class="draw-content" :style="{height:height - 80 +'px'}">
+                <el-form :model="DetailFormData" label-width="110px" label-position="right">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="承运方:">
+                                {{DetailFormData.name}}
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="创建时间:">
+                                {{EditFormData.add_time }}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="承运方许可证:">
+                                {{DetailFormData.license}}
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="更新时间:">
+                                {{EditFormData.last_time}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="承运方电话:">
+                                {{DetailFormData.phone_number}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
                 </el-form>
-                <div class="footer" style="text-align: right;padding-right: 30px;box-sizing: border-box">
-                    <el-button @click="detail_show = false" type="primary">确定</el-button>
+                <div class="drawer-footer">
+                    <el-button @click="detail_show = false" type="primary">关闭</el-button>
                 </div>
             </div>
         </el-drawer>
@@ -180,9 +203,22 @@ import util from "@/util.js";
 // import TableBase from "@/components/myTables/baseTable.vue"
 import { EbCarrierList, EbCarrierEdit } from "@/api/request"
 // import file from "@/components/imgUpload/upload.vue"
+ import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
 if (!store.state.EbCarrierData) {
         Vue.set(store.state, 'EbCarrierData', {
+             search_options: [
+                    {value: 0,label: '承运方'}
+                ],
+            search_value: 0,
             total:0,
             loading:false,
             curr_row:null,
@@ -200,7 +236,8 @@ if (!store.state.EbCarrierData) {
             // 搜索
             SearchFormData:{
                 page_num:1,
-                page_len:10
+                page_len:10,
+                name: ''
             },
             //表格数据
             rows: [],
@@ -230,26 +267,39 @@ export default {
         }
    },
     methods: {
+        // 搜索提交
+            onSearchSubmit(){
+                // this.SearchFormData.page_num = 1;
+                this.init();
+            },
         // 按钮点击 menu:参数数据 local是否本地程序
         onSubMenu(menu, local = false) {
             util.submenu(menu,this,lime.cookie_get('login_token'), local);
         },
         init() {
-            this.loading = true;
+            // this.loading = true;
+             NProgress.start();
             let pam = {
-                login_token:lime.cookie_get('login_token')
+                login_token:lime.cookie_get('login_token'),
+                page_num:this.SearchFormData.page_num,
+                page_len:this.SearchFormData.page_len,
+                name: this.SearchFormData.name
             }
             EbCarrierList(pam, res => {
-                this.loading = false;
+                // this.loading = false;
+                 NProgress.done();
                 this.rows = res.data.rows;
                 this.total = res.data.total;
             }).catch(err => {
-                this.loading = false;
+                 NProgress.done();
+                // this.loading = false;
                 this.$message.error(err.msg);
+                //  this.$router.push('/login');
             })
             // 超时关闭遮罩层
             setTimeout(() => {
-                this.loading = false;
+                 NProgress.done();
+                // this.loading = false;
             }, 10000);
         },
         // 刷新
@@ -344,5 +394,38 @@ export default {
 }
 </script>
 <style scoped>
- @import '../../assets/styles/common.css'; 
+ @import '../../assets/styles/common.css';
+  .drawer-footer {
+         position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
+    }
+
+ .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    } 
 </style>

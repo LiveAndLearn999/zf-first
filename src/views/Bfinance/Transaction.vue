@@ -14,14 +14,14 @@
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
                 </el-col>
 
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right;font-size: 16px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
                         <el-link
                             class="menu" 
@@ -36,19 +36,22 @@
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <div :style="{height: height - 150 + 'px',background: 'white'}">
+             <!-- element-loading-spinner="el-icon-loading" -->
             <el-table 
                 :data="rows"
-                :height="height - 60 - 46 - 48"
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
+                :height="height - 195 - 8"
                 v-loading="loading"
                 element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
+               
+                element-loading-background="rgba(0, 0, 0, 0.1)"
 
                 @sort-change="onSortChange"
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
-                style="width: 100%" 
+                style="width: 100%;margin-top: 5px;" 
                 size="mini">
                 <el-table-column type="index" label="#"></el-table-column>
                 <el-table-column prop="trade_type" label="交易类型"></el-table-column>
@@ -56,25 +59,36 @@
                 <el-table-column prop="trade_money" label="交易金额"></el-table-column>
                 <el-table-column prop="add_time" label="记录时间" :sortable=true></el-table-column>
                 <el-table-column prop="add_ip" label="记录ip"></el-table-column>
-                <el-table-column prop="remark" label="备注"></el-table-column>
+                <!-- <el-table-column prop="remark" label="备注"></el-table-column> -->
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
+                background
+                @size-change="handleSizeChange"
+                @current-change="onPageChange"
+                :current-page.sync="SearchFormData.page_num"
+                :page-size="SearchFormData.page_len"
+                :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+                </el-pagination>
+                <!-- <el-pagination
                     :current-page.sync="SearchFormData.page_num"
                     @current-change="onPageChange"
                     layout="prev, pager, next"
                     :total="total">
-                </el-pagination>
+                </el-pagination> -->
             </div>
         </div>
 
         <!-- 详细 -->
-        <el-dialog 
-            title=""
-            width="450px"
-            :visible.sync="detail_show">
-            <el-form :model="DetailFormData" label-width="120px">
+         <el-drawer
+            title="详细"
+            :visible.sync="detail_show"
+            direction="rtl" size="50%">
+            <div :style="{width:'100%', height:height - 80 +'px',overflow: 'auto',paddingLeft: '60px',paddingTop: '20px',boxSizing: 'border-box',borderTop: '1px solid #F2F2F2'}">
+            <el-form :model="DetailFormData" label-width="120px" label-position="left">
                 <el-form-item label="交易类型:">{{DetailFormData.trade_type || '----'}}</el-form-item>
                 <el-form-item label="关联交易编码:">{{DetailFormData.trade || '----'}}</el-form-item>
                 <el-form-item label="交易金额:">{{DetailFormData.trade_money || '----'}}</el-form-item>
@@ -82,7 +96,11 @@
                 <el-form-item label="记录ip:">{{DetailFormData.add_ip || '----'}}</el-form-item>
                 <el-form-item label="备注:">{{DetailFormData.remark || '----'}}</el-form-item>
             </el-form>
-        </el-dialog>
+            </div>
+            <div class="drawer-footer">
+                    <el-button @click="detail_show = false" type="primary">关闭</el-button>
+            </div>
+        </el-drawer>
 
     </div>
 </template>
@@ -91,6 +109,15 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.SpData) {
         Vue.set(store.state, 'SpData', {
@@ -129,13 +156,15 @@
             this.init();
         },
         methods:{
+             handleSizeChange(val) {console.log(`每页 ${val} 条`);},
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
             },
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                NProgress.start();
                 lime.req('ShopManageTradeList', {
                     login_token:lime.cookie_get('login_token'),
                     page_num:this.SearchFormData.page_num,
@@ -143,7 +172,8 @@
                     order_field:this.SearchFormData.order_field,
                     order_sort:this.SearchFormData.order_sort
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done();
                     this.rows = res.data.rows;
                     this.total = res.data.total;
                 });
@@ -151,7 +181,8 @@
 
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false;
+                    NProgress.done();
+                    // this.loading = false;
                 }, 10000);
             },
             // 表格数据刷新
@@ -186,7 +217,7 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-                this.DetailFormData = this.curr_row
+                this.DetailFormData = this.curr_row 
                 this.detail_show = true
             }
         }
@@ -196,4 +227,18 @@
 
 <style scoped>
     @import '../../assets/styles/common.css';
+    .drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999999;
+    }
 </style>

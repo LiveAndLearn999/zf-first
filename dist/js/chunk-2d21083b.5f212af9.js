@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d21083b"],{b7e5:function(n,e,t){"use strict";t.r(e);var c=function(){var n=this,e=n.$createElement,t=n._self._c||e;return t("h1",[n._v(n._s(n.cpname))])},a=[],u={data:function(){return{cpname:"保险公司"}}},r=u,s=t("9ca4"),o=Object(s["a"])(r,c,a,!1,null,"631b8476",null);e["default"]=o.exports}}]);
+//# sourceMappingURL=chunk-2d21083b.5f212af9.js.map

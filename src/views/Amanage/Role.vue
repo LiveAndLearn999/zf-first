@@ -29,24 +29,85 @@
         </div>
 
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
+        <!-- fontFamily: 'FZCYJ', -->
+        <div :style="{height: height - 144 + 'px',background: 'white'}">
+             <!-- stripe 
+              v-loading="loading"
+              element-loading-text="拼命加载中"
+               element-loading-background="rgba(0, 0, 0, 0.1)" -->
             <el-table 
                 ref="role"
                 :data="rows"
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '300'}" 
+                :header-cell-style="{height:'48px',background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '200'}"
                 row-key="uuid"
-                :height="height - 60 - 95"
-                v-loading="loading"
-                :default-expand-all="true"
-                element-loading-text="拼命加载中"
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)"
-
+                :height="height - 196"
+                :default-expand-all="true"              
                 :highlight-current-row="true"
                 @current-change="onSelectRow"
                 style="width: 100%" 
                 size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="name" label="角色名称"></el-table-column>
+                <!-- has_menus -->
+                <!-- <el-table-column type="index" width="80px" label="序号"></el-table-column> -->
+                <el-table-column align="left" prop="name" label="角色名称">
+                     <template slot-scope="scope">
+                        <span v-if="scope.row.has_menus == 0">
+                             <img src="@/assets/imgs/no-tree.png" style="height: 15px;margin-top:10px">
+                            {{scope.row.name}}
+                        </span>
+                        <span v-else >
+                             <img src="@/assets/imgs/tree.png" style="height: 15px;margin-top:10px">
+                            {{scope.row.name}}
+                        </span>
+                        <!-- <span v-else>已设置</span>
+                        {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
+                    </template>
+                </el-table-column>
+                <el-table-column 
+                    prop="has_menus" 
+                    label="状态" 
+                    align="center"
+                   >
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.has_menus == 0">
+                            <el-tag type="danger"> 未设置</el-tag>
+                        </span>
+                        <span v-else>
+                            <el-tag> 已设置</el-tag>
+                        </span>
+                        <!-- {{scope.row.has_menus == 0 ? '未设置' : '已设置'}} -->
+                    </template>
+                </el-table-column>
+                <!-- <el-table-column label="操作" width="230px" align="center">
+                    <template slot-scope="scope">
+                    <el-dropdown trigger="hover">
+                        <span class="el-dropdown-link">
+                            更多<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click="handleEdit(scope.$index, scope.row)">
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleSetMenu(scope.$index, scope.row)">设置菜单</el-button>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button
+                                size="mini"
+                                type="text"
+                                @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+                </el-table-column> -->
+
             </el-table>
         </div>
 
@@ -58,12 +119,15 @@
             <el-form :model="AddFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
+                    ref="cascaderHandle"
                         clearable 
                         :options="add_rows"
-                        :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        :props="{checkStrictly: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
+                        @change="close"
                         v-model="AddFormData.parent_uuid" style="width: 330px">
                     </el-cascader>
+                    <div class="el-form-item__error" v-if="add_err_show">所属父类不能为空</div>
                 </el-form-item>
 
                 <el-form-item label="角色名称:">
@@ -87,12 +151,15 @@
             <el-form :model="EditFormData" label-width="80px" label-position="left">
                 <el-form-item label="所属父类:">
                     <el-cascader 
+                    @change="closes"
+                    ref="cascaderHandles"
                         clearable 
                         :options="edit_rows"
-                        :props="{expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
+                        :props="{checkStrictly: true,expandTrigger: 'hover',value:'uuid', label:'name',emitPath:false}"
                         placeholder="请选择"
                         v-model="EditFormData.parent_uuid" style="width: 320px">
                     </el-cascader>
+                    <div class="el-form-item__error" v-if="edit_err_show">所属父类不能为空</div>
                 </el-form-item>
 
                 <el-form-item label="角色名称:">
@@ -108,11 +175,12 @@
 
 
         <el-drawer
-            size="800px"
+            size="50%"
             :append-to-body="true"
             :visible.sync="set_show">
             <div slot="title">设置菜单</div>
-            <div :style="{padding:'0 0 0 20px', height:height - 120 + 'px',overflow:'auto'}">
+            <!-- <div :style="{padding:'0 0 0 20px', height:height - 120 + 'px',overflow:'auto'}"> -->
+                <div class="draw-content" :style="{height:height - 80 +'px'}">
                 <el-form :model="SetFormData">
                     <fieldset class="margin" v-for="item in SetMenuList" :key="item.uuid">
                         <legend class="padding">
@@ -150,10 +218,14 @@
                         </div>
                     </fieldset>
 
-                    <el-form-item>
+                    <!-- <el-form-item style="text-align: right;padding-right: 20px;box-sizing: border-box;margin-top: 20px">
                         <el-button @click="onSetMenuSubmit" type="primary">设 置</el-button>
-                    </el-form-item>
+                    </el-form-item> -->
                 </el-form>
+            </div>
+
+             <div class="drawer-footer">
+                <el-button @click="onSetMenuSubmit" type="primary">设 置</el-button>
             </div>
         </el-drawer>
     </div>
@@ -164,9 +236,20 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
+     import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+     NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
 
     if (!store.state.RoleData) {
         Vue.set(store.state, 'RoleData', {
+            add_err_show: false,
+            edit_err_show: false,
             list:[],
             rows:[],
             loading:false,
@@ -212,8 +295,25 @@
         },
         created(){
             this.init();
+            this.curr_row = null
         },
         methods:{
+            close(val){
+                this.$refs.cascaderHandle.dropDownVisible = false;
+                // if(!this.AddFormData.parent_uuid) {
+                //     this.add_err_show = true
+                // }else {
+                //     this.add_err_show = false
+                // }
+            },
+            closes(val){
+                this.$refs.cascaderHandles.dropDownVisible = false;
+                // if(!this.EditFormData.parent_uuid) {
+                //     this.edit_err_show = true
+                // }else {
+                //     this.edit_err_show = false
+                // }
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {
                 util.submenu(menu,this,lime.cookie_get('login_token'), local);
@@ -222,22 +322,47 @@
             
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                NProgress.start();
 
                 lime.req('ShopRoleList', {
                     login_token:lime.cookie_get('login_token'),
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done()
                     this.curr_row = null;
                     this.$refs.role.setCurrentRow();
-                    this.list = res.data;
-                    this.rows = util.toTree(res.data);
+                    // this.list = res.data
+                    // console.log(res.data)
+                    let dd = res.data
+                   dd.forEach((item,index) => {
+                       let duuid = false
+                       dd.forEach((itm,idx) => {
+                           if(itm.uuid == item.parent_uuid) {
+                              duuid = true
+                           }
+                       })
+                       if(!duuid) {
+                           item.parent_uuid = ''
+                       }
+                    })
+
+                    // this.list = res.data;
+                    // this.rows = util.toTree(res.data);
+                    // this.list = dd
+                    this.rows = util.toTree(dd)
+                    console.log(this.rows)
+                }).catch(err => {
+                    this.$$message.error(err)
+                    // this.$router.push('/login');
                 });
 
 
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false;
+                    NProgress.done()
+                    // this.$router.push('/login');
+                    // this.loading = false;
                 }, 10000);
             },
 
@@ -259,6 +384,7 @@
                     name:'',
                     parent_uuid:'',
                 }
+                 NProgress.start();
                 // 如果选择列表数据,则获取作为父类
                 if (!util.empty(this.curr_row)) {
                     this.AddFormData.parent_uuid = this.curr_row.uuid;
@@ -274,18 +400,44 @@
                     })
                 });
                 this.add_rows = util.toTree(_rows);
+                NProgress.done()
                 this.add_show = true;
             },
             // 添加向后台提交
             onAddSubmit() {
+                NProgress.start();
                 this.AddFormData.login_token = lime.cookie_get('login_token');
+               let dd =  this.AddFormData.name 
+               if(!this.AddFormData.parent_uuid) {
+                   this.AddFormData = {}
+                   this.AddFormData.login_token = lime.cookie_get('login_token');
+                   this.AddFormData.name = dd
+                   
+               }
                 lime.req('ShopRoleAdd', this.AddFormData).then(res => {
-                    
+                     NProgress.done()
                     this.init();
                     this.add_show = false;
                 }).catch(err => {
+                   NProgress.done()
                     this.$message.error(err.msg);
                 })
+                // if(!this.AddFormData.parent_uuid) {
+                //     this.add_err_show = true
+                //     NProgress.done()
+                // }else {
+                //     this.add_err_show = false
+                //     lime.req('ShopRoleAdd', this.AddFormData).then(res => {
+                    
+                //     this.init();
+                //     this.add_show = false;
+                // }).catch(err => {
+                //    NProgress.done()
+                //     this.$message.error(err.msg);
+                // })
+                // }
+
+                // this.AddFormData.login_token = lime.cookie_get('login_token');
             },
 
 
@@ -295,38 +447,88 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
+                 lime.req('ShopRoleList', {
+                    login_token:lime.cookie_get('login_token'),
+                }).then(res => {
+                    this.list = res.data
+                    console.log(999999)
+                    console.log(this.list)
+                    lime.req('ShopStaffSelfLoginInfo',{
+                            login_token: lime.cookie_get('login_token')
+                        }).then(res => {
+                            // console.log(this.list)
+                            console.log(res.data)
+                            let acIdx = 0
+                            this.list.push({
+                                has_menus: 1,
+                                name: res.data.role_name,
+                                parent_uuid:"",
+                                uuid: res.data.role_uuid
+                            })
+                            console.log(this.list)
+                            NProgress.start();
+                            let _rows = [];
+                            this.edit_rows = [];
+                            this.list.forEach((item,index) => {
+                                if (item.uuid != this.curr_row.uuid) {
+                                    _rows.push({
+                                        name:item.name,
+                                        parent_uuid:item.parent_uuid,
+                                        uuid:item.uuid,
+                                    });
+                                }else {
+                                    acIdx = index
+                                }
+                            });
 
-                let _rows = [];
-                this.edit_rows = [];
+                            this.edit_rows = util.toTree(_rows);
 
-                this.list.forEach(item => {
-                    if (item.uuid != this.curr_row.uuid) {
-                        _rows.push({
-                            name:item.name,
-                            parent_uuid:item.parent_uuid,
-                            uuid:item.uuid,
-                        });
-                    }
-                });
+                            NProgress.done()
+                            // this.EditFormData.parent_uuid = this.curr_row.parent_uuid;
+                            // this.EditFormData.name = this.curr_row.name;
+                            this.EditFormData.parent_uuid = this.list[acIdx].parent_uuid;
+                            this.EditFormData.name =  this.list[acIdx].name;
+                            this.edit_show = true;
 
-                this.edit_rows = util.toTree(_rows);
+                        })
 
-
-                this.EditFormData.parent_uuid = this.curr_row.parent_uuid;
-                this.EditFormData.name = this.curr_row.name;
-                this.edit_show = true;
+                })
+                
             },
             // 编辑后台提交
             onEditSubmit() {
+                let dd = this.EditFormData.name
                 this.EditFormData.login_token = lime.cookie_get('login_token');
                 this.EditFormData.uuid        = this.curr_row.uuid;
-
-                lime.req('ShopRoleEdit', this.EditFormData).then(res => {
+              if(!this.EditFormData.parent_uuid) {
+                  this.EditFormData = {}
+                 this.EditFormData.login_token = lime.cookie_get('login_token');
+                this.EditFormData.uuid        = this.curr_row.uuid;
+                this.EditFormData.name = dd
+              }
+                NProgress.start();
+                 lime.req('ShopRoleEdit', this.EditFormData).then(res => {
+                     NProgress.done()
                     this.init();
                     this.edit_show = false;
                 }).catch(err => {
+                  NProgress.done()
                     this.$message.error(err.msg);
                 });
+                // if(!this.AddFormData.parent_uuid) {
+                //     this.edit_err_show = true
+                //     NProgress.done()
+                // }else {
+                //     this.edit_err_show = false
+                //     lime.req('ShopRoleEdit', this.EditFormData).then(res => {
+                //     this.init();
+                //     this.edit_show = false;
+                // }).catch(err => {
+                //     NProgress.start();NProgress.done()
+                //     this.$message.error(err.msg);
+                // });
+                // }
+                
             },
 
 
@@ -339,6 +541,7 @@
 
 
                 this.$confirm('确认删除?', '提示').then(() => {
+                    NProgress.start();
                     lime.req('ShopRoleDel', {
                         login_token:lime.cookie_get('login_token'),
                         uuid:this.curr_row.uuid
@@ -346,27 +549,101 @@
                         this.init();
                         this.$message.success('操作成功');
                     }).catch(err => {
+                       NProgress.done()
                         this.$message.error(err.msg);
                     })
+                }).catch(err => {
+                    console.log(err)
                 })
             },
 
-            // 设置菜单
-            handleSetMenu(menu) {
+             handleSetMenu(menu) {
+                  NProgress.start();
                 if (util.empty(this.curr_row)) {
                     this.$message.error('请选择一条数据');
                     return;
                 }
+                this.SetMenuList = [];
+                lime.req({
+                    module:'ShopRoleSetMenu',
+                    ver:'1.0.0',
+                    relation_module:'ShopMenuList',
+                    relation_ver:'1.0.0'
+                },{
+                    login_token:lime.cookie_get('login_token'),
+                    role_uuid:this.curr_row.parent_uuid
+                }).then(res => {
+                    // 数据初始化,所有菜单都归属不选
+                    this.SetMenuList = [];
+                    if (res.data.length != 0) {
+                        this.is_disabled = false;
+                    } else {
+                        this.is_disabled = true;
+                    }
+                    //this.SetMenuList = res.data;
+                    res.data.forEach(item => {
+                        item.checked = false;
+                        this.SetFormData.menu_uuids.push(item.uuid);
+                    })
 
+                    // 当前设置好的
+                    lime.req({
+                        module:'ShopRoleSetMenu',
+                        ver:'1.0.0',
+                        relation_module:'ShopMenuList',
+                        relation_ver:'1.0.0'
+                    }, {
+                        login_token:lime.cookie_get('login_token'),
+                        role_uuid:this.curr_row.uuid
+                    }).then(cres => {
+                        if (cres.code == 0) {
+                            cres.data.forEach(item => {
+                                if (this.SetFormData.menu_uuids.includes(item.uuid)) {
+                                    item.checked = true;
+                                    for (var i = 0;i<res.data.length;i++) {
+                                        if (res.data[i].uuid == item.uuid) {
+                                            res.data.splice(i,1,item);
+                                        }
+                                    }
+                                } else {
+                                    item.checked = false;
+                                }
+                            })
+                            this.SetMenuList = util.toTree(res.data);
+                            this.set_show = true;
+                             NProgress.done();
+                        } else {
+                            this.$message.error(cres.msg);
+                        }
+                        
+                        
+                    });
+
+                    
+                }).catch(err => {
+                    this.$message.error(err.msg);
+                })
+            },
+
+            // 设置菜单
+            handleSetMenus(menu) {
+                if (util.empty(this.curr_row)) {
+                    this.$message.error('请选择一条数据');
+                    return;
+                }
+                NProgress.start();
                 lime.req(
                 {
                     module:'ShopRoleSetMenu',
                     ver:'1.0.0',
                     relation_module:'ShopMenuList',
-                    relation_ver:'1.0.0'
+                    relation_ver:'1.0.0',
+                    // uuid: this.curr_row.uuid,
+                    // login_token:lime.cookie_get('login_token')
                 },
                 {
                     login_token:lime.cookie_get('login_token'),
+                    // uuid: this.curr_row.uuid,
                     role_uuid:this.curr_row.parent_uuid
                 }).then(res => {
                     // 数据初始化,所有菜单都归属不选
@@ -396,11 +673,13 @@
                                 item.checked = false;
                             }
                         })
+                       NProgress.done()
                     });
 
                     this.SetMenuList = util.toTree(res.data);
                     this.set_show = true;
                 }).catch(err => {
+                   NProgress.done()
                     this.$message.error(err.msg);
                 })
             },
@@ -491,6 +770,7 @@
             },
 
             onSetMenuSubmit() {
+                NProgress.start();
                 lime.req('ShopRoleSetMenu', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid,
@@ -500,17 +780,81 @@
                     this.init();
                     this.set_show = false;
                 }).catch(err => {
+                  NProgress.done()
                     this.$message.error(err.msg);
                 })
             }
         }
     }
 </script>
+<style >
+ .el-table tbody tr:hover>td { 
+        background-color: #cedbeb!important;
+    }
+    .el-table__body tr.current-row>td{
+        background: #cedbeb!important;
+    }
 
+    /* .el-table--striped .el-table__body tr {
+        background:#f4f8fe;
+        border:  1px solid red;
+    } */
+
+   .el-table--striped .el-table__body tr.el-table__row--striped td {
+        background:#f4f8fe;
+        /* border:  1px solid red; */
+    }
+
+    .el-drawer__header {
+        margin-bottom: 20px !important;
+    }
+</style>
+<style lang="less">
+
+
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+        background:#f4f8fe;
+    }
+.el-table__expand-icon {
+    .el-icon-arrow-right:before {
+      content: "\e791";
+      font-size: 20px;
+    }
+  }
+
+.el-submenu__title {
+    .el-icon-arrow-down:before {
+        content: "\e791";
+        font-size: 20px;
+    }
+}
+
+.el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow{
+    -webkit-transform: rotateZ(90deg); 
+    -ms-transform: rotate(90deg);
+    transform: rotateZ(90deg); 
+}
+
+.el-cascader-panel .el-radio{ 
+    width: 100%;
+    height: 100%;
+    z-index: 10; 
+    position: absolute; 
+    top: 10px;
+    right: 10px; 
+  } 
+  .el-cascader-panel .el-radio__input{ 
+     visibility: hidden; 
+   } 
+   .el-cascader-panel .el-cascader-node__postfix{ 
+     top: 10px;
+   } 
+</style>
 <style scoped>
+@import '../../assets/font/font.css';
     .menu{
         display: inline-block;
-        padding:0 16px;
+        padding:10px 16px;
         text-align: center;
     }
 
@@ -519,6 +863,8 @@
         margin: 10px;
         border:solid 1px #ccc;
         border-radius: 5px;
+        padding-bottom: 7px;
+        box-sizing: border-box;
     }
 
     .padding{
@@ -536,5 +882,39 @@
         margin-left: 30px; 
         display: inline-block; 
         min-width: 120px;
+    }
+
+    .drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 999;
+    }
+
+    .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
     }
 </style>

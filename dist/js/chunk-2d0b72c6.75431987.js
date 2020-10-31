@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0b72c6"],{"1ffa":function(e,n,c){"use strict";c.r(n);var t=function(){var e=this,n=e.$createElement,c=e._self._c||n;return c("h1",[e._v(e._s(e.cpname))])},a=[],u={data:function(){return{cpname:"找货物"}}},r=u,s=c("9ca4"),o=Object(s["a"])(r,t,a,!1,null,"ee994e08",null);n["default"]=o.exports}}]);
+//# sourceMappingURL=chunk-2d0b72c6.75431987.js.map

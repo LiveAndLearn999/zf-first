@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d22275c"],{cf69:function(n,c,e){"use strict";e.r(c);var t=function(){var n=this,c=n.$createElement,e=n._self._c||c;return e("h1",[n._v(n._s(n.cpname))])},a=[],u={data:function(){return{cpname:"二手转让"}}},r=u,s=e("9ca4"),o=Object(s["a"])(r,t,a,!1,null,"43fa41d6",null);c["default"]=o.exports}}]);
+//# sourceMappingURL=chunk-2d22275c.6edbe7e8.js.map

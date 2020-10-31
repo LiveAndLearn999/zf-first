@@ -10,12 +10,12 @@
 <template>
     <div v-wechat-title="$route.meta.title">
         <!-- 菜单 -->
-        <div style="height: 46px; line-height: 46px; overflow: hidden;">
+        <div style="height: 46px; line-height: 46px; overflow: hidden;border-bottom: 1px solid #F2F2F2;">
             <el-row>
                 <el-col :span="6">
                     <div style="padding-left:16px;">
                         <i class="el-icon-s-unfold"></i>
-                        <span style="padding-left:9px;">
+                        <span style="padding-left:9px;font-size: 16px">
                             {{$store.state.AdminData.active_title}}
                         </span>
                     </div>
@@ -23,9 +23,9 @@
 
                 <!-- 前端自定义功能 -->
                 <el-col :span="18">
-                    <div style="text-align: right; ">
+                    <div style="text-align: right; font-size:14px ">
                         <el-link @click="onSubMenu('onRefresh',true)" class="menu">刷新</el-link>
-                        <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link>
+                        <!-- <el-link @click="onSubMenu('onSearch',true)" class="menu">搜索</el-link> -->
 
                         <el-link class="menu" @click="onSubMenu(item)" 
                             v-for="(item,index) in $store.state.AdminData.right_menus" :key="index">
@@ -36,16 +36,37 @@
             </el-row>
         </div>
 
+        <div style="width: 100%;height: 45px;margin-top: 15px;font-size: 14px;padding-left: 20px;box-sizing: border-box"> 
+                <el-select v-model="search_value" placeholder="请选择" style="width: 80px;margin-right: 10px"  size="small">
+                    <el-option
+                         v-for="item in search_options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>    
+                <el-input v-model="SearchFormData.title" size="small" style="width: 240px;margin-right: 20px;height: 36px"/>
+                <el-button type="primary" @click="onSearchSubmit" size="small">搜索</el-button>
+        </div>
+
         <!-- 数据表格 -->
-        <div style="border-top: solid 1px #f2f1f4;">
-            <el-table :data="rows" :height="height - 60 - 46 - 48" 
-                v-loading="loading" element-loading-text="拼命加载中" 
-                element-loading-spinner="el-icon-loading"
-                element-loading-background="rgba(0, 0, 0, 0.8)" 
+       <div :style="{height: height - 190 - 20 + 'px',background: 'white'}">
+            <!-- lement-loading-spinner="el-icon-loading  stripe" -->
+            <!-- v-loading="loading" element-loading-text="拼命加载中" 
+            
+                element-loading-background="rgba(0, 0, 0, 0.1)"  -->
+            <el-table 
+                :data="rows" 
+                
+                :row-style="{height:'48px',fontSize: '14px',color: '#3F434C',background: 'white',fontWeight: '400',fontFamily: 'SimSun Regular'}" 
+                :header-cell-style="{background:'#f4f8fe',color:'#2a2f3b',fontSize: '16px',fontWeight: '400'}"
+                :height="height - 195 - 68" 
                 @sort-change="onSortChange" :highlight-current-row="true" 
-                @current-change="onSelectRow" style="width: 100%" size="mini">
-                <el-table-column type="index" label="#"></el-table-column>
-                <el-table-column prop="title" label="标题" align="center"></el-table-column>
+                @current-change="onSelectRow" 
+                style="width: 100%;margin-top: 5px;" 
+                size="mini">
+                <el-table-column type="index" width="80px" label="#"></el-table-column>
+                <el-table-column prop="title" label="标题" align="left"></el-table-column>
                 <el-table-column prop="cont_type" label="文件类型" align="center" >
                      <template slot-scope="scope">
                         {{scope.row.cont_type == 1 ? '视频' : '图文'}}
@@ -63,16 +84,18 @@
                 </el-table-column>
                 <el-table-column prop="look_num" label="查看次数" align="center"></el-table-column>
                 <el-table-column prop="add_time" label="添加时间" align="center" :sortable=true></el-table-column>
-                <el-table-column prop="last_time" label="最近登录时间" align="center" :sortable=true></el-table-column>
+                <el-table-column prop="last_time" label="最后更新时间" align="center" :sortable=true></el-table-column>
             </el-table>
 
-            <div class="page" :style="{width:width - 250 + 'px'}">
+            <div class="page" :style="{width:width - 280 + 'px'}">
                 <el-pagination
+                background
                 @size-change="handleSizeChange"
                 @current-change="onPageChange"
                 :current-page.sync="SearchFormData.page_no"
                 :page-size="SearchFormData.page_len"
-                layout="prev, pager, next, jumper"
+                 :page-sizes="[10]"
+                layout="total, sizes, prev, pager, next, jumper"
                 :total="total">
                 </el-pagination>
                 <!-- <el-pagination :current-page.sync="SearchFormData.page_no"
@@ -96,112 +119,321 @@
         </el-dialog>
 
         <!-- 添加 -->
-        <el-dialog title="添加" :visible.sync="add_show" width="500px" height="100px">
-            <el-form :model="AddFormData" label-width="80px" label-position="left">
-                <el-form-item label="标题:" prop="title" :required='true'>
-                    <el-input v-model="AddFormData.title" />
-                </el-form-item>
-                <el-form-item label="类型:" prop="cont_type" :required='true'>
-                    <el-radio-group v-model="AddFormData.cont_type">
-                        <el-radio :label="1">视频</el-radio>
-                        <el-radio :label="2">图文</el-radio>
-                    </el-radio-group>
-                </el-form-item> 
-                <el-form-item label="支付:" prop="is_pay" :required='true'>
-                    <el-radio-group v-model="AddFormData.is_pay" class="paystyle">
-                        <el-radio :label="0">免费</el-radio>
-                        <el-radio :label="1">收费</el-radio>
-                        <el-form-item v-if="AddFormData.is_pay==1 ? visible=true:visible=false" label="学币:" prop="min_num" label-width="50px">
-                            <el-input v-model="AddFormData.min_num" class="coinstyle"/>
+        <!-- <el-dialog title="添加" :visible.sync="add_show" width="500px" height="100px"> -->
+        <el-drawer
+            title="添加"
+            :visible.sync="add_show"
+            direction="rtl" size="50%">
+            <div  class="draw-content" :style="{height:height - 80 +'px'}">
+            <el-form :model="AddFormData" label-width="110px" label-position="right" ref="addform" :rules="rules" style="margin-top: 10px">
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="标题:" prop="title">
+                            <el-input  v-model="AddFormData.title" />
                         </el-form-item>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="上传封面" prop="thumb" :required='true'>
-                    <file ref="thumb_img"/>
-                    <!-- <el-input v-model="AddFormData.thumb" /> -->
-                </el-form-item>
-                <el-form-item label="上传内容" prop="content" :required='true'>
-                    <file v-if="AddFormData.cont_type == 2" ref="content_img"/>
-                    <vediofile v-else ref="content_vedio"/>
-                    <!-- <el-input v-model="AddFormData.content" /> -->
-                </el-form-item>
-                <el-form-item label="是否展示" :required='true' class="paystyle">
-                    <el-switch v-model="add_isshow" style="float: left;margin-top: 10px;"></el-switch>
-                    <el-form-item v-if="add_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
-                        <el-col :span="11">
-                            <el-date-picker type="date" placeholder="选择日期" v-model="add_showtime" style="width: 265px;width: 165px;"></el-date-picker>
-                        </el-col>
-                    </el-form-item>
-                </el-form-item>
-                 <el-form-item label="备注:">
-                    <el-input v-model="AddFormData.remark" />
-                </el-form-item>
-                <el-form-item label="时长:" v-if="AddFormData.cont_type === 1">
-                    <el-input v-model="AddFormData.content_time" />
-                </el-form-item>
-            </el-form>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="类型:" prop="cont_type">
+                             <el-select v-model="add_type_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_type_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                            </el-select>
+                        </el-form-item> 
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                          <el-form-item label="上传封面:" prop="thumb">
+                            <file ref="thumb_img"/>
+                            <!-- <el-input v-model="AddFormData.thumb" /> -->
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                     <el-col :span="12">
+                        <el-form-item v-if="add_type_value == 0" label="是否加密:" prop="encrypt">
+                                <el-select v-model="add_encrypt_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_encrypt_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                          <el-form-item label="上传附件:" prop="content" >
+                              <div style="width: 100%;border: 1px solid lightgray;padding: 20px;box-sizing: border-box;border-radius: 5px">
+                                  <wangeditor v-if="add_show && add_type_value == 1" ref="content_img" :newHtml="AddFormData.content"/>
+                                    <!-- <UploadAuth v-else-if="add_show && add_type_value != 1" ref="ref_vedio"/> -->
+                                     <UploadAuths v-else-if="add_show && add_type_value != 1" @func="getVideoUrl" :isEncrypt="add_encrypt_value"/>
+                              </div>
+                            <!-- <file v-if="AddFormData.cont_type == 2" ref="content_img"/> -->
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                     <el-col :span="12">
+                        <el-form-item label="支付:" prop="is_pay">
+                            <el-select v-model="add_pay_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_pay_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                          <el-form-item label="时长(分钟):"  v-if="add_type_value === 0">
+                            <el-input-number v-model="AddFormData.content_time" controls-position="right" :step="15" :min="15" :max="200" label="描述文字"></el-input-number>
+                            <!-- <el-input style="width: 360px" type="number" v-model="AddFormData.content_time" /> -->
+                        </el-form-item>
 
-            <span slot="footer">
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item v-if="add_pay_value == 1" label="学币:">
+                                <el-input-number v-model="AddFormData.min_num" controls-position="right" :step="15" :min="15" :max="200" label="描述文字"></el-input-number>
+                        </el-form-item>
+                    </el-col>
+                     <el-col :span="12">
+                        <el-form-item label="是否展示:" class="paystyle">
+                             <el-select v-model="add_show_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_show_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item v-if="add_show_value == 1" label="活动时间:" >
+                                <el-date-picker type="date" placeholder="选择日期" v-model="add_showtime" ></el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="标签:" >
+                                <el-tag
+                                :key="addtag"
+                                v-for="addtag in adddynamicTags"
+                                closable
+                                :disable-transitions="false"
+                                @close="addhandleClose(addtag)">
+                                {{addtag}}
+                                </el-tag>
+                                <el-input
+                                class="input-new-tag"
+                                v-if="addinputVisible"
+                                v-model="addinputValue"
+                                ref="addsaveTagInput"
+                                size="small"
+                                @keyup.enter.native="addhandleInputConfirm"
+                                @blur="addhandleInputConfirm"
+                                >
+                                </el-input>
+                                <el-button v-else class="button-new-tag" size="small" @click="addshowInput">+</el-button>
+
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                 <el-row>
+                     <el-col :span="24">
+                         <el-form-item label="备注:">
+                            <el-input  :rows="5" type="textarea" v-model="AddFormData.remark" />
+                        </el-form-item>
+                     </el-col>
+                 </el-row>
+            </el-form>
+            </div>
+            <div class="drawer-footer">
+                    <el-button @click="add_show = false">取消</el-button>
+                <el-button @click="onAddSubmit" type="primary">确定</el-button>
+                </div>
+            <!-- <span slot="footer">
                 <el-button @click="add_show = false">取消</el-button>
                 <el-button @click="onAddSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+            </span> -->
+        </el-drawer>
+        <!-- </el-dialog> -->
 
         <!-- 编辑 -->
-        <el-dialog title="编辑" :visible.sync="edit_show" width="500px">
-            <el-form :model="EditFormData" label-width="80px" label-position="left">
-                <el-form-item label="标题:" prop="title">
-                    <el-input v-model="EditFormData.title" />
-                </el-form-item>
-                <el-form-item label="类型:" prop="cont_type">
-                    <el-radio-group v-model="EditFormData.cont_type">
-                        <el-radio :label="1">视频</el-radio>
-                        <el-radio :label="2">图文</el-radio>
-                    </el-radio-group>
-                </el-form-item> 
-                <el-form-item label="支付:" prop="is_pay">
-                    <el-radio-group v-model="EditFormData.is_pay" class="paystyle">
-                        <el-radio :label="0">免费</el-radio>
-                        <el-radio :label="1">收费</el-radio>
-                        <el-form-item v-if="EditFormData.is_pay==1 ? visible=true:visible=false" label="学币:" prop="min_num" label-width="50px">
-                            <el-input v-model="EditFormData.min_num" class="coinstyle"/>
+        <!-- <el-dialog title="编辑" :visible.sync="edit_show" width="500px"> -->
+        
+        <el-drawer
+            title="编辑"
+            :visible.sync="edit_show"
+            direction="rtl" size="50%">
+            <div  class="draw-content" :style="{height:height - 80 +'px'}">
+            <el-form :model="EditFormData" label-width="100px" label-position="right" :rules="rules" style="margin-top: 10px">
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="标题:" prop="title">
+                            <el-input  v-model="EditFormData.title" />
                         </el-form-item>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="封面" prop="thumb">
-                    <img v-if="EditFormData.thumb" :src="EditFormData.thumb" alt="" style="width: 40px;">
-                    <span v-else>---</span>
-                    <!-- <el-input v-model="EditFormData.thumb" /> -->
-                </el-form-item>
-                <el-form-item label="修改封面" prop="thumb">
-                    <file ref="edit_thumb_img"/>
-                </el-form-item>
-                <el-form-item label="内容" prop="content">
-                    <img v-if="EditFormData.content" :src="EditFormData.content" alt="" style="width: 40px;">
-                    <span v-else>---</span>
-                    <!-- <el-input v-model="EditFormData.content" /> -->
-                </el-form-item>
-                <el-form-item label="修改内容" prop="content">
-                    <file ref="edit_content_img"/>
-                </el-form-item>
-                <el-form-item label="是否展示" class="paystyle">
-                    <el-switch v-model="edit_isshow" style="float: left;margin-top: 10px;"></el-switch>
-                    <el-form-item v-if="edit_isshow==true?visible=true:visible=false" label="活动时间:" label-width="80px" style="padding-left:20px;">
-                        <el-col :span="11">
-                            <el-date-picker type="date" placeholder="选择日期" v-model="edit_showtime" style="width: 265px;width: 165px;"></el-date-picker>
-                        </el-col>
-                    </el-form-item>
-                </el-form-item>
-                 <el-form-item label="备注:">
-                    <el-input v-model="EditFormData.remark" />
-                </el-form-item>
-            </el-form>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="类型:" prop="cont_type">
+                             <el-select v-model="edit_type_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_type_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                            </el-select>
+                        </el-form-item> 
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                          <el-form-item label="上传封面:" prop="thumb">
+                            <file ref="thumb_imgs" :imgUrl="EditFormData.thumb"/>
+                            <!-- <el-input v-model="AddFormData.thumb" /> -->
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                     <el-col :span="12">
+                        <el-form-item v-if="edit_type_value == 0" label="是否加密：" prop="encrypt">
+                                <el-select v-model="add_encrypt_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_encrypt_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                                </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                          <el-form-item label="上传附件:" prop="content" >
+                              <div style="width: 100%;border: 1px solid lightgray;padding: 20px;box-sizing: border-box;border-radius: 5px">
+                                  <wangeditor v-if="edit_show && edit_type_value == 1" ref="content_imgs" :newHtml="edit_content"/>
+                                    <!-- <UploadAuth v-else-if="edit_show && edit_type_value != 1" ref="ref_vedios"/> -->
+                                        <div v-else>
+                                            <UploadAuths @func="getVideoUrl" :isEncrypt="EditFormData.encrypt" @isShowVideo1="isShowVideoFn1" @isShowVideo2="isShowVideoFn2" v-model="EditFormData.typeContent"></UploadAuths>
+                                            <div v-if="videoPlayer3" class="prism-player" id="J_prismPlayer" style="width: 300px;height: 300px;"></div>
+                                            <video v-if="videoPlayer4" width="320" height="240" :src="videoUrl" controls></video>
+                                        </div>
+                              </div>
+                            <!-- <file v-if="AddFormData.cont_type == 2" ref="content_img"/> -->
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                     <el-col :span="12">
+                        <el-form-item label="支付:" prop="is_pay">
+                            <el-select v-model="edit_pay_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_pay_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                          <el-form-item label="时长(分钟):"  v-if="edit_type_value == 0">
+                            <el-input-number v-model="EditFormData.content_time" :step="15" controls-position="right" :min="15" :max="200" label="描述文字"></el-input-number>
+                            <!-- <el-input style="width: 360px" type="number" v-model="AddFormData.content_time" /> -->
+                        </el-form-item>
 
-            <span slot="footer">
-                <el-button @click="edit_show = false">取消</el-button>
+                    </el-col>
+                </el-row>
+                <el-row>
+                     <el-col :span="12">
+                        <el-form-item label="是否展示:" class="paystyle">
+                             <el-select v-model="edit_show_value" placeholder="请选择">
+                                        <el-option
+                                        v-for="item in add_show_options"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                        </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item v-if="edit_pay_value == 1" label="学币:">
+                                <el-input-number v-model="EditFormData.min_num" controls-position="right" :step="15" :min="15" :max="200" label="描述文字"></el-input-number>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item v-if="edit_show_value == 1" label="活动时间:" label-width="80px" style="padding-left:20px;">
+                                    <el-date-picker type="date" placeholder="选择日期" v-model="edit_showtime" ></el-date-picker>
+                            </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="标签:" >
+                                <el-tag
+                                :key="edittag"
+                                v-for="edittag in editdynamicTags"
+                                closable
+                                :disable-transitions="false"
+                                @close="edithandleClose(edittag)">
+                                {{edittag}}
+                                </el-tag>
+                                <el-input
+                                class="input-new-tag"
+                                v-if="editinputVisible"
+                                v-model="editinputValue"
+                                ref="editsaveTagInput"
+                                size="small"
+                                @keyup.enter.native="edithandleInputConfirm"
+                                @blur="edithandleInputConfirm"
+                                >
+                                </el-input>
+                                <el-button v-else class="button-new-tag" size="small" @click="editshowInput">+</el-button>
+
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                 <el-row>
+                     <el-col :span="24">
+                         <el-form-item label="备注:">
+                            <el-input  :rows="5" type="textarea" v-model="EditFormData.remark" />
+                        </el-form-item>
+                     </el-col>
+                 </el-row>
+            </el-form>
+            </div>
+            <div class="drawer-footer">
+                    <el-button @click="edit_show = false">取消</el-button>
                 <el-button @click="onEditSubmit" type="primary">确定</el-button>
-            </span>
-        </el-dialog>
+                </div>
+            <!-- <span slot="footer">
+                <el-button @click="add_show = false">取消</el-button>
+                <el-button @click="onAddSubmit" type="primary">确定</el-button>
+            </span> -->
+        </el-drawer>
+
     </div>
 </template>
 
@@ -210,11 +442,71 @@
     import store from "@/store";
     import lime from "@/lime.js";
     import util from "@/util.js";
-    import file from "@/components/imgUpload/upload.vue"
-    import vediofile from "@/components/imgUpload/vedio.vue"
+    import file from "@/components/imgUpload/drapload.vue"
+    // import vediofile from "@/components/imgUpload/vedio.vue"
+    import UploadAuth from '@/components/video/videoUpload.vue'
+     import UploadAuths from '@/components/video/videoUploads.vue'
+    import wangeditor from "@/components/wangeditor/index.vue"
+    import NProgress from 'nprogress'
+    import 'nprogress/nprogress.css' 
+    NProgress.configure({     
+        easing: 'ease',  // 动画方式    
+        speed: 500,  // 递增进度条的速度    
+        showSpinner: false, // 是否显示加载ico    
+        trickleSpeed: 200, // 自动递增间隔    
+        minimum: 0.3 // 初始化时的最小百分比
+    })
     
     if (!store.state.ShopResourceData) {
         Vue.set(store.state, 'ShopResourceData', {
+            adddynamicTags: [],
+            addinputVisible: false,
+            addinputValue: '',
+            editdynamicTags: [],
+            editinputVisible: false,
+            editinputValue: '',
+
+
+            videoPlayer3: false,
+            videoPlayer4: false,
+            vedioUrl: '',
+            videoUrl: '',
+
+            edit_content: '',
+            add_type_value: 0,
+            edit_type_value: 0,
+            edit_pay_value: 0,
+            edit_show_value: 0,
+            edit_showtime: '',
+            add_type_options: [
+                {value: 0 , label: '视频'},
+                {value: 1, label: '图文'}
+            ],
+            add_encrypt_value: 0,
+            add_encrypt_options: [
+                {value: 0 , label: '不加密'},
+                {value: 1, label: '加密'}
+            ],
+             add_pay_value: 0,
+            add_pay_options: [
+                {value: 0 , label: '免费'},
+                {value: 1, label: '收费'}
+            ],
+            add_show_value: 0,
+            add_show_options: [
+                {value: 0 , label: '否'},
+                {value: 1, label: '是'}
+            ],
+
+             rules: {
+                title: [
+                    { required: true, message: '标题必填', trigger: 'blur' }
+                ],
+                cont_type: [
+                    { required: true, message: '标题必填', trigger: 'blur' }
+                ],
+
+             },
             rows:[],
             total:0,
             loading:false,
@@ -228,6 +520,10 @@
                 order_sort:'desc'
             },
             search_show:false,
+            search_options: [
+                    {value: 0,label: '标题'},
+                ],
+            search_value: 0,
             // 添加
             add_show:false,
             add_isshow:false,//是否展示选择项
@@ -244,6 +540,7 @@
                 login_token:'',
                 content_time:0,
             },
+            add_encrypt: 0,
             // 编辑
             edit_show:false,
             edit_isshow:false,//是否展示选择项
@@ -261,13 +558,17 @@
                 content_time:0,
             },
 
+
         });
     }
 
     export default {
         components: {
             file,
-            vediofile
+            // vediofile,
+            // UploadAuth,
+            UploadAuths,
+            wangeditor
         },
         data() {return store.state.ShopResourceData;},
         computed:{
@@ -278,11 +579,98 @@
         },
         created(){this.init();},
         methods:{
+            addhandleClose(tag) {
+                this.adddynamicTags.splice(this.adddynamicTags.indexOf(tag), 1);
+            },
+
+            addshowInput() {
+                this.addinputVisible = true;
+                this.$nextTick(_ => {
+                this.$refs.addsaveTagInput.$refs.input.focus();
+                });
+            },
+
+            addhandleInputConfirm() {
+                let addinputValue = this.addinputValue;
+                if (addinputValue) {
+                this.adddynamicTags.push(addinputValue);
+                }
+                this.addinputVisible = false;
+                this.addinputValue = '';
+            },
+
+            edithandleClose(tag) {
+                this.editdynamicTags.splice(this.editdynamicTags.indexOf(tag), 1);
+            },
+
+            editshowInput() {
+                this.editinputVisible = true;
+                this.$nextTick(_ => {
+                this.$refs.editsaveTagInput.$refs.input.focus();
+                });
+            },
+
+            edithandleInputConfirm() {
+                let editinputValue = this.editinputValue;
+                if (editinputValue) {
+                this.editdynamicTags.push(editinputValue);
+                }
+                this.editinputVisible = false;
+                this.editinputValue = '';
+            },
+
+
+
+            isShowVideoFn1 (data) {
+                this.videoPlayer3 = data;
+            },
+            isShowVideoFn2 (data) {
+                this.videoPlayer4 = data;
+            },
+            getVideoUrl (data) {
+            console.log(data)
+            this.vedioUrl = data
+            // this.AddFormData.typeContent = data;
+            // this.addRules.typeContent = [];
+            // this.$refs.uploadElement2.clearValidate();
+        },
+            onAddSubmit() {
+                this.$refs['addform'].validate((valid) => {
+                    if (valid) {
+                this.AddFormData.login_token = lime.cookie_get('login_token');
+                this.AddFormData.cont_type = this.add_type_value - 0 + 1
+                this.AddFormData.is_show = this.add_show_value == 0 ? 0 : new Date(this.add_showtime).getTime()/1000;
+                this.AddFormData.thumb = this.$refs.thumb_img.img_url
+                this.AddFormData.is_pay = this.add_pay_value
+                // this.AddFormData.content = this.add_type_value == 0 ? this.$refs.ref_vedio.uploader._uploadList[0].videoId : this.$refs.content_img.content
+                this.AddFormData.content = this.add_type_value == 0 ? this.vedioUrl : this.$refs.content_img.content
+                this.AddFormData.encrypt = this.add_encrypt_value + ''
+                this.AddFormData.tags = this.adddynamicTags.toString()
+                lime.req('ShopResourceAdd', this.AddFormData).then(res => {
+                    this.SearchFormData.page_no = 1;
+                    this.init();
+                    this.add_show = false;
+                }).catch(err => {
+                    console.log(err)
+                    this.$message.error(err.msg);
+                })
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+                 // // console.log(this.$refs.ref_vedio.uploader._uploadList[0].videoId)
+                 // console.log( this.add_type_options)
+            },
+            handleChange(value) {
+                console.log(value)
+            },
             // 按钮点击 menu:参数数据 local是否本地程序
             onSubMenu(menu, local = false) {util.submenu(menu,this,lime.cookie_get('login_token'), local);},
             // 数据初始化
             init() {
-                this.loading = true;
+                // this.loading = true;
+                NProgress.start();
                 lime.req('ShopResourceList', {
                     login_token:lime.cookie_get('login_token'),
                     title:this.SearchFormData.title,
@@ -291,7 +679,8 @@
                     order_field:this.SearchFormData.order_field,
                     order_sort:this.SearchFormData.order_sort
                 }).then(res => {
-                    this.loading = false;
+                    // this.loading = false;
+                    NProgress.done();
                     if(res.code=== 0){
                         this.rows = res.data.rows;
                         this.total = res.data.total;
@@ -300,7 +689,8 @@
                 });
                 // 超时关闭遮罩层
                 setTimeout(() => {
-                    this.loading = false;
+                    NProgress.done();
+                    // this.loading = false;
                 }, 10000);
             },
             // 状态格式化
@@ -364,6 +754,11 @@
             onSearchSubmit(){
                 this.search_show = false;
                 this.SearchFormData.page_no = 1;
+                // if(this.search_value == 0) {
+                //     this.SearchFormData.mobile = ''
+                // }else {
+                //     this.SearchFormData.real_name = ''
+                // }
                 this.init();
             },
             // 选择单行
@@ -388,11 +783,13 @@
             },
             // 添加展示
             handleAdd() {this.add_show = true;},
-            onAddSubmit() {
+            onAddSubmits() {
+                // console.log(this.$refs.ref_vedio.uploader._uploadList[0].videoId)
                 this.AddFormData.login_token = lime.cookie_get('login_token');
-                this.AddFormData.is_show = this.timeFormat(this.add_showtime);
+                this.AddFormData.is_show = this.AddFormData.is_show == 0 ? 0 : new Date(this.AddFormData.is_show).getTime();
                 this.AddFormData.thumb = this.$refs.thumb_img.img_url
-                this.AddFormData.content = this.$refs.content_img.img_url
+                this.AddFormData.content = this.AddFormData.cont_type == 0 ? this.$refs.ref_vedio.uploader._uploadList[0].videoId : this.$refs.content_img.img_url
+                this.AddFormData.encrypt = this.add_encrypt + ''
                 lime.req('ShopResourceAdd', this.AddFormData).then(res => {
                     this.SearchFormData.page_no = 1;
                     this.init();
@@ -408,37 +805,90 @@
                     this.$message.error('请选择一条数据');
                     return;
                 }
-                this.edit_show =true;
                 lime.req('ShopResourceDetail', {
                     login_token:lime.cookie_get('login_token'),
                     uuid:this.curr_row.uuid
                 }).then(res => {
                     if(res.code=== 0){
-                        this.EditFormData.content = res.data.content;
+                        this.edit_show =true;
+                        this.edit_content = res.data.content
+                        this.EditFormData.thumb = res.data.thumb
+                        this.EditFormData.title = res.data.title
                         this.EditFormData.content_time = res.data.content_time;
+                        this.edit_type_value = res.data.cont_type - 0 - 1
+                        this.edit_pay_value = res.data.is_pay
+                        this.edit_show_value = res.data.is_show == 0 ? 0 : 1
+                        this.edit_showtime = res.data.is_show == 0 ? '' : res.data.is_show*1000
+                        this.EditFormData.remark =res.data.remark
+                        
+                        this.editdynamicTags = res.data.tags.split(",")
+
+                          if (res.data.video_type == 3) {
+                        var self = this;
+                        if (res.data.encrypt == 0) {
+                            this.videoPlayer3 = false;
+                            this.videoPlayer4 = true;
+                            this.dTime1 = setInterval(function () {
+                                lime.req('ShopAliVideoPlayUrl', {
+                                    login_token:lime.cookie_get('login_token'),
+                                    videoId: res.data.content
+                                }).then(res => {
+                                    if (res.code == 0) {
+                                        clearInterval(self.dTime1)
+                                        self.videoUrl = res.data.playUrl;
+                                        console.log(self.videoUrl)
+                                        self.$emit('func',self.vid)
+                                    }
+                                })
+                            },3000)
+                        } else {
+                            this.videoPlayer4 = false;
+                            this.videoPlayer3 = true;
+                            this.dTime2 = setInterval(function () {
+                                lime.req('ShopVideoAlPlayAuth', {
+                                    login_token:lime.cookie_get('login_token'),
+                                    videoId: res.data.content
+                                }).then(res => {
+                                    if (res.code == 0) {
+                                        clearInterval(self.dTime2)
+                                        self.playAuth1 = res.data;
+                                        self.$emit('func',self.vid)
+                                        //self.saveVideoId(self.videoId);
+                                        var palyer = new Aliplayer({
+                                            id: 'J_prismPlayer',
+                                            vid: self.playAuth1.videoPlayId,//self.vid
+                                            width: '100%',
+                                            height: '100%',
+                                            autoplay: false,
+                                            // 播放方式二：点播用户推荐
+                                            cover: 'http://liveroom-img.oss-cn-qingdao.aliyuncs.com/logo.png',
+                                            playauth: self.playAuth1.playAuth,
+                                            isLive: false,
+                                            rePlay: false,
+                                            playsinline: true,
+                                            encryptType: 1,
+                                        })
+                                    }
+                                });
+                            },3000)
+                        }
+                          }
+
                     }
-                }).catch(err => {
-                    this.$message.error(err.msg);
-                });
-                this.EditFormData.title = this.curr_row.title;
-                this.EditFormData.cont_type = this.curr_row.cont_type;
-                this.EditFormData.is_pay = this.curr_row.is_pay;
-                this.EditFormData.min_num = this.curr_row.min_num;
-                this.EditFormData.thumb = this.curr_row.thumb;
-                this.EditFormData.remark = this.curr_row.remark;
-                lime.req('ShopResourceDetail',  {
-                    login_token:lime.cookie_get('login_token'),
-                    uuid:this.curr_row.uuid
-                }).then(res => {
-                    this.EditFormData.content = res.data.content;
                 }).catch(err => {
                     this.$message.error(err.msg);
                 });
             },
             onEditSubmit() {
                 this.EditFormData.login_token = lime.cookie_get('login_token');
-                this.EditFormData.thumb = this.$refs.edit_thumb_img.img_url ? this.$refs.edit_thumb_img.img_url : this.EditFormData.thumb 
-                this.EditFormData.content = this.$refs.edit_content_img.img_url ? this.$refs.edit_content_img.img_url : this.EditFormData.content       
+                this.EditFormData.uuid = this.curr_row.uuid
+                this.EditFormData.thumb = this.$refs.thumb_imgs.img_url ? this.$refs.thumb_imgs.img_url : this.EditFormData.thumb 
+                this.EditFormData.content = this.edit_type_value == 0 ? this.$refs.ref_vedios.uploader._uploadList[0].videoId : this.edit_content
+                this.EditFormData.is_pay = this.edit_pay_value
+                this.EditFormData.is_show = this.edit_show_value == 0 ? '0' : new Date(this.edit_showtime).getTime()/1000 + ''
+                this.EditFormData.cont_type = this.edit_type_value - 0 + 1
+                this.EditFormData.tags = this.editdynamicTags.toString()
+
                 lime.req('ShopResourceEdit', this.EditFormData).then(res => {
                     this.init();
                     this.edit_show = false;
@@ -488,6 +938,31 @@
     }
 </script>
 
+<style>
+    @import '../../assets/styles/common.css'; 
+    .el-table tbody tr:hover>td { 
+        background-color: #cedbeb!important;
+    }
+    .el-table__body tr.current-row>td{
+        background: #cedbeb!important;
+    }
+     .el-tag + .el-tag {
+    margin-left: 10px;
+  }
+  .button-new-tag {
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: bottom;
+  }
+
+</style>
 <style lang="less" scoped>
     .menu{
         display: inline-block;
@@ -496,13 +971,17 @@
     }
 
     .page {
-        height: 40px; 
-        line-height: 40px; 
+       height: 40px; 
+        /* line-height: 40px;  */
         text-align: right;
         position: fixed;
-        bottom: 0;
-        right:0;
+        bottom: 20px;
+        right:40px;
         overflow: hidden;
+        /* background: #f4f8fe; */
+        /* border: 1px solid red; */
+        z-index: 999;
+        padding-top:  10px;
     }
 
     .coinstyle{
@@ -513,6 +992,40 @@
        .el-form-item{
             display: inline-block;
         } 
+    }
+
+    .draw-content {
+        width: 100%;
+        overflow: auto;
+        margin: 0 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 20px;
+        padding-bottom: 30px;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+    }
+
+    .draw-content:after {
+         content: "";
+        height: 30px;
+        display: block;
+
+    }
+
+    .drawer-footer {
+        position: fixed;
+        bottom: 0;
+        width: 50%;
+        height: 50px;
+        background: white;
+        /* border: 1px solid red; */
+        padding-right: 20px;
+        text-align: right;
+        box-sizing: border-box;
+        border-top: 1px solid #F2F2F2;
+        line-height: 50px;
+        z-index: 99999;
     }
 
 </style>

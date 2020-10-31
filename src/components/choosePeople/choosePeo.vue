@@ -24,7 +24,7 @@
 <script>
 import lime from "@/lime.js";
 export default {
-     name: "chooseAre",
+     name: "choosePeo",
      data() {
         return {
            people_value: '',
@@ -34,6 +34,7 @@ export default {
      },
      mounted() {
          lime.req('EbCarrierList',{login_token : lime.cookie_get('login_token')}).then(res => {
+             this.people_value = res.data.rows[0].uuid
             this.peopleAry = res.data.rows.map(v => {
                 return {value: v.uuid, label: v.name, ...v}
             });
