@@ -1,7 +1,11 @@
 <template>
     <div>
         <el-row  class="show-img">
+<<<<<<< HEAD
             <el-col :span="6">
+=======
+            <el-col :span="3">
+>>>>>>> 69f72654eaa89f70eed7d5a40fa258b3f773fe8e
                 <div v-if="img_url">
                     <el-image 
                         style="width: 60px; height: 60px;"
@@ -21,7 +25,11 @@
             </el-col>
 
 
+<<<<<<< HEAD
             <el-col :span="6">
+=======
+            <el-col :span="3">
+>>>>>>> 69f72654eaa89f70eed7d5a40fa258b3f773fe8e
                 <el-upload  :multiple="true"  
                 :show-file-list="false"
             :http-request="uploadFile" 

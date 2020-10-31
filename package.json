@@ -12,8 +12,11 @@
     "echarts": "^4.7.0",
     "element-ui": "^2.13.0",
     "nprogress": "^0.2.0",
+<<<<<<< HEAD
     "qrcode": "^1.4.4",
     "qrcodejs2": "^0.0.2",
+=======
+>>>>>>> 69f72654eaa89f70eed7d5a40fa258b3f773fe8e
     "register-service-worker": "^1.6.2",
     "vue": "^2.6.11",
     "vue-router": "^3.1.5",

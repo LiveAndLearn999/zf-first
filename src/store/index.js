@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -62,3 +63,22 @@ export default new Vuex.Store({
     },
     modules: {}
 })
+=======
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
+
+export default new Vuex.Store({
+    state: {
+        InitData: {
+            _ver_:'1.0.7'
+        }
+    },
+    mutations: {
+        
+    },
+    actions: {},
+    modules: {}
+})
+>>>>>>> 69f72654eaa89f70eed7d5a40fa258b3f773fe8e

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 69f72654eaa89f70eed7d5a40fa258b3f773fe8e
 /* DINHabMed */
 
 @font-face {  
@@ -5,4 +9,16 @@
     src: url('DINHabMed.ttf'); 
     font-weight: normal;  
     font-style: normal;  
+<<<<<<< HEAD
+=======
+=======
+/* DINHabMed */
+
+@font-face {  
+    font-family: 'FZCYJ'; 
+    src: url('DINHabMed.ttf'); 
+    font-weight: normal;  
+    font-style: normal;  
+>>>>>>> 1f702aa4e73375b5b4e4a49a41d31abce6883975
+>>>>>>> 69f72654eaa89f70eed7d5a40fa258b3f773fe8e
 }
